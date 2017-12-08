@@ -1,0 +1,23 @@
+{
+    "{{&className}}": {
+        "label": {
+            "service": "サービス",
+            "method": "メソッド",
+            "host": "ホスト",
+            "header": "ヘッダ",
+            "value": "値",
+            "isQuery": "クエリ"
+        },
+        "status": {
+            "requesting": "要求中"
+        },
+        "parameters": {
+            {{#methods}}
+            {{#parameters}}
+            "{{&camelCaseName}}": "{{&camelCaseName}}",
+            {{/parameters}}
+            {{/methods}}
+            "optionalParameters": "任意項目"
+        }
+    }
+}
