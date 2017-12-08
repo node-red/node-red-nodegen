@@ -1,0 +1,304 @@
+<script type="text/javascript">
+    RED.nodes.registerType('{{&nodeName}}',{
+        category: 'function',
+        color: '#89bf04',
+        defaults: {
+            service: { value: "", type: "{{&nodeName}}-service", required: true },
+            method: { value: "" },
+
+            {{#methods}}
+            {{#parameters}}
+            {{&methodName}}_{{&camelCaseName}}: { value: "" },
+            {{/parameters}}
+            {{/methods}}
+
+            name: { value: "" }
+        },
+        inputs:1,
+        outputs:1,
+        icon: "icon.png",
+        label: function() {
+            return this.name || "{{&nodeName}}";
+        },
+        oneditprepare: function() {
+            var selectedMethod = $('#node-input-method option:selected');
+            if (!selectedMethod.val()) {
+                var methods = $('#node-input-method').children();
+                var firstMethod = methods.first();
+                $('#node-input-method').val(firstMethod.val());
+            }
+
+            var showParameters = function() {
+                {{#methods}}
+                {{#parameters}}
+                $("#{{&methodName}}_{{&camelCaseName}}").hide();
+                {{/parameters}}
+                {{/methods}}
+
+                $("#optional-parameters").hide();
+                $("#optional-parameters-label").hide();
+                {{#methods}}
+                if ($("#node-input-method").val() === '{{&methodName}}') {
+                    {{#parameters}}
+                    {{^required}}
+                    if ('{{&camelCaseName}}' !== 'body') {
+                        $("#optional-parameters").show();
+                        $("#optional-parameters-label").show();
+                    }
+                    {{/required}}
+                    {{/parameters}}
+                }
+                {{/methods}}
+  
+                if ($("#optional-parameters").prop('checked')) {
+                    {{#methods}}
+                    if ($("#node-input-method").val() === '{{&methodName}}') {
+                        {{#parameters}}
+                        if ('{{&camelCaseName}}' !== 'body') {
+                            $("#{{&methodName}}_{{&camelCaseName}}").show();
+                        }
+                        {{/parameters}}
+                    }
+                    {{/methods}}
+                } else {
+                    {{#methods}}
+                    if ($("#node-input-method").val() === '{{&methodName}}') {
+                        {{#parameters}}
+                        {{#required}}
+                        if ('{{&camelCaseName}}' !== 'body') {
+                            $("#{{&methodName}}_{{&camelCaseName}}").show();
+                        }
+                        {{/required}}
+                        {{/parameters}}
+                    }
+                    {{/methods}}
+                }
+            };
+
+            $("#node-input-method").change(function() {
+                showParameters();
+            });
+
+            $("#optional-parameters").change(function() {
+                showParameters();
+            });
+
+            {{#methods}}
+            {{#parameters}}
+            {{#tsType}}
+            {{#isEnum}}
+            var selected_{{&methodName}}_{{&camelCaseName}} = $('#node-input-{{&methodName}}_{{&camelCaseName}} option:selected');
+            if (!selected_{{&methodName}}_{{&camelCaseName}}.val()) {
+                var children_{{&methodName}}_{{&camelCaseName}} = $('#node-input-{{&methodName}}_{{&camelCaseName}}').children();
+                var first_{{&methodName}}_{{&camelCaseName}} = children_{{&methodName}}_{{&camelCaseName}}.first();
+                $('#node-input-{{&methodName}}_{{&camelCaseName}}').val(first_{{&methodName}}_{{&camelCaseName}}.val());
+            }
+            {{/isEnum}}
+            {{/tsType}}
+            {{/parameters}}
+            {{/methods}}
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="{{&nodeName}}">
+    <div class="form-row">
+        <label for="node-input-service"><i class="fa fa-cloud"></i> <span data-i18n="{{&className}}.label.service"></span></label>
+        <input type="text" id="node-input-service">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-method"><i class="icon-tasks"></i> <span data-i18n="{{&className}}.label.method"></span></label>
+        <select id="node-input-method">
+            {{#methods}}
+            <option value="{{&methodName}}">{{&methodName}}</option>
+            {{/methods}}
+        </select>
+        &nbsp;
+        <input type="checkbox" id="optional-parameters" style="width: auto;">
+        <label for="optional-parameters" id="optional-parameters-label" style="width: auto;"> <span data-i18n="{{&className}}.parameters.optionalParameters"></span></label>
+    </div>
+
+    {{#methods}}
+    {{#parameters}}
+    <div class="form-row" id="{{&methodName}}_{{&camelCaseName}}">
+        <label for="node-input-{{&methodName}}_{{&camelCaseName}}"><i class="fa fa-list"></i> <span data-i18n="{{&className}}.parameters.{{&camelCaseName}}"></span></label>
+
+        {{#tsType}}
+        {{#isEnum}}
+        <select id="node-input-{{&methodName}}_{{&camelCaseName}}">
+        {{/isEnum}}
+        {{/tsType}}
+
+        {{#enum}}
+            <option value="{{.}}">{{.}}</option>
+        {{/enum}}
+
+        {{#tsType}}
+        {{#isEnum}}
+        </select>
+        {{/isEnum}}
+        {{/tsType}}
+
+        {{#tsType}}
+        {{^isEnum}}
+        <input type="text" id="node-input-{{&methodName}}_{{&camelCaseName}}" [placeholder="{{&description}}">
+        {{/isEnum}}
+        {{/tsType}}
+    </div>
+    {{/parameters}}
+    {{/methods}}
+
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="node-red:common.label.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]node-red:common.label.name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="{{&nodeName}}">
+{{{name}}}
+    <p>{{&description}}</p>
+    <h2>Methods</h2>
+    {{#methods}}
+        <h3>{{&methodName}}</h3>
+        <h4>{{&summary}}</h4>
+    {{/methods}}
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('{{&nodeName}}-service',{
+        category: 'config',
+        defaults: {
+            {{^domain}}
+            host: { value: "", required: true },
+            {{/domain}}
+
+            {{#isSecure}}
+            {{#isSecureToken}}
+            secureTokenHeaderOrQueryName: { value: "" },
+            secureTokenIsQuery: { value: false },
+            {{/isSecureToken}}
+
+            {{#isSecureApiKey}}
+            secureApiKeyHeaderOrQueryName: { value: "" },
+            secureApiKeyIsQuery: { value: false },
+            {{/isSecureApiKey}}
+            {{/isSecure}}
+
+            name: { value: "" },
+        },
+        credentials: {
+            {{#isSecure}}
+            {{#isSecureToken}}
+            secureTokenValue: { type:"password" },
+            {{/isSecureToken}}
+
+            {{#isSecureApiKey}}
+            secureApiKeyValue: { type:"password" },
+            {{/isSecureApiKey}}
+
+            {{#isSecureBasic}}
+            username: { type:"text" },
+            password: { type:"password" },
+            {{/isSecureBasic}}
+            {{/isSecure}}
+            temp: { type:"text" }
+        },
+        label: function() {
+            return this.name;
+        },
+        oneditprepare: function() {
+            {{#isSecure}}
+            {{#isSecureToken}}
+            $('#node-config-input-secureTokenHeaderOrQueryName-label').hide();
+            $('#node-config-input-secureTokenHeaderOrQueryName').hide();
+            $('#node-config-input-secureTokenValue-label').hide();
+            $('#node-config-input-secureTokenValue').hide();
+
+            $('#node-config-input-secureTokenIsQuery-label').hide();
+            $('#node-config-input-secureTokenIsQuery').hide();
+            var selected = $('#node-config-input-secureTokenIsQuery option:selected');
+            if (!selected.val()) {
+                $('#node-config-input-secureTokenIsQuery').val('false');
+            }
+            {{/isSecureToken}}
+
+            {{#isSecureApiKey}}
+            $('#node-config-input-secureApiKeyIsQuery-label').hide();
+            $('#node-config-input-secureApiKeyIsQuery').hide();
+            var selected = $('#node-config-input-secureApiKeyIsQuery option:selected');
+            if (!selected.val()) {
+                $('#node-config-input-secureApiKeyIsQuery').val(false);
+            }
+            {{/isSecureApiKey}}
+            {{/isSecure}}
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="{{&nodeName}}-service">
+    {{^domain}}
+    <div class="form-row">
+        <label for="node-config-input-host"><i class="fa fa-globe"></i> <span data-i18n="{{&className}}.label.host"></span></label>
+        <input type="text" id="node-config-input-host" placeholder="http://localhost:1880">
+    </div>
+    {{/domain}}
+
+    {{#isSecure}}
+    {{#isSecureApiKey}}
+    <div class="form-row">
+        <label id="node-config-input-secureApiKeyHeaderOrQueryName-label" for="node-config-input-secureApiKeyHeaderOrQueryName"><i class="fa fa-list"></i> <span data-i18n="{{&className}}.label.header"></span></label>
+        <input type="text" id="node-config-input-secureApiKeyHeaderOrQueryName" placeholder="">
+    </div>
+    <div class="form-row">
+        <label id="node-config-input-secureApiKeyValue-label" for="node-config-input-secureApiKeyValue"><i class="fa fa-lock"></i> <span data-i18n="{{&className}}.label.value"></span></label>
+        <input type="password" id="node-config-input-secureApiKeyValue" placeholder="">
+    </div>
+    <div class="form-row">
+        <label id="node-config-input-secureApiKeyIsQuery-label" for="node-config-input-secureApiKeyIsQuery"><i class="fa fa-dot-circle-o"></i> <span data-i18n="{{&className}}.label.isQuery"></span></label>
+        <select id="node-config-input-secureApiKeyIsQuery">
+            <option value="true">true</option>
+            <option value="false">false</option>
+        </select>
+    </div>
+    {{/isSecureApiKey}}
+
+    {{#isSecureBasic}}
+    <div class="form-row">
+        <label id="node-config-input-username-label" for="node-config-input-username"><i class="fa fa-user"></i> <span data-i18n="node-red:common.label.username"></span></label>
+        <input type="text" id="node-config-input-username" placeholder="">
+    </div>
+    <div class="form-row">
+        <label id="node-config-input-password-label" for="node-config-input-password"><i class="fa fa-lock"></i> <span data-i18n="node-red:common.label.password"></span></label>
+        <input type="password" id="node-config-input-password" placeholder="">
+    </div>
+    {{/isSecureBasic}}
+    {{/isSecure}}
+
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="fa fa-tag"></i> <span data-i18n="node-red:common.label.name"></span></label>
+        <input type="text" id="node-config-input-name" data-i18n="[placeholder]node-red:common.label.name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="{{&nodeName}}-service">
+    {{^domain}}
+    <p><b>Host</b>: URL to connect</p>
+    {{/domain}}
+
+    {{#isSecure}}
+    {{#isSecureToken}}
+    <p><b>Header</b>: Variable name to set API key</p>
+    <p><b>Value</b>: Value of API key</p>
+    {{/isSecureToken}}
+    {{#isSecureApiKey}}
+    <p><b>Header</b>: Variable name to set API key</p>
+    <p><b>Value</b>: Value of API key</p>
+    {{/isSecureApiKey}}
+    {{#isSecureBasic}}
+    <p><b>Username</b>: Username in Basic authentication</p>
+    <p><b>Password</b>: Password in Basic authentication</p>
+    {{/isSecureBasic}}
+    {{/isSecure}}
+</script>
+
