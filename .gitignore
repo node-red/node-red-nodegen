@@ -4,3 +4,9 @@ node-red-node-*
 
 # Dependency directory
 node_modules
+
+# Coverage result
+coverage
+
+# npm install log
+npm-debug.log.*
