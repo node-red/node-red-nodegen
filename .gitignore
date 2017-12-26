@@ -1,6 +1,7 @@
 # Generated nodes
 node-red-contrib-*
 node-red-node-*
+nodegen
 
 # Dependency directory
 node_modules

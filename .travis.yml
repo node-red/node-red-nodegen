@@ -19,3 +19,10 @@ script:
 before_script:
   - npm install -g istanbul
   - npm install coveralls
+  - npm install git+https://github.com/node-red/node-red.git
+  - export NODE_RED_HOME=`pwd`/node_modules/node-red
+  - (cd $NODE_RED_HOME ; npm install nock@~0.48.0)
+  - mkdir nodegen
+  - node bin/node-red-nodegen.js samples/lower-case.js -o ./nodegen
+  - node bin/node-red-nodegen.js http://petstore.swagger.io/v2/swagger.json -o ./nodegen
+
