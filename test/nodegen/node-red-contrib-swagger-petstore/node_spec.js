@@ -44,8 +44,12 @@ describe('node-red-contrib-swagger-petstore', function () {
             var n1 = helper.getNode('n1');
             var n3 = helper.getNode('n3');
             n3.on('input', function (msg) {
-                msg.payload.should.have.property('123');
-                done();
+                try {
+                    msg.payload.should.have.property('available');
+                    done();
+                } catch (e) {
+                    done(e);
+                }
             });
             n1.receive({});
         });
