@@ -5,6 +5,7 @@ nodegen
 
 # Dependency directory
 node_modules
+node-red
 
 # Coverage result
 coverage
