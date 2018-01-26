@@ -54,6 +54,7 @@
     },
     "devDependencies": {
         "grunt": "1.0.1",
+        "grunt-shell": "2.1.0",
         "grunt-simple-mocha": "0.4.1",
         "grunt-mocha-istanbul": "5.0.2",
         "should": "13.1.3",
