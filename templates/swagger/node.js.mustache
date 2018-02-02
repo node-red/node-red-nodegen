@@ -26,11 +26,11 @@ module.exports = function (RED) {
             {{#isSecure}}
             {{#isSecureToken}}
             if (this.service.secureTokenIsQuery) {
-                client.setApiKey(this.service.credentials.secureTokenValue,
-                                 this.service.secureTokenHeaderOrQueryName, true);
+                client.setToken(this.service.credentials.secureTokenValue,
+                                this.service.secureTokenHeaderOrQueryName, true);
             } else {
-                client.setApiKey(this.service.credentials.secureTokenValue,
-                                 this.service.secureTokenHeaderOrQueryName, false);
+                client.setToken(this.service.credentials.secureTokenValue,
+                                this.service.secureTokenHeaderOrQueryName, false);
             }
             {{/isSecureToken}}
 
