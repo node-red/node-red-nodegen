@@ -43,6 +43,7 @@ function help() {
         ' [--prefix <prefix string>]' +
         ' [--name <node name>]' +
         ' [--module <module name>]' +
+        ' [--conf <path of conf file>' +
         ' [--version <version number>' +
         //' [--icon <png or gif file>' +
         //' [--color <node color>' +
@@ -95,6 +96,10 @@ if (!argv.h && !argv.help) {
             data.src = fs.readFileSync(sourcePath);
             var filename = nodegen.function2node(data, options);
             console.log('Success: ' + filename);
+        } else if (sourcePath.endsWith('.html')) {
+            data.src = fs.readFileSync(sourcePath);
+            var filename = nodegen.widget2node(data, options);
+            console.log('Success: ' + filename);
         } else {
             console.error('error: Unsupported file type');
         }
@@ -104,4 +109,3 @@ if (!argv.h && !argv.help) {
 } else {
     help();
 }
-
