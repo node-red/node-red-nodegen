@@ -33,6 +33,8 @@ var data = {
     name: argv.name || argv.n,
     module: argv.module,
     version: argv.version || argv.v,
+    keywords: argv.keywords || argv.k,
+    category: argv.category || argv.c,
     dst: argv.output || argv.o || '.'
 };
 
@@ -44,6 +46,8 @@ function help() {
         ' [--name <node name>]' +
         ' [--module <module name>]' +
         ' [--version <version number>' +
+        ' [--keywords <keywords list>' +
+        ' [--category <node category>' +
         //' [--icon <png or gif file>' +
         //' [--color <node color>' +
         ' [--tgz]' +
@@ -63,6 +67,8 @@ function help() {
         '   --name : Node name (default: name defined in source)\n' +
         '   --module : Module name (default: "node-red-contrib-<node name>")\n' +
         '   --version : Node version (format: "number.number.number" like "4.5.1")\n' +
+        '   --keywords : Additional keywords (format: comma separated string, default: "node-red-nodegen")\n' +
+        '   --category : Node category (default: "function")\n' +
         //'   --icon : png or gif file for node appearance (image size should be 10x20)\n';
         //'   --color : color for node appearance (format: color hexadecimal numbers like "#A6BBCF")\n';
         '   --tgz : Save node as tgz file\n' +

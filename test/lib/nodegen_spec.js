@@ -66,6 +66,20 @@ describe('nodegen library', function () {
             del.sync(result);
             done();
         });
+        it('should handle parameters (keywords)', function (done) {
+            var options = {};
+            var data = {
+                keywords: 'node-red,function,lowercase',
+                dst: '.'
+            };
+            data.src = fs.readFileSync('samples/lower-case.js');
+            var result = nodegen.function2node(data, options);
+            var packageSourceCode = JSON.parse(fs.readFileSync(result + '/package.json'));
+            packageSourceCode.name.should.equal('node-red-contrib-lowercase');
+            packageSourceCode.keywords.should.eql(['node-red-nodegen', 'node-red', 'function', 'lowercase']);
+            del.sync(result);
+            done();
+        });        
         it('should handle options', function (done) {
             var options = {
                 tgz: true,

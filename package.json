@@ -43,14 +43,15 @@
         "swagger-codegen"
     ],
     "dependencies": {
-        "request": "2.83.0",
-        "yamljs": "0.3.0",
-        "mustache": "2.3.0",
-        "js-string-escape": "1.0.1",
+        "colors": "1.1.2",
+        "csv-string": "^3.1.2",
         "javascript-obfuscator": "0.12.2",
-        "swagger-js-codegen": "1.12.0",
+        "js-string-escape": "1.0.1",
         "minimist": "1.2.0",
-        "colors": "1.1.2"
+        "mustache": "2.3.0",
+        "request": "2.83.0",
+        "swagger-js-codegen": "1.12.0",
+        "yamljs": "0.3.0"
     },
     "devDependencies": {
         "grunt": "1.0.1",
