@@ -25,27 +25,33 @@ module.exports = function (RED) {
 
             {{#isSecure}}
             {{#isSecureToken}}
-            if (this.service.secureTokenIsQuery) {
-                client.setToken(this.service.credentials.secureTokenValue,
-                                this.service.secureTokenHeaderOrQueryName, true);
-            } else {
-                client.setToken(this.service.credentials.secureTokenValue,
-                                this.service.secureTokenHeaderOrQueryName, false);
+            if (this.service && this.service.credentials && this.service.credentials.secureTokenValue) {
+                if (this.service.secureTokenIsQuery) {
+                    client.setToken(this.service.credentials.secureTokenValue,
+                                    this.service.secureTokenHeaderOrQueryName, true);
+                } else {
+                    client.setToken(this.service.credentials.secureTokenValue,
+                                    this.service.secureTokenHeaderOrQueryName, false);
+                }
             }
             {{/isSecureToken}}
 
             {{#isSecureApiKey}}
-            if (this.service.secureApiKeyIsQuery) {
-                client.setApiKey(this.service.credentials.secureApiKeyValue,
-                                 this.service.secureApiKeyHeaderOrQueryName, true);
-            } else {
-                client.setApiKey(this.service.credentials.secureApiKeyValue,
-                                 this.service.secureApiKeyHeaderOrQueryName, false);
+            if (this.service && this.service.credentials && this.service.credentials.secureApiKeyValue) {
+                if (this.service.secureApiKeyIsQuery) {
+                    client.setApiKey(this.service.credentials.secureApiKeyValue,
+                                     this.service.secureApiKeyHeaderOrQueryName, true);
+                } else {
+                    client.setApiKey(this.service.credentials.secureApiKeyValue,
+                                     this.service.secureApiKeyHeaderOrQueryName, false);
+                }
             }
             {{/isSecureApiKey}}
 
             {{#isSecureBasic}}
-            client.setBasicAuth(this.service.credentials.username, this.service.credentials.password);
+            if (this.service && this.service.credentials) {
+                client.setBasicAuth(this.service.credentials.username, this.service.credentials.password);
+            }
             {{/isSecureBasic}}
             {{/isSecure}}
 
@@ -75,7 +81,7 @@ module.exports = function (RED) {
             if (!errorFlag) {
                 node.status({ fill: "blue", shape: "dot", text: "{{&className}}.status.requesting" });
                 result.then(function (response) {
-                    if (response.body !== null) {
+                    if (response.body !== null && response.body !== undefined) {
                         msg.payload = response.body;
                     }
                     node.send(msg);
