@@ -1,5 +1,6 @@
 "use strict";
 var lib = require('./lib.js');
+var mustache = require("mustache");
 
 module.exports = function (RED) {
     function {{&className}}Node(config) {
@@ -61,19 +62,28 @@ module.exports = function (RED) {
             var errorFlag = false;
             {{#methods}}
             if (node.method === '{{&methodName}}') {
-                var parameters = [];
+                var parameters = [], nodeParam, isTemplatedParam, param;
                 {{#parameters}}
-                if ('{{&camelCaseName}}' === 'body') {
-                    if (typeof msg.payload === 'object') {
-                        parameters.{{&camelCaseName}} = msg.payload;
-                    } else {
-                        node.error('Unsupported type: \'' + (typeof msg.payload) + '\', '
-                                 + 'msg.payload must be JSON object or buffer.');
-                        errorFlag = true;
-                    }
-                } else {
-                    parameters.{{&camelCaseName}} = node.{{&methodName}}_{{&camelCaseName}};
-                }
+				{{#isBodyParam}}                
+				if (typeof msg.payload === 'object') {
+					parameters.{{&camelCaseName}} = msg.payload;
+				} else {
+					node.error('Unsupported type: \'' + (typeof msg.payload) + '\', '
+							 + 'msg.payload must be JSON object or buffer.');
+					errorFlag = true;
+				}
+				{{/isBodyParam}}				
+				{{#isNotBodyParam}}
+				nodeParam = node.{{&methodName}}_{{&camelCaseName}};
+				{{=<% %>=}}
+				isTemplatedParam = nodeParam.indexOf('{{') != -1;
+				<%={{ }}=%>
+				param = nodeParam || msg.{{&camelCaseName}};
+				if (isTemplatedParam) {
+					param = mustache.render(nodeParam, msg);
+				}
+                parameters.{{&camelCaseName}} = param || '';
+                {{/isNotBodyParam}}				
                 {{/parameters}}
                 result = client.{{&methodName}}(parameters);
             }
