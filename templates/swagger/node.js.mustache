@@ -1,6 +1,5 @@
 "use strict";
 var lib = require('./lib.js');
-var mustache = require("mustache");
 
 module.exports = function (RED) {
     function {{&className}}Node(config) {
@@ -63,7 +62,7 @@ module.exports = function (RED) {
             var errorFlag = false;
             {{#methods}}
             if (node.method === '{{&methodName}}') {
-                var parameters = [], nodeParam, nodeParamType, param;
+                var parameters = [], nodeParam, nodeParamType;
                 {{#parameters}}
                 {{#isBodyParam}}
                 if (typeof msg.payload === 'object') {
