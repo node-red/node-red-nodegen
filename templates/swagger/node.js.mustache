@@ -11,6 +11,7 @@ module.exports = function (RED) {
         {{#methods}}
         {{#parameters}}
         this.{{&methodName}}_{{&camelCaseName}} = config.{{&methodName}}_{{&camelCaseName}};
+        this.{{&methodName}}_{{&camelCaseName}}Type = config.{{&methodName}}_{{&camelCaseName}}Type || 'str';
         {{/parameters}}
         {{/methods}}
 
@@ -62,31 +63,26 @@ module.exports = function (RED) {
             var errorFlag = false;
             {{#methods}}
             if (node.method === '{{&methodName}}') {
-                var parameters = [], nodeParam, isTemplatedParam, param;
+                var parameters = [], nodeParam, nodeParamType, param;
                 {{#parameters}}
-				{{#isBodyParam}}                
-				if (typeof msg.payload === 'object') {
-					parameters.{{&camelCaseName}} = msg.payload;
-				} else {
-					node.error('Unsupported type: \'' + (typeof msg.payload) + '\', '
-							 + 'msg.payload must be JSON object or buffer.');
-					errorFlag = true;
-				}
-				{{/isBodyParam}}				
-				{{#isNotBodyParam}}
-				nodeParam = node.{{&methodName}}_{{&camelCaseName}};
-				{{=<% %>=}}
-				isTemplatedParam = nodeParam.indexOf('{{') != -1;
-				<%={{ }}=%>
-				param = nodeParam || msg.{{&camelCaseName}};
-				if (isTemplatedParam) {
-					param = mustache.render(nodeParam, msg);
-				}
-                parameters.{{&camelCaseName}} = param || '';
-                {{/isNotBodyParam}}				
+                {{#isBodyParam}}
+                if (typeof msg.payload === 'object') {
+                    parameters.{{&camelCaseName}} = msg.payload;
+                } else {
+                    node.error('Unsupported type: \'' + (typeof msg.payload) + '\', '
+                             + 'msg.payload must be JSON object or buffer.');
+                    errorFlag = true;
+                }
+                {{/isBodyParam}}
+                {{#isNotBodyParam}}
+                nodeParam = node.{{&methodName}}_{{&camelCaseName}};
+                nodeParamType = node.{{&methodName}}_{{&camelCaseName}}Type;
+                parameters.{{&camelCaseName}} = nodeParamType === 'str' ? nodeParam || '' : msg[nodeParam];
+                {{/isNotBodyParam}}
                 {{/parameters}}
                 result = client.{{&methodName}}(parameters);
             }
+
             {{/methods}}
             if (!errorFlag) {
                 node.status({ fill: "blue", shape: "dot", text: "{{&className}}.status.requesting" });
@@ -150,4 +146,3 @@ module.exports = function (RED) {
         }
     });
 };
-
