@@ -1,7 +1,0 @@
-{
-    "vars" : {
-        "template_scope" : "local",
-        "store_out_msgs" : "true",
-        "fwd_in_msgs" : "true"
-    }
-}
