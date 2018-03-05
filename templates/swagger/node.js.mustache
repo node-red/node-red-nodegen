@@ -10,6 +10,7 @@ module.exports = function (RED) {
         {{#methods}}
         {{#parameters}}
         this.{{&methodName}}_{{&camelCaseName}} = config.{{&methodName}}_{{&camelCaseName}};
+        this.{{&methodName}}_{{&camelCaseName}}Type = config.{{&methodName}}_{{&camelCaseName}}Type || 'str';
         {{/parameters}}
         {{/methods}}
 
@@ -61,22 +62,26 @@ module.exports = function (RED) {
             var errorFlag = false;
             {{#methods}}
             if (node.method === '{{&methodName}}') {
-                var parameters = [];
+                var parameters = [], nodeParam, nodeParamType;
                 {{#parameters}}
-                if ('{{&camelCaseName}}' === 'body') {
-                    if (typeof msg.payload === 'object') {
-                        parameters.{{&camelCaseName}} = msg.payload;
-                    } else {
-                        node.error('Unsupported type: \'' + (typeof msg.payload) + '\', '
-                                 + 'msg.payload must be JSON object or buffer.');
-                        errorFlag = true;
-                    }
+                {{#isBodyParam}}
+                if (typeof msg.payload === 'object') {
+                    parameters.{{&camelCaseName}} = msg.payload;
                 } else {
-                    parameters.{{&camelCaseName}} = node.{{&methodName}}_{{&camelCaseName}};
+                    node.error('Unsupported type: \'' + (typeof msg.payload) + '\', '
+                             + 'msg.payload must be JSON object or buffer.');
+                    errorFlag = true;
                 }
+                {{/isBodyParam}}
+                {{#isNotBodyParam}}
+                nodeParam = node.{{&methodName}}_{{&camelCaseName}};
+                nodeParamType = node.{{&methodName}}_{{&camelCaseName}}Type;
+                parameters.{{&camelCaseName}} = nodeParamType === 'str' ? nodeParam || '' : RED.util.getMessageProperty(msg, nodeParam);
+                {{/isNotBodyParam}}
                 {{/parameters}}
                 result = client.{{&methodName}}(parameters);
             }
+
             {{/methods}}
             if (!errorFlag) {
                 node.status({ fill: "blue", shape: "dot", text: "{{&className}}.status.requesting" });
@@ -140,4 +145,3 @@ module.exports = function (RED) {
         }
     });
 };
-

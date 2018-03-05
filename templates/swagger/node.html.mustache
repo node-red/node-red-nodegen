@@ -9,13 +9,14 @@
             {{#methods}}
             {{#parameters}}
             {{&methodName}}_{{&camelCaseName}}: { value: "" },
+            {{&methodName}}_{{&camelCaseName}}Type: {value: "str"},
             {{/parameters}}
             {{/methods}}
 
             name: { value: "" }
         },
-        inputs:1,
-        outputs:1,
+        inputs: 1,
+        outputs: 1,
         icon: "icon.png",
         label: function() {
             return this.name || "{{&nodeName}}";
@@ -31,7 +32,13 @@
             var showParameters = function() {
                 {{#methods}}
                 {{#parameters}}
+                $("#node-input-{{&methodName}}_{{&camelCaseName}}").typedInput({
+                    default: 'str',
+                    typeField: $("#node-input-{{&methodName}}_{{&camelCaseName}}Type"),
+                    types: ['str', 'msg']
+                });
                 $("#{{&methodName}}_{{&camelCaseName}}").hide();
+
                 {{/parameters}}
                 {{/methods}}
 
@@ -39,24 +46,20 @@
                 $("#optional-parameters-label").hide();
                 {{#methods}}
                 if ($("#node-input-method").val() === '{{&methodName}}') {
-                    {{#parameters}}
-                    {{^required}}
-                    if ('{{&camelCaseName}}' !== 'body') {
-                        $("#optional-parameters").show();
-                        $("#optional-parameters-label").show();
-                    }
-                    {{/required}}
-                    {{/parameters}}
+                    {{#hasOptionalParams}}
+                    $("#optional-parameters").show();
+                    $("#optional-parameters-label").show();
+                    {{/hasOptionalParams}}
                 }
                 {{/methods}}
-  
+
                 if ($("#optional-parameters").prop('checked')) {
                     {{#methods}}
                     if ($("#node-input-method").val() === '{{&methodName}}') {
                         {{#parameters}}
-                        if ('{{&camelCaseName}}' !== 'body') {
-                            $("#{{&methodName}}_{{&camelCaseName}}").show();
-                        }
+                        {{#isNotBodyParam}}
+                        $("#{{&methodName}}_{{&camelCaseName}}").show();
+                        {{/isNotBodyParam}}
                         {{/parameters}}
                     }
                     {{/methods}}
@@ -65,9 +68,9 @@
                     if ($("#node-input-method").val() === '{{&methodName}}') {
                         {{#parameters}}
                         {{#required}}
-                        if ('{{&camelCaseName}}' !== 'body') {
-                            $("#{{&methodName}}_{{&camelCaseName}}").show();
-                        }
+                        {{#isNotBodyParam}}
+                        $("#{{&methodName}}_{{&camelCaseName}}").show();
+                        {{/isNotBodyParam}}
                         {{/required}}
                         {{/parameters}}
                     }
@@ -115,7 +118,7 @@
             {{/methods}}
         </select>
         &nbsp;
-        <input type="checkbox" id="optional-parameters" style="width: auto;">
+        <input type="checkbox" id="optional-parameters" style="margin-left: 10px; vertical-align: text-bottom; width: auto;">
         <label for="optional-parameters" id="optional-parameters-label" style="width: auto;"> <span data-i18n="{{&className}}.parameters.optionalParameters"></span></label>
     </div>
 
@@ -123,17 +126,14 @@
     {{#parameters}}
     <div class="form-row" id="{{&methodName}}_{{&camelCaseName}}">
         <label for="node-input-{{&methodName}}_{{&camelCaseName}}"><i class="fa fa-list"></i> <span data-i18n="{{&className}}.parameters.{{&camelCaseName}}"></span></label>
-
         {{#tsType}}
         {{#isEnum}}
         <select id="node-input-{{&methodName}}_{{&camelCaseName}}">
         {{/isEnum}}
         {{/tsType}}
-
         {{#enum}}
             <option value="{{.}}">{{.}}</option>
         {{/enum}}
-
         {{#tsType}}
         {{#isEnum}}
         </select>
@@ -142,13 +142,15 @@
 
         {{#tsType}}
         {{^isEnum}}
-        <input type="text" id="node-input-{{&methodName}}_{{&camelCaseName}}" placeholder="{{&description}}">
+        <input type="text" id="node-input-{{&methodName}}_{{&camelCaseName}}" placeholder="{{&description}}" style="width:70%">
+        <input type="hidden" id="node-input-{{&methodName}}_{{&camelCaseName}}Type">
         {{/isEnum}}
         {{/tsType}}
     </div>
+
     {{/parameters}}
     {{/methods}}
-
+    <hr/>
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="node-red:common.label.name"></span></label>
         <input type="text" id="node-input-name" data-i18n="[placeholder]node-red:common.label.name">
@@ -301,4 +303,3 @@
     {{/isSecureBasic}}
     {{/isSecure}}
 </script>
-
