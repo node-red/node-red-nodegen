@@ -1,15 +1,15 @@
 {
     "{{&className}}": {
         "label": {
-            "service": "Service",
-            "method": "Method",
-            "host": "Host",
-            "header": "Header",
-            "value": "Value",
-            "isQuery": "isQuery"
+            "service": "服务",
+            "method": "方法",
+            "host": "网络主机",
+            "header": "字头段",
+            "value": "值",
+            "isQuery": "查询"
         },
         "status": {
-            "requesting": "requesting"
+            "requesting": "请求中"
         },
         "parameters": {
             {{#methods}}
@@ -17,7 +17,7 @@
             "{{&camelCaseName}}": "{{&camelCaseName}}",
             {{/parameters}}
             {{/methods}}
-            "optionalParameters": "Option"
+            "optionalParameters": "可选项"
         }
     }
 }
