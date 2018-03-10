@@ -45,7 +45,6 @@ function help() {
         ' [--prefix <prefix string>]' +
         ' [--name <node name>]' +
         ' [--module <module name>]' +
-        ' [--conf <path of conf file>' +
         ' [--version <version number>' +
         ' [--keywords <keywords list>' +
         ' [--category <node category>' +
@@ -101,10 +100,6 @@ if (!argv.h && !argv.help) {
         } else if (sourcePath.endsWith('.js')) {
             data.src = fs.readFileSync(sourcePath);
             var filename = nodegen.function2node(data, options);
-            console.log('Success: ' + filename);
-        } else if (sourcePath.endsWith('.html')) {
-            data.src = fs.readFileSync(sourcePath);
-            var filename = nodegen.widget2node(data, options);
             console.log('Success: ' + filename);
         } else {
             console.error('error: Unsupported file type');

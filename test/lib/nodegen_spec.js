@@ -122,24 +122,5 @@ describe('nodegen library', function () {
         });
     });
 
-    describe('widget ndoe', function() {
-        it('should generate widget files', function (done) {
-            var options = {};
-            var data = { dst: '.' };
-            data.src = fs.readFileSync('samples/hello.html');
-            data.conf = 'samples/hello-def.json';
-            var result = nodegen.widget2node(data, options);
-            var packageSourceCode = JSON.parse(fs.readFileSync(result + '/package.json'));
-            packageSourceCode.name.should.equal('node-red-contrib-hello');
-            packageSourceCode.version.should.equal('0.0.1');
-            fs.statSync(result + '/node.html').size.should.be.above(0);
-            fs.statSync(result + '/node.js').size.should.be.above(0);
-            fs.statSync(result + '/icons/icon.png').size.should.be.above(0);
-            fs.statSync(result + '/README.md').size.should.be.above(0);
-            fs.statSync(result + '/LICENSE').size.should.be.above(0);
-            del.sync(result);
-            done();
-        });
-    });
 });
 
