@@ -32,11 +32,17 @@
             var showParameters = function() {
                 {{#methods}}
                 {{#parameters}}
+
+                {{#tsType}}
+                {{^isEnum}}
                 $("#node-input-{{&methodName}}_{{&camelCaseName}}").typedInput({
                     default: 'str',
                     typeField: $("#node-input-{{&methodName}}_{{&camelCaseName}}Type"),
                     types: ['str', 'msg']
                 });
+                {{/isEnum}}
+                {{/tsType}}
+
                 $("#{{&methodName}}_{{&camelCaseName}}").hide();
 
                 {{/parameters}}
