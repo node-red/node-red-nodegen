@@ -23,8 +23,7 @@ before_script:
   - docker pull swaggerapi/petstore
   - docker run -d -e SWAGGER_URL=http://petstore.swagger.io -e SWAGGER_BASE_PATH=/v2 -p 80:8080 swaggerapi/petstore
   - npm install -g istanbul
-  - npm install coveralls
-  - npm install git+https://github.com/node-red/node-red.git
+  - npm install coveralls node-red
   - export NODE_RED_HOME=`pwd`/node_modules/node-red
   - (cd $NODE_RED_HOME ; npm install nock@~0.48.0)
 
