@@ -15,8 +15,8 @@
  **/
 
 var should = require("should");
+var helper = require("node-red-node-test-helper");
 var functionNode = require("../../../nodegen/node-red-contrib-lowercase/node.js");
-var helper = require("../helper.js");
 
 describe('node-red-contrib-lowercase', function () {
 
