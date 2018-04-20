@@ -15,8 +15,8 @@
  **/
 
 var should = require("should");
+var helper = require("node-red-node-test-helper");
 var swaggerNode = require("../../../nodegen/node-red-contrib-swagger-petstore/node.js");
-var helper = require("../helper.js");
 
 describe('node-red-contrib-swagger-petstore', function () {
 
