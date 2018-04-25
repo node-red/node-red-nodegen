@@ -2,15 +2,7 @@ sudo: false
 language: node_js
 services:
   - docker
-env:
-  - CXX="g++-4.8"
 addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - g++-4.8
-    - gcc-4.8
   hosts:
     - petstore.swagger.io 
 node_js:
@@ -18,12 +10,9 @@ node_js:
   - "6"
   - "4"
 script:
-  - istanbul cover ./node_modules/.bin/grunt --report lcovonly && istanbul report text && ( cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js || true ) && rm -rf coverage
+  - istanbul cover ./node_modules/.bin/grunt --report lcovonly && istanbul report text && ( cat coverage/lcov.info | $(npm get prefix)/bin/coveralls || true ) && rm -rf coverage
 before_script:
   - docker pull swaggerapi/petstore
   - docker run -d -e SWAGGER_URL=http://petstore.swagger.io -e SWAGGER_BASE_PATH=/v2 -p 80:8080 swaggerapi/petstore
-  - npm install -g istanbul
-  - npm install coveralls node-red
-  - export NODE_RED_HOME=`pwd`/node_modules/node-red
-  - (cd $NODE_RED_HOME ; npm install nock@~0.48.0)
-
+  - npm install -g istanbul coveralls
+  
