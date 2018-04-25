@@ -15,4 +15,3 @@ before_script:
   - docker pull swaggerapi/petstore
   - docker run -d -e SWAGGER_URL=http://petstore.swagger.io -e SWAGGER_BASE_PATH=/v2 -p 80:8080 swaggerapi/petstore
   - npm install -g istanbul coveralls
-  
