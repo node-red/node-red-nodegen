@@ -83,24 +83,36 @@ if (!argv.h && !argv.help) {
             request(sourcePath, function (error, response, body) {
                 if (!error) {
                     data.src = JSON.parse(body);
-                    var filename = nodegen.swagger2node(data, options);
-                    console.log('Success: ' + filename);
+                    nodegen.swagger2node(data, options).then(function (result) {
+                        console.log('Success: ' + result);
+                    }).catch(function (error) {
+                        console.log('Error: ' + error);
+                    });
                 } else {
                     console.error(error);
                 }
             });
         } else if (sourcePath.endsWith('.json')) {
             data.src = JSON.parse(fs.readFileSync(sourcePath));
-            var filename = nodegen.swagger2node(data, options);
-            console.log('Success: ' + filename);
+            nodegen.swagger2node(data, options).then(function (result) {
+                console.log('Success: ' + result);
+            }).catch(function (error) {
+                console.log('Error: ' + error);
+            });
         } else if (sourcePath.endsWith('.yaml')) {
             data.src = yamljs.load(sourcePath);
-            var filename = nodegen.swagger2node(data, options);
-            console.log('Success: ' + filename);
+            nodegen.swagger2node(data, options).then(function (result) {
+                console.log('Success: ' + result);
+            }).catch(function (error) {
+                console.log('Error: ' + error);
+            });
         } else if (sourcePath.endsWith('.js')) {
             data.src = fs.readFileSync(sourcePath);
-            var filename = nodegen.function2node(data, options);
-            console.log('Success: ' + filename);
+            nodegen.function2node(data, options).then(function (result) {
+                console.log('Success: ' + result);
+            }).catch(function (error) {
+                console.log('Error: ' + error);
+            });
         } else {
             console.error('error: Unsupported file type');
         }
