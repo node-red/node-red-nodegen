@@ -45,7 +45,7 @@
     "dependencies": {
         "colors": "1.1.2",
         "csv-string": "^3.1.2",
-        "javascript-obfuscator": "0.12.2",
+        "javascript-obfuscator": "0.16.0",
         "js-string-escape": "1.0.1",
         "minimist": "1.2.0",
         "mustache": "2.3.0",
