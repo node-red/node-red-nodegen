@@ -5,10 +5,11 @@ services:
 addons:
   hosts:
     - petstore.swagger.io 
-node_js:
-  - "8"
-  - "6"
-  - "4"
+matrix:
+  include:
+    - node_js: "10"
+    - node_js: "8"
+    - node_js: "6"
 script:
   - istanbul cover ./node_modules/.bin/grunt --report lcovonly && istanbul report text && ( cat coverage/lcov.info | $(npm get prefix)/bin/coveralls || true ) && rm -rf coverage
 before_script:
