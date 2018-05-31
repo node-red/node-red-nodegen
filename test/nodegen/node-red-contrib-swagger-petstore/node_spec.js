@@ -24,6 +24,10 @@ describe('node-red-contrib-swagger-petstore', function () {
         helper.startServer(done);
     });
 
+    after(function(done) {
+        helper.stopServer(done);
+    });
+
     afterEach(function () {
         helper.unload();
     });
