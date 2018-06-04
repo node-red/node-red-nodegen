@@ -24,6 +24,10 @@ describe('node-red-contrib-handle-clear-interval', function () {
         helper.startServer(done);
     });
 
+    after(function(done) {
+        helper.stopServer(done);
+    });
+
     afterEach(function () {
         helper.unload();
     });

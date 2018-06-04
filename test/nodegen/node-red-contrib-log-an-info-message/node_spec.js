@@ -24,6 +24,10 @@ describe('node-red-contrib-log-an-info-message', function () {
         helper.startServer(done);
     });
 
+    after(function(done) {
+        helper.stopServer(done);
+    });
+
     afterEach(function () {
         helper.unload();
     });
