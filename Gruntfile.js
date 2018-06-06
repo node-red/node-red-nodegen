@@ -1,6 +1,9 @@
 module.exports = function (grunt) {
     grunt.initConfig({
         shell: {
+            generateNode_setNodeContext: {
+                command: 'node bin/node-red-nodegen.js samples/set-node-context.js -o ./nodegen'
+            },
             generateNode_handleClearInterval: {
                 command: 'node bin/node-red-nodegen.js samples/handle-clearInterval.js -o ./nodegen'
             },
