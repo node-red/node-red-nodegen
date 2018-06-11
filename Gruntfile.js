@@ -4,6 +4,9 @@ module.exports = function (grunt) {
             generateNode_getNodeContext: {
                 command: 'node bin/node-red-nodegen.js samples/get-node-context.js -o ./nodegen'
             },
+            generateNode_getKeysInFlowContext: {
+                command: 'node bin/node-red-nodegen.js samples/get-keys-in-flow-context.js -o ./nodegen'
+            },
             generateNode_handleClearInterval: {
                 command: 'node bin/node-red-nodegen.js samples/handle-clearInterval.js -o ./nodegen'
             },
