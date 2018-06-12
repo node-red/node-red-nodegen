@@ -1,6 +1,12 @@
 module.exports = function (grunt) {
     grunt.initConfig({
         shell: {
+            generateNode_getFlowContext1: {
+                command: 'node bin/node-red-nodegen.js samples/get-flow-context1.js -o ./nodegen'
+            }, 
+            generateNode_getFlowContext2: {
+                command: 'node bin/node-red-nodegen.js samples/get-flow-context2.js -o ./nodegen'
+            },            
             generateNode_setFlowContext: {
                 command: 'node bin/node-red-nodegen.js samples/set-flow-context.js -o ./nodegen'
             },
