@@ -61,7 +61,7 @@ module.exports = function (grunt) {
         },
         simplemocha: {
             options: {
-                timeout: 3000
+                timeout: 10000
             },
             all: {
                 src: [ 'test/**/*_spec.js' ]
@@ -69,7 +69,7 @@ module.exports = function (grunt) {
         },
         mocha_istanbul: {
             options: {
-                timeout: 3000
+                timeout: 10000
             },
             coverage: {
                 src: [ 'test/**/*_spec.js' ]
