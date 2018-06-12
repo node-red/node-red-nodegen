@@ -44,7 +44,6 @@
                 {{/tsType}}
 
                 $("#{{&methodName}}_{{&camelCaseName}}").hide();
-
                 {{/parameters}}
                 {{/methods}}
 
@@ -56,6 +55,7 @@
                     $("#optional-parameters").show();
                     $("#optional-parameters-label").show();
                     {{/hasOptionalParams}}
+
                 }
                 {{/methods}}
 
@@ -67,6 +67,7 @@
                         $("#{{&methodName}}_{{&camelCaseName}}").show();
                         {{/isNotBodyParam}}
                         {{/parameters}}
+
                     }
                     {{/methods}}
                 } else {
@@ -79,6 +80,7 @@
                         {{/isNotBodyParam}}
                         {{/required}}
                         {{/parameters}}
+
                     }
                     {{/methods}}
                 }
@@ -186,7 +188,6 @@
             secureTokenHeaderOrQueryName: { value: "" },
             secureTokenIsQuery: { value: false },
             {{/isSecureToken}}
-
             {{#isSecureApiKey}}
             secureApiKeyHeaderOrQueryName: { value: "" },
             secureApiKeyIsQuery: { value: false },
@@ -200,11 +201,9 @@
             {{#isSecureToken}}
             secureTokenValue: { type:"password" },
             {{/isSecureToken}}
-
             {{#isSecureApiKey}}
             secureApiKeyValue: { type:"password" },
             {{/isSecureApiKey}}
-
             {{#isSecureBasic}}
             username: { type:"text" },
             password: { type:"password" },
@@ -230,7 +229,6 @@
                 $('#node-config-input-secureTokenIsQuery').val('false');
             }
             {{/isSecureToken}}
-
             {{#isSecureApiKey}}
             $('#node-config-input-secureApiKeyIsQuery-label').hide();
             $('#node-config-input-secureApiKeyIsQuery').hide();
@@ -270,7 +268,6 @@
         </select>
     </div>
     {{/isSecureApiKey}}
-
     {{#isSecureBasic}}
     <div class="form-row">
         <label id="node-config-input-username-label" for="node-config-input-username"><i class="fa fa-user"></i> <span data-i18n="node-red:common.label.username"></span></label>
