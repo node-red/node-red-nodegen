@@ -36,7 +36,6 @@ module.exports = function (RED) {
                 }
             }
             {{/isSecureToken}}
-
             {{#isSecureApiKey}}
             if (this.service && this.service.credentials && this.service.credentials.secureApiKeyValue) {
                 if (this.service.secureApiKeyIsQuery) {
@@ -48,7 +47,6 @@ module.exports = function (RED) {
                 }
             }
             {{/isSecureApiKey}}
-
             {{#isSecureBasic}}
             if (this.service && this.service.credentials) {
                 client.setBasicAuth(this.service.credentials.username, this.service.credentials.password);
@@ -79,6 +77,7 @@ module.exports = function (RED) {
                 parameters.{{&camelCaseName}} = nodeParamType === 'str' ? nodeParam || '' : RED.util.getMessageProperty(msg, nodeParam);
                 {{/isNotBodyParam}}
                 {{/parameters}}
+
                 result = client.{{&methodName}}(parameters);
             }
 
@@ -112,13 +111,11 @@ module.exports = function (RED) {
         this.secureTokenHeaderOrQueryName = n.secureTokenHeaderOrQueryName;
         this.secureTokenIsQuery = n.secureTokenIsQuery;
         {{/isSecureToken}}
-
         {{#isSecureApiKey}}
         this.secureApiKeyValue = n.secureApiKeyValue;
         this.secureApiKeyHeaderOrQueryName = n.secureApiKeyHeaderOrQueryName;
         this.secureApiKeyIsQuery = n.secureApiKeyIsQuery;
         {{/isSecureApiKey}}
-
         {{#isSecureBasic}}
         this.username = n.username;
         this.password = n.password;
@@ -131,11 +128,9 @@ module.exports = function (RED) {
             {{#isSecureToken}}
             secureTokenValue: { type: "password" },
             {{/isSecureToken}}
-
             {{#isSecureApiKey}}
             secureApiKeyValue: { type: "password" },
             {{/isSecureApiKey}}
-
             {{#isSecureBasic}}
             username: { type: "text" },
             password: { type: "password" },
