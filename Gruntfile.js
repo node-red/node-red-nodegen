@@ -1,6 +1,39 @@
 module.exports = function (grunt) {
     grunt.initConfig({
         shell: {
+            generateNode_sendToMultipleOutputs : {
+                command: 'node bin/node-red-nodegen.js samples/send-to-multiple-outputs.js -o ./nodegen'
+            },
+            generateNode_sendToMultipleMessages : {
+                command: 'node bin/node-red-nodegen.js samples/send-to-multiple-messages.js -o ./nodegen'
+            },
+            generateNode_allowInputToBeDiscardedByReturningNull : {
+                command: 'node bin/node-red-nodegen.js samples/allow-input-to-be-discarded-by-returning-null.js -o ./nodegen'
+            },
+            generateNode_handleNullAmongstValidMessages : {
+                command: 'node bin/node-red-nodegen.js samples/handle-null-amongst-valid-messages.js -o ./nodegen'
+            },
+            generateNode_getKeysInGlobalContext : {
+                command: 'node bin/node-red-nodegen.js samples/get-keys-in-global-context.js -o ./nodegen'
+            },
+            generateNode_dropAndLogNonObjectMessageTypesString : {
+                command: 'node bin/node-red-nodegen.js samples/drop-and-log-nonobject-message-types-string.js -o ./nodegen'
+            },
+            generateNode_dropAndLogNonObjectMessageTypesBuffer : {
+                command: 'node bin/node-red-nodegen.js samples/drop-and-log-nonobject-message-types-buffer.js -o ./nodegen'
+            },
+            generateNode_dropAndLogNonObjectMessageTypesArray : {
+                command: 'node bin/node-red-nodegen.js samples/drop-and-log-nonobject-message-types-array.js -o ./nodegen'
+            },
+            generateNode_dropAndLogNonObjectMessageTypesBoolean : {
+                command: 'node bin/node-red-nodegen.js samples/drop-and-log-nonobject-message-types-boolean.js -o ./nodegen'
+            },
+            generateNode_dropAndLogNonObjectMessageTypesNumber : {
+                command: 'node bin/node-red-nodegen.js samples/drop-and-log-nonobject-message-types-number.js -o ./nodegen'
+            },
+            generateNode_handleNodeon : {
+                command: 'node bin/node-red-nodegen.js samples/handle-nodeon.js -o ./nodegen'
+            },
             generateNode_sendReturnedMessageUsingSend: {
                 command: 'node bin/node-red-nodegen.js samples/send-returned-message-using-send.js -o ./nodegen'
             },
