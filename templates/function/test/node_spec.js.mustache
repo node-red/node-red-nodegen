@@ -6,6 +6,14 @@ helper.init(require.resolve('node-red'));
 
 describe('{{&nodeName}} node', function () {
 
+    before(function (done) {
+        helper.startServer(done);
+    });
+
+    after(function (done) {
+        helper.stopServer(done);
+    });
+
     afterEach(function () {
         helper.unload();
     });
