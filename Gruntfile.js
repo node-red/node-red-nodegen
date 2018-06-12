@@ -1,6 +1,9 @@
 module.exports = function (grunt) {
     grunt.initConfig({
         shell: {
+            generateNode_sendReturnedMessage: {
+                command: 'node bin/node-red-nodegen.js samples/send-returned-message.js -o ./nodegen'
+            },
             generateNode_setNodeContext: {
                 command: 'node bin/node-red-nodegen.js samples/set-node-context.js -o ./nodegen'
             },
