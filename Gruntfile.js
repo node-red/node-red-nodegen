@@ -1,6 +1,12 @@
 module.exports = function (grunt) {
     grunt.initConfig({
         shell: {
+            getGlobalContext1: {
+                command: 'node bin/node-red-nodegen.js samples/get-global-context1.js -o ./nodegen'
+            },
+            getGlobalContext2: {
+                command: 'node bin/node-red-nodegen.js samples/get-global-context2.js -o ./nodegen'
+            },
             generateNode_getFlowContext1: {
                 command: 'node bin/node-red-nodegen.js samples/get-flow-context1.js -o ./nodegen'
             }, 
