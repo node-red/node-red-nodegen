@@ -1,6 +1,9 @@
 module.exports = function (grunt) {
     grunt.initConfig({
         shell: {
+            generateNode_setGlobalContext: {
+                command: 'node bin/node-red-nodegen.js samples/set-global-context.js -o ./nodegen'
+            },
             generateNode_getNodeContext: {
                 command: 'node bin/node-red-nodegen.js samples/get-node-context.js -o ./nodegen'
             },
