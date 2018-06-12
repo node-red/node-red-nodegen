@@ -6,38 +6,24 @@
 </script>
 
 <script type="text/x-red" data-help-name="{{&nodeName}}">
-    <p>A JavaScript function block to run against the messages being received by the node.</p>
-    <p>The messages are passed in as a JavaScript object called <code>msg</code>.</p>
-    <p>By convention it will have a <code>msg.payload</code> property containing
-       the body of the message.</p>
-    <p>The function is expected to return a message object (or multiple message objects), but can choose
-       to return nothing in order to halt a flow.</p>
+    <p>Summary of the node.</p>
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+       <dt>payload<span class="property-type">object</span></dt>
+       <dd>Explanation of payload.</dd>
+       <dt class="optional">topic <span class="property-type">string</span></dt>
+       <dd>Explanation of topic.</dd>
+    </dl>
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>payload<span class="property-type">object</span></dt>
+        <dd>Explanation of payload.</dd>
+        <dt class="optional">topic<span class="property-type">string</span></dt>
+        <dd>Explanation of topic.</dd>
+    </dl>
     <h3>Details</h3>
-    <p>See the <a target="_blank" href="http://nodered.org/docs/writing-functions.html">online documentation</a>
-    for more information on writing functions.</p>
-    <h4>Sending messages</h4>
-    <p>The function can either return the messages it wants to pass on to the next nodes
-    in the flow, or can call <code>node.send(messages)</code>.</p>
-    <p>It can return/send:</p>
-    <ul>
-      <li>a single message object - passed to nodes connected to the first output</li>
-      <li>an array of message objects - passed to nodes connected to the corresponding outputs</li>
-    </ul>
-    <p>If any element of the array is itself an array of messages, multiple
-          messages are sent to the corresponding output.</p>
-    <p>If null is returned, either by itself or as an element of the array, no
-          message is passed on.</p>
-    <h4>Logging and Error Handling</h4>
-    <p>To log any information, or report an error, the following functions are available:</p>
-      <ul>
-          <li><code>node.log("Log message")</code></li>
-          <li><code>node.warn("Warning")</code></li>
-          <li><code>node.error("Error")</code></li>
-      </ul>
-    </p>
-    <p>The Catch node can also be used to handle errors. To invoke a Catch node,
-    pass <code>msg</code> as a second argument to <code>node.error</code>:</p>
-    <pre>node.error("Error",msg);</pre>
+    <p>Explanation of the details.</p>
+    <p><b>Note</b>: Note of the node.</p>
 </script>
 
 <script type="text/javascript">
@@ -46,69 +32,12 @@
         category: '{{&category}}',
         defaults: {
             name: {value:""},
-            func: {value:"\nreturn msg;"},
-            noerr: {value:0,required:true,validate:function(v) { return ((!v) || (v === 0)) ? true : false; }}
         },
         inputs:1,
         outputs: {{&outputs}},
         icon: "icon.png",
         label: function() {
             return this.name || '{{&nodeName}}';
-        },
-        oneditprepare: function() {
-            var that = this;
-
-            this.editor = RED.editor.createEditor({
-                id: 'node-input-func-editor',
-                mode: 'ace/mode/javascript',
-                value: $("#node-input-func").val(),
-                globals: {
-                    msg:true,
-                    context:true,
-                    RED: true,
-                    util: true,
-                    flow: true,
-                    global: true,
-                    console: true,
-                    Buffer: true,
-                    setTimeout: true,
-                    clearTimeout: true,
-                    setInterval: true,
-                    clearInterval: true
-                }
-            });
-
-            this.editor.focus();
-        },
-        oneditsave: function() {
-            var annot = this.editor.getSession().getAnnotations();
-            this.noerr = 0;
-            $("#node-input-noerr").val(0);
-            for (var k=0; k < annot.length; k++) {
-                //console.log(annot[k].type,":",annot[k].text, "on line", annot[k].row);
-                if (annot[k].type === "error") {
-                    $("#node-input-noerr").val(annot.length);
-                    this.noerr = annot.length;
-                }
-            }
-            $("#node-input-func").val(this.editor.getValue());
-            this.editor.destroy();
-            delete this.editor;
-        },
-        oneditcancel: function() {
-            this.editor.destroy();
-            delete this.editor;
-        },
-        oneditresize: function(size) {
-            var rows = $("#dialog-form>div:not(.node-text-editor-row)");
-            var height = $("#dialog-form").height();
-            for (var i=0; i<rows.size(); i++) {
-                height -= $(rows[i]).outerHeight(true);
-            }
-            var editorRow = $("#dialog-form>div.node-text-editor-row");
-            height -= (parseInt(editorRow.css("marginTop"))+parseInt(editorRow.css("marginBottom")));
-            $(".node-text-editor").css("height",height+"px");
-            this.editor.resize();
         }
     });
 </script>
