@@ -43,6 +43,15 @@ module.exports = function (grunt) {
             generateNode_handleSetTimeout: {
                 command: 'node bin/node-red-nodegen.js samples/handle-setTimeout.js -o ./nodegen'
             },
+            generateNode_useTheSameDateObjectFromOutsideTheSandbox: {
+                command: 'node bin/node-red-nodegen.js samples/use-the-same-Date-object-from-outside-the-sandbox.js -o ./nodegen'
+            },
+            generateNode_logADebugMessage: {
+                command: 'node bin/node-red-nodegen.js samples/log-a-Debug-Message.js -o ./nodegen'
+            },
+            generateNode_logATraceMessage: {
+                command: 'node bin/node-red-nodegen.js samples/log-a-Trace-Message.js -o ./nodegen'
+            },
             generateNode_logAWarningMessage: {
                 command: 'node bin/node-red-nodegen.js samples/log-a-Warning-Message.js -o ./nodegen'
             },
