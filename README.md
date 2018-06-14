@@ -1,8 +1,13 @@
 # Node generator for Node-RED
 
+Node generator is command line tool to generate Node-RED node modules from a number of different sources including Swagger specification and function node's source.
+Using this tool, node developers can dramatically reduce their time to implement Node-RED node modules.
+
+## Installation
+
 Install node generator globally to make the `node-red-nodegen` command available on your path:
 
-    npm install -g git+http://github.com/node-red/node-red-nodegen.git
+    npm install -g node-red-nodegen
 
 You may need to run this with `sudo`, or from within an Administrator command shell.
 
@@ -24,6 +29,8 @@ You may need to run this with `sudo`, or from within an Administrator command sh
        --name : Node name (default: name defined in source)
        --module : Module name (default: "node-red-contrib-<node name>")
        --version : Node version (format: "number.number.number" like "4.5.1")
+       --keywords : Additional keywords (format: comma separated string, default: "node-red-nodegen")
+       --category : Node category (default: "function")
        --tgz : Save node as tgz file
        --help : Show help
 
