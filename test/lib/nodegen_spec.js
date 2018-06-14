@@ -16,6 +16,7 @@ describe('nodegen library', function () {
                 packageSourceCode.version.should.equal('0.0.1');
                 fs.statSync(result + '/node.html').size.should.be.above(0);
                 fs.statSync(result + '/node.js').size.should.be.above(0);
+                fs.statSync(result + '/test/node_spec.js').size.should.be.above(0);
                 fs.statSync(result + '/icons/icon.png').size.should.be.above(0);
                 fs.statSync(result + '/README.md').size.should.be.above(0);
                 fs.statSync(result + '/LICENSE').size.should.be.above(0);
@@ -95,7 +96,9 @@ describe('nodegen library', function () {
             nodegen.function2node(data, options).then(function (result) {
                 fs.statSync(result).isFile().should.be.eql(true);
                 del.sync(result);
-                del.sync(result.replace(/-[0-9]+\.[0-9]+\.[0-9]+\.tgz$/, ''));
+                var jsfile = result.replace(/-[0-9]+\.[0-9]+\.[0-9]+\.tgz$/, '/node.js');
+                fs.readFileSync(jsfile).toString().split('\n').length.should.be.eql(1);
+                del.sync(jsfile);
                 done();
             });
         });
@@ -116,6 +119,7 @@ describe('nodegen library', function () {
                     fs.statSync(result + '/node.html').size.should.be.above(0);
                     fs.statSync(result + '/node.js').size.should.be.above(0);
                     fs.statSync(result + '/lib.js').size.should.be.above(0);
+                    fs.statSync(result + '/test/node_spec.js').size.should.be.above(0);
                     fs.statSync(result + '/icons/icon.png').size.should.be.above(0);
                     fs.statSync(result + '/locales/en-US/node.json').size.should.be.above(0);
                     fs.statSync(result + '/locales/ja/node.json').size.should.be.above(0);
@@ -127,7 +131,25 @@ describe('nodegen library', function () {
                 });
             });
         });
+        it('should handle options', function (done) {
+            var options = {
+                tgz: true,
+                obfuscate: true
+            };
+            var data = { dst: '.' };
+            var sourcePath = 'http://petstore.swagger.io/v2/swagger.json';
+            request(sourcePath, function (error, response, body) {
+                data.src = JSON.parse(body);
+                nodegen.swagger2node(data, options).then(function (result) {
+                    fs.statSync(result).isFile().should.be.eql(true);
+                    del.sync(result);
+                    var jsfile = result.replace(/-[0-9]+\.[0-9]+\.[0-9]+\.tgz$/, '/node.js');
+                    fs.readFileSync(jsfile).toString().split('\n').length.should.be.eql(1);
+                    del.sync(jsfile);
+                    done();
+                });
+            });
+        });
     });
-
 });
 
