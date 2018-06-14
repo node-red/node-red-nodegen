@@ -40,6 +40,9 @@ module.exports = function (grunt) {
             generateNode_sendReturnedMessage: {
                 command: 'node bin/node-red-nodegen.js samples/send-returned-message.js -o ./nodegen'
             },
+            generateNode_passThroughTopic: {
+                command: 'node bin/node-red-nodegen.js samples/pass-through-topic.js -o ./nodegen'
+            },
             generateNode_setNodeContext: {
                 command: 'node bin/node-red-nodegen.js samples/set-node-context.js -o ./nodegen'
             },
