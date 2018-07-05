@@ -45,11 +45,11 @@ function help() {
         ' [--prefix <prefix string>]' +
         ' [--name <node name>]' +
         ' [--module <module name>]' +
-        ' [--version <version number>' +
-        ' [--keywords <keywords list>' +
-        ' [--category <node category>' +
-        //' [--icon <png or gif file>' +
-        //' [--color <node color>' +
+        ' [--version <version number>]' +
+        ' [--keywords <keywords list>]' +
+        ' [--category <node category>]' +
+        //' [--icon <png or gif file>]' +
+        //' [--color <node color>]' +
         ' [--tgz]' +
         ' [--help]\n' +
         '\n' +
