@@ -103,8 +103,11 @@ module.exports = function (grunt) {
             generateNode_lowerCase: {
                 command: 'node bin/node-red-nodegen.js samples/lower-case.js -o ./nodegen'
             },
+            getSwagger_swaggerPetstore: {
+                command: 'node bin/getswagger.js'
+            },
             generateNode_swaggerPetstore: {
-                command: 'node bin/node-red-nodegen.js http://petstore.swagger.io/v2/swagger.json -o ./nodegen'
+                command: 'node bin/node-red-nodegen.js samples/swagger.json -o ./nodegen'
             }
         },
         simplemocha: {
