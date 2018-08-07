@@ -41,13 +41,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle addPet()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "addPet"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "addPet"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.payload.should.eql({
                         "id": 4513,
@@ -95,13 +94,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle updatePet()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "updatePet"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "updatePet"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.payload.should.eql({
                         "id": 4513,
@@ -149,13 +147,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle findPetsByStatus()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "findPetsByStatus", findPetsByStatus_status: "available"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "findPetsByStatus", findPetsByStatus_status: "available"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.payload.should.containEql({
                         "id": 4513,
@@ -184,13 +181,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle getPetById()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "getPetById", getPetById_petId: "4513"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "getPetById", getPetById_petId: "4513"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.payload.should.containEql({
                         "id": 4513,
@@ -219,13 +215,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle updatePetWithForm()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "updatePetWithForm", updatePetWithForm_petId: "4513", updatePetWithForm_name: "pending doggie", updatePetWithForm_status: "pending"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "updatePetWithForm", updatePetWithForm_petId: "4513", updatePetWithForm_name: "pending doggie", updatePetWithForm_status: "pending"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.should.have.property('payload', 'foo');
                     msg.should.have.property('topic', 'bar');
@@ -238,13 +233,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle deletePet()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "deletePet", deletePet_petId: "4513"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "deletePet", deletePet_petId: "4513"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.should.have.property('payload', 'foo');
                     msg.should.have.property('topic', 'bar');
@@ -257,13 +251,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle getInventory()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "getInventory"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "getInventory"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.payload.should.have.property('available');
                     done();
@@ -275,13 +268,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle placeOrder()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "placeOrder"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "placeOrder"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.payload.should.eql({
                         "id": 4147,
@@ -309,13 +301,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle getOrderById()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "getOrderById", getOrderById_orderId: "4147"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "getOrderById", getOrderById_orderId: "4147"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.payload.should.eql({
                         "id": 4147,
@@ -334,13 +325,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle deleteOrder()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "deleteOrder", deleteOrder_orderId: "4147"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "deleteOrder", deleteOrder_orderId: "4147"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.should.have.property('payload', 'foo');
                     msg.should.have.property('topic', 'bar');
@@ -353,13 +343,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle createUser()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "createUser"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "createUser"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.payload.should.eql({
                         "id": 8110,
@@ -391,13 +380,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle createUsersWithArrayInput()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "createUsersWithArrayInput"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "createUsersWithArrayInput"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.payload.should.eql([
                         {
@@ -433,13 +421,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle createUsersWithListInput()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "createUsersWithListInput"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "createUsersWithListInput"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.payload.should.eql([
                         {
@@ -475,13 +462,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle loginUser()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "loginUser", loginUser_username: "My user name", loginUser_password: "My password"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "loginUser", loginUser_username: "My user name", loginUser_password: "My password"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.payload.should.startWith('logged in user session:');
                     done();
@@ -493,13 +479,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle logoutUser()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "logoutUser"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "logoutUser"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.should.have.property('payload', 'foo');
                     msg.should.have.property('topic', 'bar');
@@ -512,13 +497,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle getUserByName()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "getUserByName", getUserByName_username: "My user name"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "getUserByName", getUserByName_username: "My user name"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.payload.should.eql({
                         "id": 8808,
@@ -539,13 +523,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle updateUser()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "updateUser", updateUser_username: "My user name"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "updateUser", updateUser_username: "My user name"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.payload.should.eql({
                         "id": 8808,
@@ -577,13 +560,12 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
     it('should handle deleteUser()', function (done) {
-        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n3"]], service: "n2", method: "deleteUser", deleteUser_username: "My user name2"},
-                    {id: "n2", type: "swagger-petstore-service"},
-                    {id: "n3", type: "helper"}];
+        var flow = [{id: "n1", type: "swagger-petstore", wires: [["n2"]], method: "deleteUser", deleteUser_username: "My user name2"},
+                    {id: "n2", type: "helper"}];
         helper.load(swaggerNode, flow, function () {
             var n1 = helper.getNode('n1');
-            var n3 = helper.getNode('n3');
-            n3.on('input', function (msg) {
+            var n2 = helper.getNode('n2');
+            n2.on('input', function (msg) {
                 try {
                     msg.should.have.property('payload', 'foo');
                     msg.should.have.property('topic', 'bar');
@@ -596,4 +578,3 @@ describe('node-red-contrib-swagger-petstore', function () {
         });
     });
 });
-

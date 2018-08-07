@@ -1,15 +1,17 @@
 <script type="text/javascript">
-    RED.nodes.registerType('{{&nodeName}}',{
+    RED.nodes.registerType('{{&nodeName}}', {
         category: '{{&category}}',
         color: '#89bf04',
         defaults: {
+            {{#hasServiceParams}}
             service: { value: "", type: "{{&nodeName}}-service", required: true },
+            {{/hasServiceParams}}
             method: { value: "" },
 
             {{#methods}}
             {{#parameters}}
             {{&methodName}}_{{&camelCaseName}}: { value: "" },
-            {{&methodName}}_{{&camelCaseName}}Type: {value: "str"},
+            {{&methodName}}_{{&camelCaseName}}Type: { value: "str" },
             {{/parameters}}
             {{/methods}}
 
@@ -18,10 +20,10 @@
         inputs: 1,
         outputs: 1,
         icon: "icon.png",
-        label: function() {
+        label: function () {
             return this.name || "{{&nodeName}}";
         },
-        oneditprepare: function() {
+        oneditprepare: function () {
             var selectedMethod = $('#node-input-method option:selected');
             if (!selectedMethod.val()) {
                 var methods = $('#node-input-method').children();
@@ -29,7 +31,7 @@
                 $('#node-input-method').val(firstMethod.val());
             }
 
-            var showParameters = function() {
+            var showParameters = function () {
                 {{#methods}}
                 {{#parameters}}
 
@@ -86,11 +88,11 @@
                 }
             };
 
-            $("#node-input-method").change(function() {
+            $("#node-input-method").change(function () {
                 showParameters();
             });
 
-            $("#optional-parameters").change(function() {
+            $("#optional-parameters").change(function () {
                 showParameters();
             });
 
@@ -113,10 +115,12 @@
 </script>
 
 <script type="text/x-red" data-template-name="{{&nodeName}}">
+    {{#hasServiceParams}}
     <div class="form-row">
         <label for="node-input-service"><i class="fa fa-cloud"></i> <span data-i18n="{{&className}}.label.service"></span></label>
         <input type="text" id="node-input-service">
     </div>
+    {{/hasServiceParams}}
 
     <div class="form-row">
         <label for="node-input-method"><i class="icon-tasks"></i> <span data-i18n="{{&className}}.label.method"></span></label>
@@ -174,9 +178,9 @@
         <h4>{{&summary}}</h4>
     {{/methods}}
 </script>
-
+{{#hasServiceParams}}
 <script type="text/javascript">
-    RED.nodes.registerType('{{&nodeName}}-service',{
+    RED.nodes.registerType('{{&nodeName}}-service', {
         category: 'config',
         defaults: {
             {{^domain}}
@@ -211,10 +215,10 @@
             {{/isSecure}}
             temp: { type:"text" }
         },
-        label: function() {
+        label: function () {
             return this.name;
         },
-        oneditprepare: function() {
+        oneditprepare: function () {
             {{#isSecure}}
             {{#isSecureToken}}
             $('#node-config-input-secureTokenHeaderOrQueryName-label').hide();
@@ -306,3 +310,4 @@
     {{/isSecureBasic}}
     {{/isSecure}}
 </script>
+{{/hasServiceParams}}
