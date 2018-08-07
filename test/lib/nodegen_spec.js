@@ -98,7 +98,8 @@ describe('nodegen library', function () {
                 del.sync(result);
                 var jsfile = result.replace(/-[0-9]+\.[0-9]+\.[0-9]+\.tgz$/, '/node.js');
                 fs.readFileSync(jsfile).toString().split('\n').length.should.be.eql(1);
-                del.sync(jsfile);
+                result = result.replace(/-[0-9]+\.[0-9]+\.[0-9]+\.tgz$/, '');
+                del.sync(result);
                 done();
             });
         });
@@ -145,7 +146,8 @@ describe('nodegen library', function () {
                     del.sync(result);
                     var jsfile = result.replace(/-[0-9]+\.[0-9]+\.[0-9]+\.tgz$/, '/node.js');
                     fs.readFileSync(jsfile).toString().split('\n').length.should.be.eql(1);
-                    del.sync(jsfile);
+                    result = result.replace(/-[0-9]+\.[0-9]+\.[0-9]+\.tgz$/, '');
+                    del.sync(result);
                     done();
                 });
             });
