@@ -17,6 +17,7 @@
  **/
 
 var fs = require('fs');
+var path = require('path');
 var request = require('request');
 var yamljs = require('yamljs');
 var argv = require('minimist')(process.argv.slice(2));
@@ -32,7 +33,7 @@ var data = {
     prefix: argv.prefix || argv.p,
     name: argv.name || argv.n,
     module: argv.module,
-    version: argv.version || argv.v,
+    version: argv.version,
     keywords: argv.keywords || argv.k,
     category: argv.category || argv.c,
     dst: argv.output || argv.o || '.'
@@ -51,7 +52,8 @@ function help() {
         //' [--icon <png or gif file>]' +
         //' [--color <node color>]' +
         ' [--tgz]' +
-        ' [--help]\n' +
+        ' [--help]' +
+        ' [-v]\n' +
         '\n' +
         'Description:'.bold + '\n' +
         '   Node generator for Node-RED\n' +
@@ -72,11 +74,21 @@ function help() {
         //'   --icon : png or gif file for node appearance (image size should be 10x20)\n';
         //'   --color : color for node appearance (format: color hexadecimal numbers like "#A6BBCF")\n';
         '   --tgz : Save node as tgz file\n' +
-        '   --help : Show help\n';
+        '   --help : Show help\n' +
+        '   -v : Show node generator version\n';
     console.log(helpText);
 }
 
-if (!argv.h && !argv.help) {
+function version() {
+    var packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json')));
+    console.log(packageJson.version);
+}
+
+if (argv.help || argv.h) {
+    help();
+} else if (argv.v) {
+    version();
+} else {
     var sourcePath = argv._[0];
     if (sourcePath) {
         if (sourcePath.startsWith('http://') || sourcePath.startsWith('https://')) {
@@ -119,6 +131,4 @@ if (!argv.h && !argv.help) {
     } else {
         help();
     }
-} else {
-    help();
 }
