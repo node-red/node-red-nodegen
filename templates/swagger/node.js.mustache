@@ -4,7 +4,9 @@ var lib = require('./lib.js');
 module.exports = function (RED) {
     function {{&className}}Node(config) {
         RED.nodes.createNode(this, config);
+        {{#hasServiceParams}}
         this.service = RED.nodes.getNode(config.service);
+        {{/hasServiceParams}}
         this.method = config.method;
 
         {{#methods}}
@@ -97,8 +99,10 @@ module.exports = function (RED) {
             }
         });
     }
+
     RED.nodes.registerType("{{&nodeName}}", {{&className}}Node);
 
+    {{#hasServiceParams}}
     function {{&className}}ServiceNode(n) {
         RED.nodes.createNode(this, n);
         {{^domain}}
@@ -122,6 +126,7 @@ module.exports = function (RED) {
         {{/isSecureBasic}}
         {{/isSecure}}
     }
+
     RED.nodes.registerType("{{&nodeName}}-service", {{&className}}ServiceNode, {
         credentials: {
             {{#isSecure}}
@@ -139,4 +144,5 @@ module.exports = function (RED) {
             temp: { type: "text" }
         }
     });
+    {{/hasServiceParams}}
 };
