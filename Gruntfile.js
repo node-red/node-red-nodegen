@@ -122,7 +122,7 @@ module.exports = function (grunt) {
             options: {
                 timeout: 10000
             },
-            coverage: {
+            all: {
                 src: [ 'test/**/*_spec.js' ]
             }
         }
@@ -131,6 +131,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-shell');
     grunt.loadNpmTasks('grunt-simple-mocha');
     grunt.loadNpmTasks('grunt-mocha-istanbul');
-    grunt.registerTask('default', ['shell', 'simplemocha']);
-    grunt.registerTask('coverage', 'Run Istanbul code test coverage task', ['shell', 'mocha_istanbul']);
+    grunt.registerTask('default', ['shell', 'mocha_istanbul:all']);
+    grunt.registerTask('coverage', 'Run Istanbul code test coverage task', ['shell', 'mocha_istanbul:all']);
 };
