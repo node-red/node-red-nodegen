@@ -69,7 +69,7 @@ module.exports = function (RED) {
                     parameters.{{&camelCaseName}} = msg.payload;
                 } else {
                     node.error('Unsupported type: \'' + (typeof msg.payload) + '\', '
-                             + 'msg.payload must be JSON object or buffer.');
+                             + 'msg.payload must be JSON object or buffer.', msg);
                     errorFlag = true;
                 }
                 {{/isBodyParam}}
@@ -93,7 +93,7 @@ module.exports = function (RED) {
                     node.send(msg);
                     node.status({});
                 }).catch(function (error) {
-                    node.error(error);
+                    node.error(error, msg);
                     node.status({ fill: "red", shape: "ring", text: "node-red:common.status.error" });
                 });
             }
