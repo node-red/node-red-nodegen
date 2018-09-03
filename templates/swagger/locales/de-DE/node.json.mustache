@@ -1,0 +1,24 @@
+{
+    "{{&className}}": {
+        "label": {
+            "service": "Service",
+            "method": "Methode",
+            "host": "Host",
+            "header": "Header",
+            "value": "Wert",
+            "isQuery": "Suchanfrage"
+        },
+        "status": {
+            "requesting": "Anfrage..."
+        },
+        "parameters": {
+            {{#methods}}
+            "{{&methodName}}": "{{&methodName}}",
+            {{#parameters}}
+            "{{&camelCaseName}}": "{{&camelCaseName}}",
+            {{/parameters}}
+            {{/methods}}
+            "optionalParameters": "Optionen"
+        }
+    }
+}
