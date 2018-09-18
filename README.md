@@ -1,6 +1,6 @@
 # Node generator for Node-RED
 
-Node generator is command line tool to generate Node-RED node modules from a number of different sources including Swagger specification and function node's source.
+Node generator is command line tool to generate Node-RED node modules from several various sources including Swagger specification and function node's source.
 Using this tool, node developers can dramatically reduce their time to implement Node-RED node modules.
 
 ## Installation
@@ -34,7 +34,18 @@ You may need to run this with `sudo`, or from within an Administrator command sh
        --tgz : Save node as tgz file
        --help : Show help
 
-### Example 1. Create original node from function node (JavaScript code)
+### Example 1. Create original node from Swagger definition
+
+- node-red-nodegen http://petstore.swagger.io/v2/swagger.json
+- cd node-red-contrib-swagger-petstore
+- sudo npm link
+- cd ~/.node-red
+- npm link node-red-contrib-swagger-petstore
+- node-red
+
+-> You can use swagger-petstore node on Node-RED flow editor.
+
+### Example 2. Create original node from function node (JavaScript code)
 
 - On Node-RED flow editor, save function node to library with file name (lower-case.js).
 - node-red-nodegen ~/.node-red/lib/function/lower-case.js
@@ -46,16 +57,11 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 
 -> You can use lower-case node on Node-RED flow editor.
 
-### Example 2. Create original node from Swagger definition
-
-- node-red-nodegen http://petstore.swagger.io/v2/swagger.json
-- cd node-red-contrib-swagger-petstore
-- sudo npm link
-- cd ~/.node-red
-- npm link node-red-contrib-swagger-petstore
-- node-red
-
--> You can use swagger-petstore node on Node-RED flow editor.
+## Documentation
+- [Use cases](docs/index.md#use-cases) ([Japanese](docs/index_ja.md#use-cases))
+- [How to use Node generator](docs/index.md#how-to-use-node-generator) ([Japanese](docs/index_ja.md#how-to-use-node-generator))
+- [Generated files which node package contains](docs/index.md#generated-files-which-node-package-contains) ([Japanese](docs/index_ja.md#generated-files-which-node-package-contains))
+- [How to create node from Swagger definition](docs/index.md#how-to-create-node-from-swagger-definition) ([Japanese](docs/index_ja.md#how-to-create-node-from-swagger-definition))
+- [How to create node from function node](docs/index.md#how-to-create-node-from-function-node) ([Japanese](docs/index_ja.md#how-to-create-node-from-function-node))
 
 Note: Currently node generator supports GET and POST methods using JSON format without authentication.
-
