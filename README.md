@@ -1,3 +1,6 @@
+___NOTICE: This branch (webofthings) is under heavy active development and not fully tested.
+Not suitable for production.___
+
 # Node generator for Node-RED
 
 Node generator is command line tool to generate Node-RED node modules from several various sources including Swagger specification and function node's source.
@@ -22,6 +25,7 @@ You may need to run this with `sudo`, or from within an Administrator command sh
     Supported source:
        - Function node (js file in library, "~/.node-red/lib/function/")
        - Swagger definition
+       - Thing Description of W3C Web of Things (jsonld file in library, or URL that points jsonld file)
 
     Options:
        -o : Destination path to save generated node (default: current directory)
@@ -56,6 +60,18 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 - node-red
 
 -> You can use lower-case node on Node-RED flow editor.
+
+### Example 3. Create original node from Thing Description
+
+- node-red-nodegen example.jsonld
+- cd node-red-contrib-example-thing
+- sudo npm link
+- cd ~/.node-red
+- npm link node-red-contrib-example-thing
+- node-red
+
+-> You can use Example Thing node on Node-RED flow editor.
+
 
 ## Documentation
 - [Use cases](docs/index.md#use-cases) ([Japanese](docs/index_ja.md#use-cases))

@@ -1,0 +1,27 @@
+{
+    "name": "{{&projectName}}",
+    "version": "{{&projectVersion}}",
+    "description": "Node-RED node for {{&nodeName}}",
+    "main": "node.js",
+    "scripts": {
+        "test": "mocha \"test/**/*_spec.js\""
+    },
+    "node-red": {
+        "nodes": {
+            "{{&nodeName}}": "node.js"
+        }
+    },
+    "keywords": [
+        {{#keywords}}
+        "{{name}}"{{^last}}, {{/last}}
+        {{/keywords}}
+    ],
+    "dependencies": {
+        "request": "^2.87.0"
+    },
+    "devDependencies": {
+        "node-red": "0.18.7",
+        "node-red-node-test-helper": "0.1.8"
+    },
+    "license": "{{&licenseName}}"
+}

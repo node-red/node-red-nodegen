@@ -1,0 +1,152 @@
+<script type="text/javascript">
+    RED.nodes.registerType('{{&nodeName}}',{
+        category: '{{&category}}',
+        color: '#3B6968',
+        defaults: {
+            interactiontype: {value: "property"},
+            propname: {value: ""},
+            proptype: {value: ""},
+            actname: {value: ""},
+            evname: {value: ""}
+        },
+        credentials: {
+            token: {type: "password"},
+            username: {type: "text"},
+            password: {type: "password"}
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "icon.png",
+        label: function() {
+            var label = this.name || "{{&nodeName}}"
+            if (this.interactiontype == "property") {
+                label = label + "-" + this.propname;
+            } else if (this.interactiontype == "action") {
+                label = label + "-" + this.actname;
+            } else if (this.interactiontype == "event") {
+                label = label + "-" + this.evname;
+            }
+            return label;
+        },
+        oneditprepare: function() {
+            var rwo = {{&genproprwo}};
+            $('#node-input-interactiontype').change(function() {
+                var inttype = $("#node-input-interactiontype").val();
+                $('.int-sel').hide();
+                if (inttype == "property") {
+                    $(".int-prop-sel").show();
+                } else if (inttype == "action") {
+                    $(".int-act-sel").show();
+                } else {
+                    $(".int-ev-sel").show();
+                }
+            });
+            $('#node-input-propname').change(function() {
+                $('#node-input-proptype').children().attr("disabled", "disabled");
+                var propname = $("#node-input-propname").val();
+                if (rwo[propname]) {
+                    if (rwo[propname].readable) {
+                        $('#node-input-proptype').children("[value='read']").removeAttr("disabled");
+                    }
+                    if (rwo[propname].writable) {
+                        $('#node-input-proptype').children("[value='write']").removeAttr("disabled");
+                    }
+                    if (rwo[propname].observable) {
+                        $('#node-input-proptype').children("[value='observe']").removeAttr("disabled");
+                    }
+                }
+            });
+            $('.cred-userpass').show();
+            $('.cred-token').show();
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="{{&nodeName}}">
+    <div class="form-row">
+        <label for="node-input-interactiontype">Interaction Type</label>
+        <select id="node-input-interactiontype">
+            <option value="property" selected>Property</option>
+            <option value="action">Action</option>
+            <option value="event">Event</option>
+        </select>
+    </div>
+    <div class="form-row int-sel int-prop-sel">
+        <label for="node-input-propname">Property name</label>
+        <select id="node-input-propname">
+            {{#properties}}
+            <option value="{{name}}">{{label}}</option>
+            {{/properties}}
+        </select>
+    </div>
+    <div class="form-row int-sel int-act-sel">
+        <label for="node-input-actname">Action name</label>
+        <select id="node-input-actname">
+            {{#actions}}
+            <option value="{{name}}">{{label}}</option>
+            {{/actions}}
+        </select>
+    </div>
+    <div class="form-row int-sel int-ev-sel">
+        <label for="node-input-evname">Event name</label>
+        <select id="node-input-evname">
+            {{#events}}
+            <option value="{{name}}">{{label}}</option>
+            {{/events}}
+        </select>
+    </div>
+    <div class="form-row int-sel int-prop-sel">
+        <label for="node-input-proptype">Access type</label>
+        <select id="node-input-proptype">
+            <option value="read" selected>Read</option>
+            <option value="write">Write</option>
+            <option value="observe">Observe</option>
+        </select>
+    </div>
+    <div class="form-row cred-userpass hidden">
+        <label for="node-input-username"><i class="icon-tag"></i> Username</label>
+        <input type="text" id="node-input-username">
+        <label for="node-input-password"><i class="icon-tag"></i> Password</label>
+        <input type="password" id="node-input-password">
+    </div>
+    <div class="form-row cred-token hidden">
+        <label for="node-input-token"><i class="icon-tag"></i> Bearer Token</label>
+        <input type="password" id="node-input-token">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="{{&nodeName}}">
+{{id}}
+
+<p>{{name}}</p>
+{{description}}
+
+<h2>Properties</h2>
+<ul>
+{{#properties}}
+  <li>{{label}}</li>
+{{/properties}}
+</ul>
+
+<h2>Actions</h2>
+<ul>
+{{#actions}}
+  <li>{{label}}</li>
+{{/actions}}
+</ul>
+
+<h2>Events</h2>
+<ul>
+{{#events}}
+  <li>{{label}}</li>
+{{/events}}
+</ul>
+
+<h2>Related Resources</h2>
+<ul>
+{{#links}}
+  <li><a href="{{href}}" target="_blank">{{rel}}</a></li>
+{{/links}}
+</ul>
+
+</script>

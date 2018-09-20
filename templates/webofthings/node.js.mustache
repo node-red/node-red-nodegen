@@ -1,0 +1,295 @@
+module.exports = function (RED) {
+    "use strict";
+    const request = require("request");
+
+    function formSelection(interaction, forms) {
+        if (interaction === "property-read") {
+            for (const f of forms) {
+                if (f.rel && f.rel === "readProperty") {
+                    return f;
+                }
+            }
+            return forms[0];
+        } else if (interaction === "property-write") {
+            for (const f of forms) {
+                if (f.rel && f.rel === "writeProperty") {
+                    return f;
+                }
+            }
+            return forms[0];
+        } else if (interaction === "property-observe" || interaction === "event") {
+            for (const f of forms) {
+                if (f.rel && f.rel === "observeProperty") {
+                    if (f.href && f.href.match(/^htt/)) {
+                        return f;
+                    }
+                }
+                if (f.subProtocol && f.subProtocol === "LongPoll") {
+                    return f;
+                }
+            }
+            return forms[0];
+        } else if (interaction === "action") {
+            return forms[0];
+        } else {
+            return forms[0];
+        }
+    }
+
+    function {{className}}Node(config) {
+        RED.nodes.createNode(this, config);
+        const node = this;
+        node.interactiontype = config.interactiontype;
+        node.propname = config.propname;
+        node.proptype = config.proptype;
+        node.actname = config.actname;
+        node.evname = config.evname;
+        console.log(JSON.stringify(node));
+        const username = node.credentials.username;
+        const password = node.credentials.password;
+        const token = node.credentials.token;
+        const auth = {};
+        // if username and password is set, use it.
+        if (username && password) {
+            auth.user = username;
+            auth.pass = password;
+            auth.sendImmediately = true;
+        } else if (token) {
+            auth.bearer = token
+            auth.sendImmediately = true;
+        }
+     
+        node.td = JSON.parse(`{{&tdstr}}`);
+        if (node.interactiontype === "property") {
+            if (node.proptype === "read") {
+                node.on("input", (msg) => {
+                    const prop = node.td.properties[node.propname];
+                    const options = {};
+                    // select a suitable form
+                    const form = formSelection("property-read", prop.forms);    
+                    const href = form.href;
+                    if (href.match(/^https?:\/\//)) {
+                        options.uri = href;
+                    } else {
+                        options.uri = node.td.base + href;
+                    }
+                    options.rejectUnauthorized = false;
+                    if (auth.user || auth.bearer) {
+                        options.auth = auth;
+                    }
+                    options.method = form["http:methodName"] ? form["http:methodName"] : "GET";
+                    console.log(JSON.stringify(options));
+                    request(options, (err, res, body) => {
+                        if (err) {
+                            msg.payload = `${err.toString()}: ${options.baseUrl}${options.uri}`;
+                            msg.statusCode = err.code;
+                            node.send(msg); 
+                        } else {
+                            msg.statusCode = res.statusCode;
+                            msg.headers = res.headers;
+                            msg.responseUrl = res.request.uri.href;
+                            if (prop.forms[0].mediaType && 
+                                prop.forms[0].mediaType === "application/json") {
+                                msg.payload = JSON.parse(body);
+                            } else {
+                                msg.payload = body;
+                            }
+                            // TODO: validation of return value    
+                            node.send(msg); 
+                        }
+                    });
+                });
+            } else if (node.proptype === "write") {
+                node.on("input", (msg) => {
+                    const prop = node.td.properties[node.propname];
+                    const options = {};
+                    const form = formSelection("property-write", prop.forms);    
+                    const href = form.href;
+                    if (href.match(/^https?:\/\//)) {
+                        options.uri = href;
+                    } else {
+                        options.uri = node.td.base + href;
+                    }
+                    options.rejectUnauthorized = false;
+                    if (form.mediaType &&
+                        form.mediaType === "application/json") {
+                        options.json = true;
+                    } else {
+                        options.json = false;
+                    }
+                    options.body = msg.payload;
+                    if (auth.user || auth.bearer) {
+                        options.auth = auth;
+                    }
+                    options.method = form["http:methodName"] ? form["http:methodName"] : "PUT";
+                    console.log(JSON.stringify(options));
+                    request(options, (err, res, body) => {
+                        if (err) {
+                            msg.payload = `${err.toString()}: ${options.baseUrl}${options.uri}`;
+                            msg.statusCode = err.code;
+                            node.send(msg); 
+                        } else {
+                            msg.statusCode = res.statusCode;
+                            msg.headers = res.headers;
+                            msg.responseUrl = res.request.uri.href;
+                            msg.payload = body;
+                            // TODO: validation of return value    
+                            node.send(msg);    
+                        }
+                    });
+                });
+            } else if (node.proptype === "observe") {
+                // long polling only
+                // use input as trigger of request
+                let timerId;
+                node.on("input", (msg) => {
+                    const prop = node.td.properties[node.propname];
+                    const options = {};
+                    const form = formSelection("property-observe", prop.forms);
+                    const href = form.href;
+                    if (href.match(/^https?:\/\//)) {
+                        options.uri = href;
+                    } else {
+                        options.uri = node.td.base + href;
+                    }
+                    options.rejectUnauthorized = false;
+                    options.timeout = 60000;
+                    if (auth.user || auth.bearer) {
+                        options.auth = auth;
+                    }
+                    options.method = form["http:methodName"] ? form["http:methodName"] : "GET";
+                    console.log(JSON.stringify(options));
+                    request(options, (err, res, body) => {
+                        if (err) {
+                            msg.payload = `${err.toString()}: ${options.baseUrl}${options.uri}`;
+                            msg.statusCode = err.code;
+                            node.status({fill:"yellow",shape:"dot",text:"Polling timeout"});
+                            node.send(null); 
+                            timerId = setTimeout(() => {
+                                node.emit("input",{});
+                            }, 5000);
+                        } else {
+                            node.status({fill:"green",shape:"dot",text:"OK"});
+                            msg.statusCode = res.statusCode;
+                            msg.headers = res.headers;
+                            msg.responseUrl = res.request.uri.href;
+                            if (form.mediaType && 
+                                form.mediaType === "application/json") {
+                                msg.payload = JSON.parse(body);
+                            } else {
+                                msg.payload = body;
+                            }
+                            // TODO: validation of return value    
+                            node.send(msg); 
+                            timerId = setTimeout(() => {
+                                node.emit("input",{});
+                            }, 5000);
+                        }
+                    });
+                });
+                node.on("close", () => {
+                    if (timerId) {
+                        clearTimeout(timerId);
+                    }
+                });
+                node.emit("input",{});               
+            }
+        } else if (node.interactiontype === "action") {
+            node.on("input", (msg) => {
+                const act = node.td.actions[node.actname];
+                const options = {};
+                const form = formSelection("action", act.forms);    
+                const href = form.href;
+                if (href.match(/^https?:\/\//)) {
+                    options.uri = href;
+                } else {
+                    options.uri = node.td.base + href;
+                }
+                options.rejectUnauthorized = false;
+                options.json = true;
+                options.body = msg.payload;
+                if (auth.user || auth.bearer) {
+                    options.auth = auth;
+                }
+                options.method = form["http:methodName"] ? form["http:methodName"] : "POST";
+                console.log(JSON.stringify(options));
+                request(options, (err, res, body) => {
+                    if (err) {
+                        msg.payload = `${err.toString()}: ${options.baseUrl}${options.uri}`;
+                        msg.statusCode = err.code;
+                        node.send(msg); 
+                    } else {
+                        msg.statusCode = res.statusCode;
+                        msg.headers = res.headers;
+                        msg.responseUrl = res.request.uri.href;
+                        msg.payload = body;
+                        // TODO: validation of return value 
+                        node.send(msg);    
+                    }
+                });
+            });
+        } else if (node.interactiontype === "event") {
+            // long polling only
+            // use input as trigger of request
+            let timerId;
+            node.on("input", (msg) => {
+                const ev = node.td.events[node.evname];
+                const options = {};
+                const form = formSelection("event", ev.forms);    
+                const href = form.href;
+                if (href.match(/^https?:\/\//)) {
+                    options.uri = href;
+                } else {
+                    options.uri = node.td.base + href;
+                }
+                options.rejectUnauthorized = false;
+                options.timeout = 100000;
+                if (auth.user || auth.bearer) {
+                    options.auth = auth;
+                }
+                options.method = form["http:methodName"] ? form["http:methodName"] : "GET";
+                console.log(JSON.stringify(options));
+                request(options, (err, res, body) => {
+                    if (err) {
+                        msg.payload = `${err.toString()}: ${options.baseUrl}${options.uri}`;
+                        msg.statusCode = err.code;
+                        node.status({fill:"yellow",shape:"dot",text:"Polling timeout"});
+                        node.send(null); 
+                        timerId = setTimeout(() => {
+                            node.emit("input",{});
+                        }, 5000);
+                    } else {
+                        node.status({fill:"green",shape:"dot",text:"OK"});
+                        msg.statusCode = res.statusCode;
+                        msg.headers = res.headers;
+                        msg.responseUrl = res.request.uri.href;
+                        if (form.mediaType && 
+                            form.mediaType === "application/json") {
+                            msg.payload = JSON.parse(body);
+                        } else {
+                            msg.payload = body;
+                        }
+                        // TODO: validation of return value
+                        node.send(msg); 
+                        timerId = setTimeout(() => { 
+                            node.emit("input",{});
+                        }, 5000);
+                    }
+                });
+            });
+            node.on("close", () => {
+                if (timerId) {
+                    clearTimeout(timerId);
+                }
+            });
+            node.emit("input", {});               
+        }
+    };
+    RED.nodes.registerType("{{&nodeName}}", {{&className}}Node, {
+        credentials: {
+            token: {type:"password"},
+            username: {type:"text"},
+            password: {type:"password"}
+        }
+    });
+};
