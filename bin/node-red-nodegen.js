@@ -62,7 +62,6 @@ function help() {
         '   - Function node (js file in library, "~/.node-red/lib/function/")\n' +
         // '   - Subflow node (json file of subflow)\n' +
         '   - Swagger definition\n' +
-        '   - Thing Description (jsonld file)\n' +
         '\n' +
         'Options:\n'.bold +
         '   -o : Destination path to save generated node (default: current directory)\n' +
@@ -122,13 +121,6 @@ if (argv.help || argv.h) {
         } else if (sourcePath.endsWith('.js')) {
             data.src = fs.readFileSync(sourcePath);
             nodegen.function2node(data, options).then(function (result) {
-                console.log('Success: ' + result);
-            }).catch(function (error) {
-                console.log('Error: ' + error);
-            });
-        } else if (sourcePath.endsWith('.jsonld')) {
-            data.src = JSON.parse(fs.readFileSync(sourcePath));
-            nodegen.wottd2node(data, options).then(function (result) {
                 console.log('Success: ' + result);
             }).catch(function (error) {
                 console.log('Error: ' + error);
