@@ -141,7 +141,8 @@ module.exports = function (RED) {
             } else if (node.proptype === "observe") {
                 // long polling only
                 // use input as trigger of request
-                let timerId;
+                let timerId = null;
+                let reqObj = null;
                 node.on("input", (msg) => {
                     const prop = node.td.properties[node.propname];
                     const options = {};
@@ -159,7 +160,7 @@ module.exports = function (RED) {
                     }
                     options.method = form["http:methodName"] ? form["http:methodName"] : "GET";
                     console.log(JSON.stringify(options));
-                    request(options, (err, res, body) => {
+                    reqObj = request(options, (err, res, body) => {
                         if (err) {
                             msg.payload = `${err.toString()}: ${options.baseUrl}${options.uri}`;
                             msg.statusCode = err.code;
@@ -190,7 +191,11 @@ module.exports = function (RED) {
                 node.on("close", () => {
                     if (timerId) {
                         clearTimeout(timerId);
-                    }
+                        timerId = null;
+                    } 
+                    if (reqObj) {
+                        reqObj.abort();
+                    } 
                 });
                 node.emit("input",{});               
             }
