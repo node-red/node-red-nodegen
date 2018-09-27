@@ -1,25 +1,23 @@
 <script type="text/javascript">
     RED.nodes.registerType('{{&nodeName}}', {
         category: '{{&category}}',
-        color: '#89bf04',
+        color: '{{&color}}',
         defaults: {
             {{#hasServiceParams}}
             service: { value: "", type: "{{&nodeName}}-service", required: true },
             {{/hasServiceParams}}
-            method: { value: "" },
-
+            method: { value: "", required: true },
             {{#methods}}
             {{#parameters}}
             {{&methodName}}_{{&camelCaseName}}: { value: "" },
             {{&methodName}}_{{&camelCaseName}}Type: { value: "str" },
             {{/parameters}}
             {{/methods}}
-
             name: { value: "" }
         },
         inputs: 1,
         outputs: 1,
-        icon: "icon.png",
+        icon: '{{&icon}}',
         label: function () {
             return this.name || "{{&nodeName}}";
         },

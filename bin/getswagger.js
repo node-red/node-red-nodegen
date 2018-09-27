@@ -20,6 +20,7 @@ var fs = require('fs');
 var request = require('request');
 
 request("http://petstore.swagger.io/v2/swagger.json", function (error, response, body) {
+    "use strict";
     if (!error) {
         try {
             var swagger = JSON.parse(body);
