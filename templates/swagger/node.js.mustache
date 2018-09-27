@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var lib = require('./lib.js');
 
 module.exports = function (RED) {
@@ -8,27 +8,31 @@ module.exports = function (RED) {
         this.service = RED.nodes.getNode(config.service);
         {{/hasServiceParams}}
         this.method = config.method;
-
         {{#methods}}
         {{#parameters}}
         this.{{&methodName}}_{{&camelCaseName}} = config.{{&methodName}}_{{&camelCaseName}};
         this.{{&methodName}}_{{&camelCaseName}}Type = config.{{&methodName}}_{{&camelCaseName}}Type || 'str';
         {{/parameters}}
         {{/methods}}
-
         var node = this;
 
         node.on('input', function (msg) {
+            var errorFlag = false;
             {{#domain}}
             var client = new lib.{{&className}}();
             {{/domain}}
             {{^domain}}
-            var client = new lib.{{&className}}({ domain: this.service.host });
+            var client;
+            if (this.service && this.service.host) {
+                client = new lib.{{&className}}({ domain: this.service.host });
+            } else {
+                node.error('Host in configuration node is not specified.', msg);
+                errorFlag = true;
+            }
             {{/domain}}
-
             {{#isSecure}}
             {{#isSecureToken}}
-            if (this.service && this.service.credentials && this.service.credentials.secureTokenValue) {
+            if (!errorFlag && this.service && this.service.credentials && this.service.credentials.secureTokenValue) {
                 if (this.service.secureTokenIsQuery) {
                     client.setToken(this.service.credentials.secureTokenValue,
                                     this.service.secureTokenHeaderOrQueryName, true);
@@ -39,7 +43,7 @@ module.exports = function (RED) {
             }
             {{/isSecureToken}}
             {{#isSecureApiKey}}
-            if (this.service && this.service.credentials && this.service.credentials.secureApiKeyValue) {
+            if (!errorFlag && this.service && this.service.credentials && this.service.credentials.secureApiKeyValue) {
                 if (this.service.secureApiKeyIsQuery) {
                     client.setApiKey(this.service.credentials.secureApiKeyValue,
                                      this.service.secureApiKeyHeaderOrQueryName, true);
@@ -50,18 +54,18 @@ module.exports = function (RED) {
             }
             {{/isSecureApiKey}}
             {{#isSecureBasic}}
-            if (this.service && this.service.credentials) {
+            if (!errorFlag && this.service && this.service.credentials) {
                 client.setBasicAuth(this.service.credentials.username, this.service.credentials.password);
             }
             {{/isSecureBasic}}
             {{/isSecure}}
-
-            client.body = msg.payload;
+            if (!errorFlag) {
+                client.body = msg.payload;
+            }
 
             var result;
-            var errorFlag = false;
             {{#methods}}
-            if (node.method === '{{&methodName}}') {
+            if (!errorFlag && node.method === '{{&methodName}}') {
                 var parameters = [], nodeParam, nodeParamType;
                 {{#parameters}}
                 {{#isBodyParam}}
@@ -82,10 +86,14 @@ module.exports = function (RED) {
 
                 result = client.{{&methodName}}(parameters);
             }
-
             {{/methods}}
+            if (!errorFlag && result === undefined) {
+                node.error('Method is not specified.', msg);
+                errorFlag = true;
+            }
+
             if (!errorFlag) {
-                node.status({ fill: "blue", shape: "dot", text: "{{&className}}.status.requesting" });
+                node.status({ fill: 'blue', shape: 'dot', text: '{{&className}}.status.requesting' });
                 result.then(function (response) {
                     if (response.body !== null && response.body !== undefined) {
                         msg.payload = response.body;
@@ -94,14 +102,13 @@ module.exports = function (RED) {
                     node.status({});
                 }).catch(function (error) {
                     node.error(error, msg);
-                    node.status({ fill: "red", shape: "ring", text: "node-red:common.status.error" });
+                    node.status({ fill: 'red', shape: 'ring', text: 'node-red:common.status.error' });
                 });
             }
         });
     }
 
-    RED.nodes.registerType("{{&nodeName}}", {{&className}}Node);
-
+    RED.nodes.registerType('{{&nodeName}}', {{&className}}Node);
     {{#hasServiceParams}}
     function {{&className}}ServiceNode(n) {
         RED.nodes.createNode(this, n);
@@ -127,21 +134,21 @@ module.exports = function (RED) {
         {{/isSecure}}
     }
 
-    RED.nodes.registerType("{{&nodeName}}-service", {{&className}}ServiceNode, {
+    RED.nodes.registerType('{{&nodeName}}-service', {{&className}}ServiceNode, {
         credentials: {
             {{#isSecure}}
             {{#isSecureToken}}
-            secureTokenValue: { type: "password" },
+            secureTokenValue: { type: 'password' },
             {{/isSecureToken}}
             {{#isSecureApiKey}}
-            secureApiKeyValue: { type: "password" },
+            secureApiKeyValue: { type: 'password' },
             {{/isSecureApiKey}}
             {{#isSecureBasic}}
-            username: { type: "text" },
-            password: { type: "password" },
+            username: { type: 'text' },
+            password: { type: 'password' },
             {{/isSecureBasic}}
             {{/isSecure}}
-            temp: { type: "text" }
+            temp: { type: 'text' }
         }
     });
     {{/hasServiceParams}}
