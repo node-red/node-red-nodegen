@@ -5,26 +5,26 @@ module.exports = function (RED) {
     function formSelection(interaction, forms) {
         if (interaction === "property-read") {
             for (const f of forms) {
-                if (f.rel && f.rel === "readProperty") {
+                if (f.rel && f.rel.toLowerCase() === "readproperty") {
                     return f;
                 }
             }
             return forms[0];
         } else if (interaction === "property-write") {
             for (const f of forms) {
-                if (f.rel && f.rel === "writeProperty") {
+                if (f.rel && f.rel.toLowerCase() === "writeproperty") {
                     return f;
                 }
             }
             return forms[0];
         } else if (interaction === "property-observe" || interaction === "event") {
             for (const f of forms) {
-                if (f.rel && f.rel === "observeProperty") {
+                if (f.rel && f.rel.toLowerCase() === "observeproperty") {
                     if (f.href && f.href.match(/^htt/)) {
                         return f;
                     }
                 }
-                if (f.subProtocol && f.subProtocol === "LongPoll") {
+                if (f.subProtocol && f.subProtocol.toLowerCase() === "longpoll") {
                     return f;
                 }
             }
@@ -90,7 +90,11 @@ module.exports = function (RED) {
                             msg.responseUrl = res.request.uri.href;
                             if (prop.forms[0].mediaType && 
                                 prop.forms[0].mediaType === "application/json") {
-                                msg.payload = JSON.parse(body);
+                                try {
+                                    msg.payload = JSON.parse(body);
+                                } catch(e) {
+                                    msg.payload = body;
+                                }
                             } else {
                                 msg.payload = body;
                             }
@@ -176,7 +180,11 @@ module.exports = function (RED) {
                             msg.responseUrl = res.request.uri.href;
                             if (form.mediaType && 
                                 form.mediaType === "application/json") {
-                                msg.payload = JSON.parse(body);
+                                try {
+                                    msg.payload = JSON.parse(body);
+                                } catch(e) {
+                                    msg.payload = body;
+                                }
                             } else {
                                 msg.payload = body;
                             }
@@ -271,7 +279,11 @@ module.exports = function (RED) {
                         msg.responseUrl = res.request.uri.href;
                         if (form.mediaType && 
                             form.mediaType === "application/json") {
-                            msg.payload = JSON.parse(body);
+                            try {
+                                msg.payload = JSON.parse(body);
+                            } catch(e) {
+                                msg.payload = body;
+                            }
                         } else {
                             msg.payload = body;
                         }
