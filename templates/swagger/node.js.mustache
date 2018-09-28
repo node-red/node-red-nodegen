@@ -66,25 +66,29 @@ module.exports = function (RED) {
             var result;
             {{#methods}}
             if (!errorFlag && node.method === '{{&methodName}}') {
-                var parameters = [], nodeParam, nodeParamType;
+                var {{&methodName}}_parameters = [];
+                var {{&methodName}}_nodeParam;
+                var {{&methodName}}_nodeParamType;
                 {{#parameters}}
                 {{#isBodyParam}}
                 if (typeof msg.payload === 'object') {
-                    parameters.{{&camelCaseName}} = msg.payload;
+                    {{&methodName}}_parameters.{{&camelCaseName}} = msg.payload;
                 } else {
-                    node.error('Unsupported type: \'' + (typeof msg.payload) + '\', '
-                             + 'msg.payload must be JSON object or buffer.', msg);
+                    node.error('Unsupported type: \'' + (typeof msg.payload) + '\', ' + 'msg.payload must be JSON object or buffer.', msg);
                     errorFlag = true;
                 }
                 {{/isBodyParam}}
                 {{#isNotBodyParam}}
-                nodeParam = node.{{&methodName}}_{{&camelCaseName}};
-                nodeParamType = node.{{&methodName}}_{{&camelCaseName}}Type;
-                parameters.{{&camelCaseName}} = nodeParamType === 'str' ? nodeParam || '' : RED.util.getMessageProperty(msg, nodeParam);
+                {{&methodName}}_nodeParam = node.{{&methodName}}_{{&camelCaseName}};
+                {{&methodName}}_nodeParamType = node.{{&methodName}}_{{&camelCaseName}}Type;
+                if ({{&methodName}}_nodeParamType === 'str') {
+                    {{&methodName}}_parameters.{{&camelCaseName}} = {{&methodName}}_nodeParam || '';
+                } else {
+                    {{&methodName}}_parameters.{{&camelCaseName}} = RED.util.getMessageProperty(msg, {{&methodName}}_nodeParam);
+                }
                 {{/isNotBodyParam}}
                 {{/parameters}}
-
-                result = client.{{&methodName}}(parameters);
+                result = client.{{&methodName}}({{&methodName}}_parameters);
             }
             {{/methods}}
             if (!errorFlag && result === undefined) {
