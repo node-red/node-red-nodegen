@@ -1,30 +1,84 @@
 module.exports = function (RED) {
     "use strict";
     const request = require("request");
+    const url = require('url');
+    const HttpsProxyAgent = require('https-proxy-agent');
+    const WebSocket = require('ws');
+ 
+    function normalizeTdForm(td) {
+        function formconv(intr,f) {
+            if (f && f.href) { f.href = url.resolve(baseUrl, f.href)}
+            if (f && !f.security) {
+                if (intr.security) {
+                    f.security = intr.security;
+                } else if (td.security) {
+                    f.security = td.security;
+                }
+            } 
+            return f;
+        };
+        const baseUrl = td.base;
+        for (const p in td.properties) {
+            let forms = td.properties[p].forms;
+            if (forms) {
+                td.properties[p].forms = forms.map((f) => formconv(td.properties[p], f))
+                            .filter((f) => (f.href && (f.href.match(/^https?:/) || 
+                                    f.href.match(/^wss?:/))));                       
+            }
+        }
+        for (const a in td.actions) {
+            let forms = td.actions[a].forms;
+            if (forms) {
+                td.actions[a].forms = forms.map((f) => formconv(td.actions[a], f))
+                            .filter((f) => (f.href && (f.href.match(/^https?:/) || 
+                                    f.href.match(/^wss?:/))));
+            }
+        }
+        for (const e in td.events) {
+            let forms = td.events[e].forms;
+            if (forms) {
+                td.events[e].forms = forms.map((f) => formconv(td.events[e], f))
+                            .filter((f) => (f.href && (f.href.match(/^https?:/) || 
+                                   f.href.match(/^wss?:/))));
+            }
+        }
+        return td;
+    }
 
     function formSelection(interaction, forms) {
         if (interaction === "property-read") {
             for (const f of forms) {
-                if (f.rel && f.rel.toLowerCase() === "readproperty") {
+                if ((f.rel && f.rel === "readproperty") ||
+                    (f.op && f.op === "readproperty")) {
                     return f;
                 }
             }
             return forms[0];
         } else if (interaction === "property-write") {
             for (const f of forms) {
-                if (f.rel && f.rel.toLowerCase() === "writeproperty") {
+                if ((f.rel && f.rel === "writeproperty") ||
+                    (f.op && f.op === "writeproperty")) {
                     return f;
                 }
             }
             return forms[0];
         } else if (interaction === "property-observe" || interaction === "event") {
+            // First priority: websocket
             for (const f of forms) {
-                if (f.rel && f.rel.toLowerCase() === "observeproperty") {
-                    if (f.href && f.href.match(/^htt/)) {
-                        return f;
-                    }
+                if (f.href && f.href.match(/^wss?:/)) {
+                    return f;
                 }
-                if (f.subProtocol && f.subProtocol.toLowerCase() === "longpoll") {
+            }
+            // Second priority: longpoll
+            for (const f of forms) {
+                if (f.subProtocol && f.subProtocol.match(/^longpoll$/i)) {
+                    return f;
+                }
+            }
+            // Third priority: observeproperty
+            for (const f of forms) {
+                if ((f.rel && f.rel.match(/^observeproperty$/i)) ||
+                        (f.op && f.op.match(/^observeproperty$/i))) { 
                     return f;
                 }
             }
@@ -36,7 +90,181 @@ module.exports = function (RED) {
         }
     }
 
-    function {{className}}Node(config) {
+    function bindingWebSocket(node, form, options) {
+        let ws;
+        let reconnectTimeout;
+        let needReconnect = false;
+        const setupWsClient = () => {
+            let wsoptions = {};
+            if (process.env.http_proxy) {
+                const agoptions = url.parse(process.env.http_proxy);
+                const agent = new HttpsProxyAgent(agoptions);
+                wsoptions = {agent: agent};
+            }
+            if (options && options.auth && (options.auth.user || options.auth.bearer)) {
+                wsoptions.auth = options.auth;
+            }
+            node.status({fill:"yellow",shape:"dot",text:"WS Connecting..."});
+            needReconnect = true;
+            ws = new WebSocket(form.href, wsoptions);
+            node.trace(`Connecting websocket: ${form.href}`);
+
+            ws.on('open', () => {
+                node.status({fill:"green",shape:"dot",text:"WS Connected"});
+                node.trace('websocket opened.');
+            });
+            ws.on('close', (code, reason) => {
+                node.status({fill:"orange",shape:"dot",text:`WS Reconnecting...`});
+                node.trace(`websocket closed (code=${code}, reason=${reason})`);
+                if (needReconnect) {
+                    reconnectTimeout = setTimeout(setupWsClient, 5000);
+                }
+            });
+            ws.on('error', (error) => {
+                node.status({fill:"red",shape:"dot",text:`WS Error: ${error}`});
+                node.warn(`websocket error: ${error}`);
+            });
+            ws.on('message', (data) => {
+                node.status({fill:"green",shape:"dot",text:"WS OK"});
+                const msg = {};
+                if (form.mediaType && form.mediaType === "application/json") {
+                    try {
+                        msg.payload = JSON.parse(data);
+                    } catch(e) {
+                        msg.payload = data;
+                    }
+                } else {
+                    msg.payload = data;
+                }
+                node.send(msg)
+            });
+        }
+        setupWsClient();
+        node.on('close', () => {
+            node.trace('Close node');
+            node.status({});
+            clearTimeout(reconnectTimeout);
+            needReconnect = false;
+            try {
+                ws.close();
+            } catch (err) {
+
+            }
+        });
+    }
+
+    function bindingLongPoll(node, form, options) {
+        let reqObj;
+        let needReconnect = false;
+        let reconnectTimeout;
+        const setupLPClient = () => { 
+            const reqoptions = {};
+            reqoptions.uri = form.href;
+            reqoptions.rejectUnauthorized = false;
+            // reqoptions.timeout = 60000; 
+            if (options && options.auth && (options.auth.user || options.auth.bearer)) {
+                reqoptions.auth = options.auth;
+            }
+            reqoptions.method = form["http:methodName"] ? form["http:methodName"] : "GET";
+            node.debug(`Request options: ${JSON.stringify(reqoptions)}`);
+            needReconnect = true;
+            reqObj = request(reqoptions, (err, res, body) => {
+                if (err) {
+                    const msg = {};
+                    msg.payload = `${err.toString()}: ${reqoptions.uri}`;
+                    msg.statusCode = err.code;
+                    node.status({fill:"yellow",shape:"dot",text:"Polling error"});
+                    node.send(msg);
+                    if (needReconnect) {
+                        reconnectTimeout = setTimeout(setupLPClient, 5000);
+                    }
+                } else {
+                    const msg = {};
+                    node.status({fill:"green",shape:"dot",text:"OK"});
+                    msg.statusCode = res.statusCode;
+                    msg.headers = res.headers;
+                    msg.responseUrl = res.request.uri.href;
+                    if (form.mediaType && 
+                        form.mediaType === "application/json") {
+                        try {
+                            msg.payload = JSON.parse(body);
+                        } catch(e) {
+                            msg.payload = body;
+                        }
+                    } else {
+                        msg.payload = body;
+                    }
+                    // TODO: validation of return value    
+                    node.send(msg);
+                    if (needReconnect) {
+                        reconnectTimeout = setTimeout(setupLPClient, 5000);
+                    }
+                }
+            });
+            node.status({fill:"green",shape:"dot",text:"Connecting..."});
+        }
+        setupLPClient();
+        node.on("close", () => {
+            node.status({});
+            needReconnect = false;
+            clearTimeout(reconnectTimeout);
+            if (reqObj) {
+                reqObj.abort();
+            } 
+        });
+    }
+
+    function bindingHttp(node, form, options) { // options.interaction, options.auth, options.reqbody, options.msg
+        if (!options) {
+            node.debug('Http binding needs options parameter.');
+            return;
+        }
+        const msg = options.msg || {};
+        const reqoptions = {}; 
+        reqoptions.uri = form.href;
+        reqoptions.rejectUnauthorized = false;
+        if (options.auth && (options.auth.user || options.auth.bearer)) {
+            reqoptions.auth = options.auth;
+        }
+        if (options.interaction === "property-read") {
+            reqoptions.method = form["http:methodName"] ? form["http:methodName"] : "GET";
+        } else if (options.interaction === "property-write") {
+            reqoptions.method = form["http:methodName"] ? form["http:methodName"] : "PUT";
+            reqoptions.json = form.mediaType && form.mediaType === "application/json";
+            reqoptions.body = options.reqbody;
+        } else { // assume "action"
+            reqoptions.method = form["http:methodName"] ? form["http:methodName"] : "POST";
+            reqoptions.json = form.mediaType && form.mediaType === "application/json";
+            reqoptions.body = options.reqbody;
+        }
+        node.debug(`request options: ${JSON.stringify(reqoptions)}`);
+        request(reqoptions, (err, res, body) => {
+            if (err) {
+                msg.payload = `${err.toString()}: ${reqoptions.uri}`;
+                msg.statusCode = err.code;
+                node.send(msg); 
+            } else {
+                msg.statusCode = res.statusCode;
+                msg.headers = res.headers;
+                msg.responseUrl = res.request.uri.href;
+                if (form.mediaType && 
+                    form.mediaType === "application/json") {
+                    try {
+                        msg.payload = JSON.parse(body);
+                    } catch(e) {
+                        msg.payload = body;
+                    }
+                } else {
+                    msg.payload = body;
+                }
+                // TODO: validation of return value    
+                node.send(msg); 
+            }
+        });
+    }
+
+
+    function Node(config) {
         RED.nodes.createNode(this, config);
         const node = this;
         node.interactiontype = config.interactiontype;
@@ -60,254 +288,46 @@ module.exports = function (RED) {
         }
      
         node.td = JSON.parse(`{{&tdstr}}`);
+        const normTd = normalizeTdForm(node.td);
         if (node.interactiontype === "property") {
             if (node.proptype === "read") {
                 node.on("input", (msg) => {
-                    const prop = node.td.properties[node.propname];
-                    const options = {};
-                    // select a suitable form
-                    const form = formSelection("property-read", prop.forms);    
-                    const href = form.href;
-                    if (href.match(/^https?:\/\//)) {
-                        options.uri = href;
-                    } else {
-                        options.uri = node.td.base + href;
-                    }
-                    options.rejectUnauthorized = false;
-                    if (auth.user || auth.bearer) {
-                        options.auth = auth;
-                    }
-                    options.method = form["http:methodName"] ? form["http:methodName"] : "GET";
-                    console.log(JSON.stringify(options));
-                    request(options, (err, res, body) => {
-                        if (err) {
-                            msg.payload = `${err.toString()}: ${options.baseUrl}${options.uri}`;
-                            msg.statusCode = err.code;
-                            node.send(msg); 
-                        } else {
-                            msg.statusCode = res.statusCode;
-                            msg.headers = res.headers;
-                            msg.responseUrl = res.request.uri.href;
-                            if (prop.forms[0].mediaType && 
-                                prop.forms[0].mediaType === "application/json") {
-                                try {
-                                    msg.payload = JSON.parse(body);
-                                } catch(e) {
-                                    msg.payload = body;
-                                }
-                            } else {
-                                msg.payload = body;
-                            }
-                            // TODO: validation of return value    
-                            node.send(msg); 
-                        }
-                    });
+                    const prop = normTd.properties[node.propname];
+                    const form = formSelection("property-read", prop.forms);
+                    bindingHttp(node, form, {interaction:"property-read", auth: auth, msg: msg});
                 });
             } else if (node.proptype === "write") {
                 node.on("input", (msg) => {
-                    const prop = node.td.properties[node.propname];
-                    const options = {};
-                    const form = formSelection("property-write", prop.forms);    
-                    const href = form.href;
-                    if (href.match(/^https?:\/\//)) {
-                        options.uri = href;
-                    } else {
-                        options.uri = node.td.base + href;
-                    }
-                    options.rejectUnauthorized = false;
-                    if (form.mediaType &&
-                        form.mediaType === "application/json") {
-                        options.json = true;
-                    } else {
-                        options.json = false;
-                    }
-                    options.body = msg.payload;
-                    if (auth.user || auth.bearer) {
-                        options.auth = auth;
-                    }
-                    options.method = form["http:methodName"] ? form["http:methodName"] : "PUT";
-                    console.log(JSON.stringify(options));
-                    request(options, (err, res, body) => {
-                        if (err) {
-                            msg.payload = `${err.toString()}: ${options.baseUrl}${options.uri}`;
-                            msg.statusCode = err.code;
-                            node.send(msg); 
-                        } else {
-                            msg.statusCode = res.statusCode;
-                            msg.headers = res.headers;
-                            msg.responseUrl = res.request.uri.href;
-                            msg.payload = body;
-                            // TODO: validation of return value    
-                            node.send(msg);    
-                        }
-                    });
+                    const prop = normTd.properties[node.propname];
+                    const form = formSelection("property-write", prop.forms);
+                    bindingHttp(node, form, {interaction: "property-write", auth: auth, msg: msg, reqbody: msg.payload});    
                 });
             } else if (node.proptype === "observe") {
-                // long polling only
-                // use input as trigger of request
-                let timerId = null;
-                let reqObj = null;
-                node.on("input", (msg) => {
-                    const prop = node.td.properties[node.propname];
-                    const options = {};
-                    const form = formSelection("property-observe", prop.forms);
-                    const href = form.href;
-                    if (href.match(/^https?:\/\//)) {
-                        options.uri = href;
-                    } else {
-                        options.uri = node.td.base + href;
-                    }
-                    options.rejectUnauthorized = false;
-                    options.timeout = 60000;
-                    if (auth.user || auth.bearer) {
-                        options.auth = auth;
-                    }
-                    options.method = form["http:methodName"] ? form["http:methodName"] : "GET";
-                    console.log(JSON.stringify(options));
-                    reqObj = request(options, (err, res, body) => {
-                        if (err) {
-                            msg.payload = `${err.toString()}: ${options.baseUrl}${options.uri}`;
-                            msg.statusCode = err.code;
-                            node.status({fill:"yellow",shape:"dot",text:"Polling timeout"});
-                            node.send(null); 
-                            timerId = setTimeout(() => {
-                                node.emit("input",{});
-                            }, 5000);
-                        } else {
-                            node.status({fill:"green",shape:"dot",text:"OK"});
-                            msg.statusCode = res.statusCode;
-                            msg.headers = res.headers;
-                            msg.responseUrl = res.request.uri.href;
-                            if (form.mediaType && 
-                                form.mediaType === "application/json") {
-                                try {
-                                    msg.payload = JSON.parse(body);
-                                } catch(e) {
-                                    msg.payload = body;
-                                }
-                            } else {
-                                msg.payload = body;
-                            }
-                            // TODO: validation of return value    
-                            node.send(msg); 
-                            timerId = setTimeout(() => {
-                                node.emit("input",{});
-                            }, 5000);
-                        }
-                    });
-                });
-                node.on("close", () => {
-                    if (timerId) {
-                        clearTimeout(timerId);
-                        timerId = null;
-                    } 
-                    if (reqObj) {
-                        reqObj.abort();
-                    } 
-                });
-                node.emit("input",{});               
+                const prop = normTd.properties[node.propname];
+                const form = formSelection("property-observe", prop.forms);
+                if (form.href.match(/^wss?:/)) { // websocket
+                    bindingWebSocket(node, form, null);
+                } else { // long polling
+                    bindingLongPoll(node, form, {auth: auth});
+                }               
             }
         } else if (node.interactiontype === "action") {
             node.on("input", (msg) => {
-                const act = node.td.actions[node.actname];
-                const options = {};
-                const form = formSelection("action", act.forms);    
-                const href = form.href;
-                if (href.match(/^https?:\/\//)) {
-                    options.uri = href;
-                } else {
-                    options.uri = node.td.base + href;
-                }
-                options.rejectUnauthorized = false;
-                options.json = true;
-                options.body = msg.payload;
-                if (auth.user || auth.bearer) {
-                    options.auth = auth;
-                }
-                options.method = form["http:methodName"] ? form["http:methodName"] : "POST";
-                console.log(JSON.stringify(options));
-                request(options, (err, res, body) => {
-                    if (err) {
-                        msg.payload = `${err.toString()}: ${options.baseUrl}${options.uri}`;
-                        msg.statusCode = err.code;
-                        node.send(msg); 
-                    } else {
-                        msg.statusCode = res.statusCode;
-                        msg.headers = res.headers;
-                        msg.responseUrl = res.request.uri.href;
-                        msg.payload = body;
-                        // TODO: validation of return value 
-                        node.send(msg);    
-                    }
-                });
+                const act = normTd.actions[node.actname];
+                const form = formSelection("action", act.forms);  
+                bindingHttp(node, form, {interaction: "action", auth: auth, msg: msg, reqbody:msg.payload});                
             });
         } else if (node.interactiontype === "event") {
-            // long polling only
-            // use input as trigger of request
-            let timerId = null;
-            let reqObj = null;
-            node.on("input", (msg) => {
-                const ev = node.td.events[node.evname];
-                const options = {};
-                const form = formSelection("event", ev.forms);    
-                const href = form.href;
-                if (href.match(/^https?:\/\//)) {
-                    options.uri = href;
-                } else {
-                    options.uri = node.td.base + href;
-                }
-                options.rejectUnauthorized = false;
-                options.timeout = 100000;
-                if (auth.user || auth.bearer) {
-                    options.auth = auth;
-                }
-                options.method = form["http:methodName"] ? form["http:methodName"] : "GET";
-                console.log(JSON.stringify(options));
-                reqObj = request(options, (err, res, body) => {
-                    if (err) {
-                        msg.payload = `${err.toString()}: ${options.baseUrl}${options.uri}`;
-                        msg.statusCode = err.code;
-                        node.status({fill:"yellow",shape:"dot",text:"Polling timeout"});
-                        node.send(null); 
-                        timerId = setTimeout(() => {
-                            node.emit("input",{});
-                        }, 5000);
-                    } else {
-                        node.status({fill:"green",shape:"dot",text:"OK"});
-                        msg.statusCode = res.statusCode;
-                        msg.headers = res.headers;
-                        msg.responseUrl = res.request.uri.href;
-                        if (form.mediaType && 
-                            form.mediaType === "application/json") {
-                            try {
-                                msg.payload = JSON.parse(body);
-                            } catch(e) {
-                                msg.payload = body;
-                            }
-                        } else {
-                            msg.payload = body;
-                        }
-                        // TODO: validation of return value
-                        node.send(msg); 
-                        timerId = setTimeout(() => { 
-                            node.emit("input",{});
-                        }, 5000);
-                    }
-                });
-            });
-            node.on("close", () => {
-                if (timerId) {
-                    clearTimeout(timerId);
-                    timerId = null;
-                }
-                if (reqObj) {
-                    reqObj.abort();
-                }
-            });
-            node.emit("input", {});               
+            const ev = normTd.events[node.evname];
+            const form = formSelection("event", ev.forms);
+            if (form.href.match(/^wss?:/)) { // websocket
+                bindingWebSocket(node, form, {auth: auth});
+            } else { // long polling
+                bindingLongPoll(node, form, {auth: auth});
+            }               
         }
     };
-    RED.nodes.registerType("{{&nodeName}}", {{&className}}Node, {
+    RED.nodes.registerType("{{&nodeName}}", Node, {
         credentials: {
             token: {type:"password"},
             username: {type:"text"},
