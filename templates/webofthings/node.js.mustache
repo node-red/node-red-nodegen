@@ -4,6 +4,7 @@ module.exports = function (RED) {
     const url = require('url');
     const HttpsProxyAgent = require('https-proxy-agent');
     const WebSocket = require('ws');
+    const urltemplate = require('url-template');
  
     function normalizeTdForm(td) {
         function formconv(intr,f) {
@@ -90,7 +91,11 @@ module.exports = function (RED) {
         }
     }
 
-    function bindingWebSocket(node, form, options) {
+    function extractTemplate(href, context={}) {
+        return urltemplate.parse(href).expand(context);
+    }
+
+    function bindingWebSocket(node, form, options={}) {
         let ws;
         let reconnectTimeout;
         let needReconnect = false;
@@ -106,7 +111,8 @@ module.exports = function (RED) {
             }
             node.status({fill:"yellow",shape:"dot",text:"WS Connecting..."});
             needReconnect = true;
-            ws = new WebSocket(form.href, wsoptions);
+            const href = extractTemplate(form.href,options.urivars);
+            ws = new WebSocket(href, wsoptions);
             node.trace(`Connecting websocket: ${form.href}`);
 
             ws.on('open', () => {
@@ -153,13 +159,13 @@ module.exports = function (RED) {
         });
     }
 
-    function bindingLongPoll(node, form, options) {
+    function bindingLongPoll(node, form, options={}) {
         let reqObj;
         let needReconnect = false;
         let reconnectTimeout;
         const setupLPClient = () => { 
             const reqoptions = {};
-            reqoptions.uri = form.href;
+            reqoptions.uri = extractTemplate(form.href, options.urivars);
             reqoptions.rejectUnauthorized = false;
             // reqoptions.timeout = 60000; 
             if (options && options.auth && (options.auth.user || options.auth.bearer)) {
@@ -214,14 +220,14 @@ module.exports = function (RED) {
         });
     }
 
-    function bindingHttp(node, form, options) { // options.interaction, options.auth, options.reqbody, options.msg
+    function bindingHttp(node, form, options={}) { // options.interaction, options.auth, options.reqbody, options.msg
         if (!options) {
             node.debug('Http binding needs options parameter.');
             return;
         }
         const msg = options.msg || {};
         const reqoptions = {}; 
-        reqoptions.uri = form.href;
+        reqoptions.uri = extractTemplate(form.href, options.urivars);
         reqoptions.rejectUnauthorized = false;
         if (options.auth && (options.auth.user || options.auth.bearer)) {
             reqoptions.auth = options.auth;
@@ -294,36 +300,41 @@ module.exports = function (RED) {
                 node.on("input", (msg) => {
                     const prop = normTd.properties[node.propname];
                     const form = formSelection("property-read", prop.forms);
-                    bindingHttp(node, form, {interaction:"property-read", auth: auth, msg: msg});
+                    const urivars = prop.uriVariables ? msg.payload : {};
+                    bindingHttp(node, form, {interaction:"property-read", auth, msg, urivars});
                 });
             } else if (node.proptype === "write") {
                 node.on("input", (msg) => {
                     const prop = normTd.properties[node.propname];
                     const form = formSelection("property-write", prop.forms);
-                    bindingHttp(node, form, {interaction: "property-write", auth: auth, msg: msg, reqbody: msg.payload});    
+                    // URI template is not supported, because 'write' doesn't use GET method.
+                    bindingHttp(node, form, {interaction: "property-write", auth, msg, reqbody: msg.payload});    
                 });
             } else if (node.proptype === "observe") {
                 const prop = normTd.properties[node.propname];
                 const form = formSelection("property-observe", prop.forms);
+                const urivars = prop.uriVariables ? msg.payload : {};
                 if (form.href.match(/^wss?:/)) { // websocket
-                    bindingWebSocket(node, form, null);
+                    bindingWebSocket(node, form, {auth, urivars});
                 } else { // long polling
-                    bindingLongPoll(node, form, {auth: auth});
+                    bindingLongPoll(node, form, {auth, urivars});
                 }               
             }
         } else if (node.interactiontype === "action") {
             node.on("input", (msg) => {
                 const act = normTd.actions[node.actname];
-                const form = formSelection("action", act.forms);  
-                bindingHttp(node, form, {interaction: "action", auth: auth, msg: msg, reqbody:msg.payload});                
+                const form = formSelection("action", act.forms);
+                const urivars = act.uriVariables ? msg.payload : {};  
+                bindingHttp(node, form, {interaction: "action", uth, msg, urivars, reqbody:msg.payload});                
             });
         } else if (node.interactiontype === "event") {
             const ev = normTd.events[node.evname];
             const form = formSelection("event", ev.forms);
+            const urivars = ev.uriVariables ? msg.payload : {};
             if (form.href.match(/^wss?:/)) { // websocket
-                bindingWebSocket(node, form, {auth: auth});
+                bindingWebSocket(node, form, {auth, urivars});
             } else { // long polling
-                bindingLongPoll(node, form, {auth: auth});
+                bindingLongPoll(node, form, {auth, urivars});
             }               
         }
     };
