@@ -8,14 +8,15 @@ module.exports = function (RED) {
  
     function normalizeTdForm(td) {
         function formconv(intr,f) {
-            if (f && f.href) { f.href = url.resolve(baseUrl, f.href)}
-            if (f && !f.security) {
-                if (intr.security) {
+            if (f && f.hasOwnProperty("href")) { f.href = url.resolve(baseUrl, f.href)}
+            if (f && !f.hasOwnProperty("security")) {
+                if (intr.hasOwnProperty("security")) {
                     f.security = intr.security;
-                } else if (td.security) {
+                } else if (td.hasOwnProperty("security")) {
                     f.security = td.security;
                 }
-            } 
+            }
+            if (f && !f.hasOwnProperty("mediaType")) { f.mediaType = "application/json"; } 
             return f;
         };
         const baseUrl = td.base;
@@ -23,15 +24,17 @@ module.exports = function (RED) {
             let forms = td.properties[p].forms;
             if (forms) {
                 td.properties[p].forms = forms.map((f) => formconv(td.properties[p], f))
-                            .filter((f) => (f.href && (f.href.match(/^https?:/) || 
+                            .filter((f) => (f.hasOwnProperty("href") && (f.href.match(/^https?:/) || 
                                     f.href.match(/^wss?:/))));                       
             }
+            if (!td.properties[p].hasOwnProperty("observable")) { td.properties[p].observable = false;}
+            if (!td.properties[p].hasOwnProperty("writable")) { td.properties[p].writable = false;}
         }
         for (const a in td.actions) {
             let forms = td.actions[a].forms;
             if (forms) {
                 td.actions[a].forms = forms.map((f) => formconv(td.actions[a], f))
-                            .filter((f) => (f.href && (f.href.match(/^https?:/) || 
+                            .filter((f) => (f.hasOwnProperty("href") && (f.href.match(/^https?:/) || 
                                     f.href.match(/^wss?:/))));
             }
         }
@@ -39,7 +42,7 @@ module.exports = function (RED) {
             let forms = td.events[e].forms;
             if (forms) {
                 td.events[e].forms = forms.map((f) => formconv(td.events[e], f))
-                            .filter((f) => (f.href && (f.href.match(/^https?:/) || 
+                            .filter((f) => (f.hasOwnProperty("href") && (f.href.match(/^https?:/) || 
                                    f.href.match(/^wss?:/))));
             }
         }
@@ -49,16 +52,16 @@ module.exports = function (RED) {
     function formSelection(interaction, forms) {
         if (interaction === "property-read") {
             for (const f of forms) {
-                if ((f.rel && f.rel === "readproperty") ||
-                    (f.op && f.op === "readproperty")) {
+                if ((f.hasOwnProperty("rel") && f.rel === "readproperty") ||
+                    (f.hasOwnProperty("op") && f.op === "readproperty")) {
                     return f;
                 }
             }
             return forms[0];
         } else if (interaction === "property-write") {
             for (const f of forms) {
-                if ((f.rel && f.rel === "writeproperty") ||
-                    (f.op && f.op === "writeproperty")) {
+                if ((f.hasOwnProperty("rel") && f.rel === "writeproperty") ||
+                    (f.hasOwnProperty("op") && f.op === "writeproperty")) {
                     return f;
                 }
             }
@@ -66,20 +69,20 @@ module.exports = function (RED) {
         } else if (interaction === "property-observe" || interaction === "event") {
             // First priority: websocket
             for (const f of forms) {
-                if (f.href && f.href.match(/^wss?:/)) {
+                if (f.hasOwnProperty("href") && f.href.match(/^wss?:/)) {
                     return f;
                 }
             }
             // Second priority: longpoll
             for (const f of forms) {
-                if (f.subProtocol && f.subProtocol.match(/^longpoll$/i)) {
+                if (f.hasOwnProperty("subProtocol") && f.subProtocol.match(/^longpoll$/i)) {
                     return f;
                 }
             }
             // Third priority: observeproperty
             for (const f of forms) {
-                if ((f.rel && f.rel.match(/^observeproperty$/i)) ||
-                        (f.op && f.op.match(/^observeproperty$/i))) { 
+                if ((f.hasOwnProperty("rel") && f.rel.match(/^observeproperty$/i)) ||
+                    (f.hasOwnProperty("op") && f.op.match(/^observeproperty$/i))) { 
                     return f;
                 }
             }
@@ -106,7 +109,8 @@ module.exports = function (RED) {
                 const agent = new HttpsProxyAgent(agoptions);
                 wsoptions = {agent: agent};
             }
-            if (options && options.auth && (options.auth.user || options.auth.bearer)) {
+            if (options.hasOwnProperty("auth") && 
+                (options.auth.hasOwnProperty("user") || options.auth.hasOwnProperty("bearer"))) {
                 wsoptions.auth = options.auth;
             }
             node.status({fill:"yellow",shape:"dot",text:"WS Connecting..."});
@@ -120,9 +124,10 @@ module.exports = function (RED) {
                 node.trace('websocket opened.');
             });
             ws.on('close', (code, reason) => {
-                node.status({fill:"orange",shape:"dot",text:`WS Reconnecting...`});
-                node.trace(`websocket closed (code=${code}, reason=${reason})`);
+                node.status({});
+                node.trace(`websocket closed (code=${code}, reason=${reason})`); 
                 if (needReconnect) {
+                    node.status({fill:"orange",shape:"dot",text:`WS Reconnecting...`});
                     reconnectTimeout = setTimeout(setupWsClient, 5000);
                 }
             });
@@ -133,7 +138,7 @@ module.exports = function (RED) {
             ws.on('message', (data) => {
                 node.status({fill:"green",shape:"dot",text:"WS OK"});
                 const msg = {};
-                if (form.mediaType && form.mediaType === "application/json") {
+                if (form.mediaType === "application/json") {
                     try {
                         msg.payload = JSON.parse(data);
                     } catch(e) {
@@ -148,7 +153,6 @@ module.exports = function (RED) {
         setupWsClient();
         node.on('close', () => {
             node.trace('Close node');
-            node.status({});
             clearTimeout(reconnectTimeout);
             needReconnect = false;
             try {
@@ -156,6 +160,7 @@ module.exports = function (RED) {
             } catch (err) {
 
             }
+            node.status({});
         });
     }
 
@@ -171,8 +176,8 @@ module.exports = function (RED) {
             if (options && options.auth && (options.auth.user || options.auth.bearer)) {
                 reqoptions.auth = options.auth;
             }
-            reqoptions.method = form["http:methodName"] ? form["http:methodName"] : "GET";
-            node.debug(`Request options: ${JSON.stringify(reqoptions)}`);
+            reqoptions.method = form.hasOwnProperty("http:methodName") ? form["http:methodName"] : "GET";
+            node.trace(`LongPoll Request options: ${JSON.stringify(reqoptions)}`);
             needReconnect = true;
             reqObj = request(reqoptions, (err, res, body) => {
                 if (err) {
@@ -190,8 +195,7 @@ module.exports = function (RED) {
                     msg.statusCode = res.statusCode;
                     msg.headers = res.headers;
                     msg.responseUrl = res.request.uri.href;
-                    if (form.mediaType && 
-                        form.mediaType === "application/json") {
+                    if (form.mediaType === "application/json") {
                         try {
                             msg.payload = JSON.parse(body);
                         } catch(e) {
@@ -221,29 +225,26 @@ module.exports = function (RED) {
     }
 
     function bindingHttp(node, form, options={}) { // options.interaction, options.auth, options.reqbody, options.msg
-        if (!options) {
-            node.debug('Http binding needs options parameter.');
-            return;
-        }
         const msg = options.msg || {};
         const reqoptions = {}; 
         reqoptions.uri = extractTemplate(form.href, options.urivars);
         reqoptions.rejectUnauthorized = false;
-        if (options.auth && (options.auth.user || options.auth.bearer)) {
+        if (options.hasOwnProperty("auth") && 
+            (options.auth.hasOwnProperty("user") || options.auth.hasOwnProperty("bearer"))) {
             reqoptions.auth = options.auth;
         }
         if (options.interaction === "property-read") {
-            reqoptions.method = form["http:methodName"] ? form["http:methodName"] : "GET";
+            reqoptions.method = form.hasOwnProperty("http:methodName") ? form["http:methodName"] : "GET";
         } else if (options.interaction === "property-write") {
-            reqoptions.method = form["http:methodName"] ? form["http:methodName"] : "PUT";
-            reqoptions.json = form.mediaType && form.mediaType === "application/json";
+            reqoptions.method = form.hasOwnProperty("http:methodName") ? form["http:methodName"] : "PUT";
+            reqoptions.json = form.mediaType === "application/json";
             reqoptions.body = options.reqbody;
         } else { // assume "action"
-            reqoptions.method = form["http:methodName"] ? form["http:methodName"] : "POST";
-            reqoptions.json = form.mediaType && form.mediaType === "application/json";
+            reqoptions.method = form.hasOwnProperty("http:methodName") ? form["http:methodName"] : "POST";
+            reqoptions.json = form.mediaType === "application/json";
             reqoptions.body = options.reqbody;
         }
-        node.debug(`request options: ${JSON.stringify(reqoptions)}`);
+        node.trace(`HTTP request options: ${JSON.stringify(reqoptions)}`);
         request(reqoptions, (err, res, body) => {
             if (err) {
                 msg.payload = `${err.toString()}: ${reqoptions.uri}`;
@@ -253,8 +254,7 @@ module.exports = function (RED) {
                 msg.statusCode = res.statusCode;
                 msg.headers = res.headers;
                 msg.responseUrl = res.request.uri.href;
-                if (form.mediaType && 
-                    form.mediaType === "application/json") {
+                if (form.mediaType === "application/json") {
                     try {
                         msg.payload = JSON.parse(body);
                     } catch(e) {
@@ -278,7 +278,8 @@ module.exports = function (RED) {
         node.proptype = config.proptype;
         node.actname = config.actname;
         node.evname = config.evname;
-        console.log(JSON.stringify(node));
+        node.status({});
+        node.debug(`node config: ${JSON.stringify(node)}`);
         const username = node.credentials.username;
         const password = node.credentials.password;
         const token = node.credentials.token;
@@ -300,7 +301,7 @@ module.exports = function (RED) {
                 node.on("input", (msg) => {
                     const prop = normTd.properties[node.propname];
                     const form = formSelection("property-read", prop.forms);
-                    const urivars = prop.uriVariables ? msg.payload : {};
+                    const urivars = prop.hasOwnProperty("uriVariables") ? msg.payload : {};
                     bindingHttp(node, form, {interaction:"property-read", auth, msg, urivars});
                 });
             } else if (node.proptype === "write") {
@@ -313,7 +314,7 @@ module.exports = function (RED) {
             } else if (node.proptype === "observe") {
                 const prop = normTd.properties[node.propname];
                 const form = formSelection("property-observe", prop.forms);
-                const urivars = prop.uriVariables ? msg.payload : {};
+                const urivars = prop.hasOwnProperty("uriVariables") ? msg.payload : {};
                 if (form.href.match(/^wss?:/)) { // websocket
                     bindingWebSocket(node, form, {auth, urivars});
                 } else { // long polling
@@ -324,13 +325,13 @@ module.exports = function (RED) {
             node.on("input", (msg) => {
                 const act = normTd.actions[node.actname];
                 const form = formSelection("action", act.forms);
-                const urivars = act.uriVariables ? msg.payload : {};  
+                const urivars = act.hasOwnProperty("uriVariables") ? msg.payload : {};  
                 bindingHttp(node, form, {interaction: "action", uth, msg, urivars, reqbody:msg.payload});                
             });
         } else if (node.interactiontype === "event") {
             const ev = normTd.events[node.evname];
             const form = formSelection("event", ev.forms);
-            const urivars = ev.uriVariables ? msg.payload : {};
+            const urivars = ev.hasOwnProperty("uriVariables") ? msg.payload : {};
             if (form.href.match(/^wss?:/)) { // websocket
                 bindingWebSocket(node, form, {auth, urivars});
             } else { // long polling
