@@ -7,7 +7,8 @@
             propname: {value: ""},
             proptype: {value: ""},
             actname: {value: ""},
-            evname: {value: ""}
+            evname: {value: ""},
+            name: {value: ""}
         },
         credentials: {
             token: {type: "password"},
@@ -18,7 +19,7 @@
         outputs: 1,
         icon: "{{&iconpath}}",
         label: function() {
-            var label = this.name || "{{&nodeName}}"
+            var label = "{{&ufName}}"
             if (this.interactiontype == "property") {
                 label = label + "-" + this.propname;
             } else if (this.interactiontype == "action") {
@@ -26,7 +27,13 @@
             } else if (this.interactiontype == "event") {
                 label = label + "-" + this.evname;
             }
-            return label;
+            return this.name || label;
+        },
+        labelStyle: function() {
+            return this.name ? "node_label_italic" : "";
+        },
+        paletteLabel: function() {
+            return "{{&ufName}}";
         },
         oneditprepare: function() {
             var rwo = {{&genproprwo}};
@@ -64,7 +71,7 @@
 
 <script type="text/x-red" data-template-name="{{&nodeName}}">
     <div class="form-row">
-        <label for="node-input-interactiontype">Interaction Type</label>
+        <label for="node-input-interactiontype"><i class="fa fa-exchange"></i> Interaction</label>
         <select id="node-input-interactiontype">
             <option value="property" selected>Property</option>
             <option value="action">Action</option>
@@ -72,7 +79,7 @@
         </select>
     </div>
     <div class="form-row int-sel int-prop-sel">
-        <label for="node-input-propname">Property name</label>
+        <label for="node-input-propname"><i class="fa fa-bar-chart"></i> Name</label>
         <select id="node-input-propname">
             {{#properties}}
             <option value="{{name}}">{{label}}</option>
@@ -80,7 +87,7 @@
         </select>
     </div>
     <div class="form-row int-sel int-act-sel">
-        <label for="node-input-actname">Action name</label>
+        <label for="node-input-actname"><i class="fa fa-bolt"></i> Name</label>
         <select id="node-input-actname">
             {{#actions}}
             <option value="{{name}}">{{label}}</option>
@@ -88,7 +95,7 @@
         </select>
     </div>
     <div class="form-row int-sel int-ev-sel">
-        <label for="node-input-evname">Event name</label>
+        <label for="node-input-evname"><i class="fa fa-bell"></i> Name</label>
         <select id="node-input-evname">
             {{#events}}
             <option value="{{name}}">{{label}}</option>
@@ -96,7 +103,7 @@
         </select>
     </div>
     <div class="form-row int-sel int-prop-sel">
-        <label for="node-input-proptype">Access type</label>
+        <label for="node-input-proptype"><i class="fa fa-pencil"></i> Access</label>
         <select id="node-input-proptype">
             <option value="read" selected>Read</option>
             <option value="write">Write</option>
@@ -104,21 +111,25 @@
         </select>
     </div>
     <div class="form-row cred-userpass hidden">
-        <label for="node-input-username"><i class="icon-tag"></i> Username</label>
+        <label for="node-input-username"><i class="fa fa-user"></i> Username</label>
         <input type="text" id="node-input-username">
-        <label for="node-input-password"><i class="icon-tag"></i> Password</label>
+        <label for="node-input-password"><i class="fa fa-key"></i> Password</label>
         <input type="password" id="node-input-password">
     </div>
     <div class="form-row cred-token hidden">
-        <label for="node-input-token"><i class="icon-tag"></i> Bearer Token</label>
+        <label for="node-input-token"><i class="fa fa-ticket"></i> Token</label>
         <input type="password" id="node-input-token">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Node name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
     </div>
 </script>
 
 <script type="text/x-red" data-help-name="{{&nodeName}}">
 {{id}}
 
-<p>{{name}}</p>
+<p>{{ufName}}</p>
 {{description}}
 
 <h2>Properties</h2>
