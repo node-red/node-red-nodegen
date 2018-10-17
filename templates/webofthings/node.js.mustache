@@ -29,7 +29,7 @@ module.exports = function (RED) {
             if (f && !f.hasOwnProperty("mediaType")) { f.mediaType = "application/json"; } // default value of mediaType is json
             return f;
         };
-        const baseUrl = td.base;
+        const baseUrl = td.base || "";
         for (const p in td.properties) {
             let forms = td.properties[p].forms;
             if (forms) {
