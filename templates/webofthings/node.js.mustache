@@ -16,7 +16,17 @@ module.exports = function (RED) {
                     f.security = td.security;
                 }
             }
-            if (f && !f.hasOwnProperty("mediaType")) { f.mediaType = "application/json"; } 
+            if (f && f.hasOwnProperty("rel")) {  
+                if (Array.isArray(f.rel) && f.rel.length > 0) {
+                    f.rel = f.rel[0];
+                }
+            }
+            if (f && f.hasOwnProperty("op")) { // if op is array, select first element.
+                if (Array.isArray(f.op) && f.op.length > 0) {
+                    f.op = f.op[0];
+                }
+            }
+            if (f && !f.hasOwnProperty("mediaType")) { f.mediaType = "application/json"; } // default value of mediaType is json
             return f;
         };
         const baseUrl = td.base;
@@ -52,16 +62,16 @@ module.exports = function (RED) {
     function formSelection(interaction, forms) {
         if (interaction === "property-read") {
             for (const f of forms) {
-                if ((f.hasOwnProperty("rel") && f.rel === "readproperty") ||
-                    (f.hasOwnProperty("op") && f.op === "readproperty")) {
+                if ((f.hasOwnProperty("rel") && f.rel.match(/^readproperty$/i)) ||
+                    (f.hasOwnProperty("op") && f.op.match(/^readproperty$/i))) {
                     return f;
                 }
             }
             return forms[0];
         } else if (interaction === "property-write") {
             for (const f of forms) {
-                if ((f.hasOwnProperty("rel") && f.rel === "writeproperty") ||
-                    (f.hasOwnProperty("op") && f.op === "writeproperty")) {
+                if ((f.hasOwnProperty("rel") && f.rel.match(/^writeproperty$/i)) ||
+                    (f.hasOwnProperty("op") && f.op.match(/^writeproperty$/i))) {
                     return f;
                 }
             }
