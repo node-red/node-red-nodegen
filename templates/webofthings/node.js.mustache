@@ -249,10 +249,12 @@ module.exports = function (RED) {
             reqoptions.method = form.hasOwnProperty("http:methodName") ? form["http:methodName"] : "PUT";
             reqoptions.json = form.mediaType === "application/json";
             reqoptions.body = options.reqbody;
+            reqoptions.headers = {'Content-Type': form.mediaType};
         } else { // assume "action"
             reqoptions.method = form.hasOwnProperty("http:methodName") ? form["http:methodName"] : "POST";
             reqoptions.json = form.mediaType === "application/json";
             reqoptions.body = options.reqbody;
+            reqoptions.headers = {'Content-Type': form.mediaType};
         }
         node.trace(`HTTP request options: ${JSON.stringify(reqoptions)}`);
         request(reqoptions, (err, res, body) => {
