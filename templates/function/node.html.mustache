@@ -28,14 +28,14 @@
 
 <script type="text/javascript">
     RED.nodes.registerType('{{&nodeName}}',{
-        color:"#C0DEED",
+        color: '{{&color}}',
         category: '{{&category}}',
         defaults: {
-            name: {value:""},
+            name: { value: '' },
         },
         inputs:1,
         outputs: {{&outputs}},
-        icon: "icon.png",
+        icon: '{{&icon}}',
         label: function() {
             return this.name || '{{&nodeName}}';
         }
