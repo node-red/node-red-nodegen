@@ -7,7 +7,8 @@
             propname: {value: ""},
             proptype: {value: ""},
             actname: {value: ""},
-            evname: {value: ""},
+            evname: {value: ""}, 
+            formindex: {value: 0},
             name: {value: ""}
         },
         credentials: {
@@ -37,14 +38,58 @@
         },
         oneditprepare: function() {
             var rwo = {{&genproprwo}};
+            var formsel = {{&genformsel}};
+
+            function prepareforms(idx) {
+                var inttype = $("#node-input-interactiontype").val();
+                $('#node-input-formindex').empty();
+                switch (inttype) {
+                    case "property":
+                        var propname = $("#node-input-propname").val();
+                        var proptype = $("#node-input-proptype").val();                       
+                        if (formsel.property[propname] && formsel.property[propname][proptype]) {
+                            var formelem = formsel.property[propname][proptype];
+                            for (var i=0; i < formelem.length; i++) {
+                                $('#node-input-formindex').append($("<option>", {value: formelem[i].index, text:formelem[i].secscheme+" "+formelem[i].title}));
+                            }
+                        };
+                        break;
+                    case "action":
+                        var actname = $("#node-input-actname").val();                       
+                        if (formsel.action[actname]) {
+                            var formelem = formsel.action[actname];
+                            for (var i=0; i < formelem.length; i++) {
+                                $('#node-input-formindex').append($("<option>", {value: formelem[i].index, text:formelem[i].secscheme+" "+formelem[i].title}));
+                            }
+                        }
+                        break;
+                    case "event":
+                        var evname = $("#node-input-evname").val();                    
+                        if (formsel.event[evname]) {
+                            var formelem = formsel.event[evname];
+                            for (var i=0; i < formelem.length; i++) {
+                                $('#node-input-formindex').append($("<option>", {value: formelem[i].index, text:formelem[i].secscheme+" "+formelem[i].title}));
+                            }
+                        }
+                        break;
+                }
+                if (idx) { 
+                    $('#node-input-formindex').val(idx);
+                }
+            }
+            prepareforms(this.formindex);
+
             $('#node-input-interactiontype').change(function() {
                 var inttype = $("#node-input-interactiontype").val();
                 $('.int-sel').hide();
                 if (inttype == "property") {
+                    $("#node-input-propname").change();
                     $(".int-prop-sel").show();
                 } else if (inttype == "action") {
+                    $("#node-input-actname").change();
                     $(".int-act-sel").show();
                 } else {
+                    $("#node-input-evname").change();
                     $(".int-ev-sel").show();
                 }
             });
@@ -62,9 +107,86 @@
                         $('#node-input-proptype').children("[value='observe']").removeAttr("disabled");
                     }
                 }
+                $('#node-input-proptype').change();
             });
-            $('.cred-userpass').show();
-            $('.cred-token').show();
+            $('#node-input-proptype').change(function() {
+                var formindex = $("#node-input-formindex").val();
+                var propname = $("#node-input-propname").val();
+                var proptype = $("#node-input-proptype").val();
+                if (formsel.property[propname] && formsel.property[propname][proptype] &&
+                    formsel.property[propname][proptype].find(function(e){return e.index==formindex})) {
+                    prepareforms(formindex);
+                } else {
+                    prepareforms(null);
+                }
+                $('#node-input-formindex').change();
+            });
+            $('#node-input-actname').change(function() {
+                var actname = $("#node-input-actname").val();
+                var formindex = $("#node-input-formindex").val();
+                if (formsel.action[actname] &&
+                    formsel.action[actname].find(function(e){return e.index==formindex})) {
+                    prepareforms(formindex);
+                } else {
+                    prepareforms(null);
+                }
+                $('#node-input-formindex').change();
+            });
+            $('#node-input-evname').change(function() {
+                var evname = $("#node-input-evname").val();
+                var formindex = $("#node-input-formindex").val();
+                if (formsel.event[evname] &&
+                    formsel.event[evname].find(function(e){return e.index==formindex})) {
+                    prepareforms(formindex);
+                } else {
+                    prepareforms(null);
+                }
+                $('#node-input-formindex').change();
+            });
+            $("#node-input-formindex").change(function() {
+                var inttype = $("#node-input-interactiontype").val();
+                var formindex = $("#node-input-formindex").val();
+                var secscheme = undefined;
+                if (formindex) {
+                    switch (inttype) {
+                        case "property":
+                            var propname = $("#node-input-propname").val();
+                            var proptype = $("#node-input-proptype").val();
+                            if (formsel.property[propname] && formsel.property[propname][proptype]) {
+                                secscheme = formsel.property[propname][proptype].find(function(e){return e.index==formindex}).secscheme;
+                            }
+                            break;
+                        case "action":
+                            var actname = $("#node-input-actname").val();
+                            if (formsel.action[actname]) {
+                                secscheme = formsel.action[actname].find(function(e){return e.index==formindex}).secscheme;
+                            }
+                            break;
+                        case "event":
+                            var evname = $("#node-input-evname").val();
+                            if (formsel.event[evname]) {
+                                secscheme = formsel.event[evname].find(function(e){return e.index==formindex}).secscheme;
+                            }
+                            break;
+                    };
+                }
+                switch (secscheme) {
+                    case "basic":
+                    case "digest":
+                        $('.cred-userpass').show();
+                        $('.cred-token').hide();
+                        break;
+                    case "bearer":
+                    case "apikey":
+                        $('.cred-userpass').hide();
+                        $('.cred-token').show();
+                        break;
+                    default:
+                        $('.cred-userpass').hide();
+                        $('.cred-token').hide();
+                        break;
+                }
+            });
         }
     });
 </script>
@@ -82,7 +204,7 @@
         <label for="node-input-propname"><i class="fa fa-bar-chart"></i> Name</label>
         <select id="node-input-propname">
             {{#properties}}
-            <option value="{{name}}">{{label}}</option>
+            <option value="{{name}}">{{title}}</option>
             {{/properties}}
         </select>
     </div>
@@ -90,7 +212,7 @@
         <label for="node-input-actname"><i class="fa fa-bolt"></i> Name</label>
         <select id="node-input-actname">
             {{#actions}}
-            <option value="{{name}}">{{label}}</option>
+            <option value="{{name}}">{{title}}</option>
             {{/actions}}
         </select>
     </div>
@@ -98,7 +220,7 @@
         <label for="node-input-evname"><i class="fa fa-bell"></i> Name</label>
         <select id="node-input-evname">
             {{#events}}
-            <option value="{{name}}">{{label}}</option>
+            <option value="{{name}}">{{title}}</option>
             {{/events}}
         </select>
     </div>
@@ -108,6 +230,11 @@
             <option value="read" selected>Read</option>
             <option value="write">Write</option>
             <option value="observe">Observe</option>
+        </select>
+    </div>
+    <div class="form-row int-form-sel">
+        <label for="node-input-formindex"><i class=fa fa-pencil"></i> Form</label>
+        <select id="node-input-formindex">
         </select>
     </div>
     <div class="form-row cred-userpass hidden">
@@ -135,21 +262,40 @@
 <h2>Properties</h2>
 <ul>
 {{#properties}}
-  <li>{{label}}</li>
+  <li>
+  {{title}}: {{description}}
+   <ul>
+    {{#forms}}
+     <li>{{index}}: <code>{{href}}</code></li>
+    {{/forms}}
+   </ul> 
+  </li>
 {{/properties}}
 </ul>
 
 <h2>Actions</h2>
 <ul>
 {{#actions}}
-  <li>{{label}}</li>
+  <li>{{title}}: {{description}}
+   <ul>
+    {{#forms}}
+     <li>{{index}}: <code>{{href}}</code></li>
+    {{/forms}}
+   </ul> 
+</li>
 {{/actions}}
 </ul>
 
 <h2>Events</h2>
 <ul>
 {{#events}}
-  <li>{{label}}</li>
+  <li>{{title}}: {{description}}
+   <ul>
+    {{#forms}}
+     <li>{{index}}: <code>{{href}}</code></li>
+    {{/forms}}
+   </ul> 
+  </li>
 {{/events}}
 </ul>
 

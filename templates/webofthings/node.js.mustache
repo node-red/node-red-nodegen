@@ -5,107 +5,21 @@ module.exports = function (RED) {
     const HttpsProxyAgent = require('https-proxy-agent');
     const WebSocket = require('ws');
     const urltemplate = require('url-template');
- 
-    function normalizeTdForm(td) {
-        function formconv(intr,f) {
-            if (f && f.hasOwnProperty("href")) { f.href = url.resolve(baseUrl, f.href)}
-            if (f && !f.hasOwnProperty("security")) {
-                if (intr.hasOwnProperty("security")) {
-                    f.security = intr.security;
-                } else if (td.hasOwnProperty("security")) {
-                    f.security = td.security;
-                }
-            }
-            if (f && f.hasOwnProperty("rel")) {  
-                if (Array.isArray(f.rel) && f.rel.length > 0) {
-                    f.rel = f.rel[0];
-                }
-            }
-            if (f && f.hasOwnProperty("op")) { // if op is array, select first element.
-                if (Array.isArray(f.op) && f.op.length > 0) {
-                    f.op = f.op[0];
-                }
-            }
-            if (f && !f.hasOwnProperty("mediaType")) { f.mediaType = "application/json"; } // default value of mediaType is json
-            return f;
-        };
-        const baseUrl = td.base || "";
-        for (const p in td.properties) {
-            let forms = td.properties[p].forms;
-            if (forms) {
-                td.properties[p].forms = forms.map((f) => formconv(td.properties[p], f))
-                            .filter((f) => (f.hasOwnProperty("href") && (f.href.match(/^https?:/) || 
-                                    f.href.match(/^wss?:/))));                       
-            }
-            if (!td.properties[p].hasOwnProperty("observable")) { td.properties[p].observable = false;}
-            if (!td.properties[p].hasOwnProperty("writable")) { td.properties[p].writable = false;}
-        }
-        for (const a in td.actions) {
-            let forms = td.actions[a].forms;
-            if (forms) {
-                td.actions[a].forms = forms.map((f) => formconv(td.actions[a], f))
-                            .filter((f) => (f.hasOwnProperty("href") && (f.href.match(/^https?:/) || 
-                                    f.href.match(/^wss?:/))));
-            }
-        }
-        for (const e in td.events) {
-            let forms = td.events[e].forms;
-            if (forms) {
-                td.events[e].forms = forms.map((f) => formconv(td.events[e], f))
-                            .filter((f) => (f.hasOwnProperty("href") && (f.href.match(/^https?:/) || 
-                                   f.href.match(/^wss?:/))));
-            }
-        }
-        return td;
-    }
-
-    function formSelection(interaction, forms) {
-        if (interaction === "property-read") {
-            for (const f of forms) {
-                if ((f.hasOwnProperty("rel") && f.rel.match(/^readproperty$/i)) ||
-                    (f.hasOwnProperty("op") && f.op.match(/^readproperty$/i))) {
-                    return f;
-                }
-            }
-            return forms[0];
-        } else if (interaction === "property-write") {
-            for (const f of forms) {
-                if ((f.hasOwnProperty("rel") && f.rel.match(/^writeproperty$/i)) ||
-                    (f.hasOwnProperty("op") && f.op.match(/^writeproperty$/i))) {
-                    return f;
-                }
-            }
-            return forms[0];
-        } else if (interaction === "property-observe" || interaction === "event") {
-            // First priority: websocket
-            for (const f of forms) {
-                if (f.hasOwnProperty("href") && f.href.match(/^wss?:/)) {
-                    return f;
-                }
-            }
-            // Second priority: longpoll
-            for (const f of forms) {
-                if (f.hasOwnProperty("subProtocol") && f.subProtocol.match(/^longpoll$/i)) {
-                    return f;
-                }
-            }
-            // Third priority: observeproperty
-            for (const f of forms) {
-                if ((f.hasOwnProperty("rel") && f.rel.match(/^observeproperty$/i)) ||
-                    (f.hasOwnProperty("op") && f.op.match(/^observeproperty$/i))) { 
-                    return f;
-                }
-            }
-            return forms[0];
-        } else if (interaction === "action") {
-            return forms[0];
-        } else {
-            return forms[0];
-        }
-    }
+    const Ajv = require('ajv');
 
     function extractTemplate(href, context={}) {
         return urltemplate.parse(href).expand(context);
+    }
+
+    function getResType(form) {
+        if (form) {
+            if (form.response && form.response.contentType) {
+                return form.response.contentType;
+            } else if (form.contentType) {
+                return form.contentType;
+            }
+        }
+        return "application/json";
     }
 
     function bindingWebSocket(node, form, options={}) {
@@ -148,7 +62,7 @@ module.exports = function (RED) {
             ws.on('message', (data) => {
                 node.status({fill:"green",shape:"dot",text:"WS OK"});
                 const msg = {};
-                if (form.mediaType === "application/json") {
+                if (getResType(form) === "application/json") {
                     try {
                         msg.payload = JSON.parse(data);
                     } catch(e) {
@@ -157,6 +71,12 @@ module.exports = function (RED) {
                 } else {
                     msg.payload = data;
                 }
+                if (options.outschema) {
+                    const ajv = new Ajv();
+                    if (!ajv.validate(options.outschema, msg.payload)) {
+                        node.warn(`ouput schema validation error: ${ajv.errorsText()}`, msg);
+                    }
+                }     
                 node.send(msg)
             });
         }
@@ -205,7 +125,7 @@ module.exports = function (RED) {
                     msg.statusCode = res.statusCode;
                     msg.headers = res.headers;
                     msg.responseUrl = res.request.uri.href;
-                    if (form.mediaType === "application/json") {
+                    if (getResType(form) === "application/json") {
                         try {
                             msg.payload = JSON.parse(body);
                         } catch(e) {
@@ -214,7 +134,13 @@ module.exports = function (RED) {
                     } else {
                         msg.payload = body;
                     }
-                    // TODO: validation of return value    
+                    // TODO: validation of return value
+                    if (options.outschema) {
+                        const ajv = new Ajv();
+                        if (!ajv.validate(options.outschema, msg.payload)) {
+                            node.warn(`ouput schema validation error: ${ajv.errorsText()}`, msg);
+                        }
+                    }     
                     node.send(msg);
                     if (needReconnect) {
                         reconnectTimeout = setTimeout(setupLPClient, 5000);
@@ -247,18 +173,33 @@ module.exports = function (RED) {
             reqoptions.method = form.hasOwnProperty("http:methodName") ? form["http:methodName"] : "GET";
         } else if (options.interaction === "property-write") {
             reqoptions.method = form.hasOwnProperty("http:methodName") ? form["http:methodName"] : "PUT";
-            reqoptions.json = form.mediaType === "application/json";
-            reqoptions.body = options.reqbody;
-            reqoptions.headers = {'Content-Type': form.mediaType};
+            switch (reqoptions.method) {
+                case "GET":
+                    break;
+                case "POST":
+                case "PUT":
+                    reqoptions.json = form.contentType === "application/json";
+                    reqoptions.body = options.reqbody;
+                    reqoptions.headers = {'Content-Type': form.contentType};
+                    break;
+            }
         } else { // assume "action"
             reqoptions.method = form.hasOwnProperty("http:methodName") ? form["http:methodName"] : "POST";
-            reqoptions.json = form.mediaType === "application/json";
-            reqoptions.body = options.reqbody;
-            reqoptions.headers = {'Content-Type': form.mediaType};
+            switch (reqoptions.method) {
+                case "GET":
+                    break;
+                case "POST":
+                case "PUT":
+                    reqoptions.json = form.contentType === "application/json";
+                    reqoptions.body = options.reqbody;
+                    reqoptions.headers = {'Content-Type': form.contentType};
+                    break;
+            }
         }
         node.trace(`HTTP request options: ${JSON.stringify(reqoptions)}`);
         request(reqoptions, (err, res, body) => {
             if (err) {
+                node.log(`Error: ${err.toString()}`);
                 msg.payload = `${err.toString()}: ${reqoptions.uri}`;
                 msg.statusCode = err.code;
                 node.send(msg); 
@@ -266,7 +207,7 @@ module.exports = function (RED) {
                 msg.statusCode = res.statusCode;
                 msg.headers = res.headers;
                 msg.responseUrl = res.request.uri.href;
-                if (form.mediaType === "application/json") {
+                if (getResType(form) === "application/json") {
                     try {
                         msg.payload = JSON.parse(body);
                     } catch(e) {
@@ -275,12 +216,38 @@ module.exports = function (RED) {
                 } else {
                     msg.payload = body;
                 }
-                // TODO: validation of return value    
+                // TODO: validation of return value
+                if (options.outschema) {
+                    const ajv = new Ajv();
+                    if (!ajv.validate(options.outschema, msg.payload)) {
+                        node.warn(`ouput schema validation error: ${ajv.errorsText()}`, msg);
+                    }
+                }    
                 node.send(msg); 
             }
         });
     }
 
+    function makeauth(td, form, username, password, token) {
+        const scheme = td.securityDefinitions[form.security].scheme;
+        const auth = {};
+        switch (scheme) {
+            case "basic":
+                auth.user = username;
+                auth.pass = password;
+                auth.sendImmediately = true;
+                break;
+            case "digest":
+                auth.user = username;
+                auth.pass = password;
+                auth.sendImmediately = false;
+                break;
+            case "bearer":
+                auth.bearer = token;
+                break;
+        }
+        return auth;
+    }
 
     function Node(config) {
         RED.nodes.createNode(this, config);
@@ -290,67 +257,98 @@ module.exports = function (RED) {
         node.proptype = config.proptype;
         node.actname = config.actname;
         node.evname = config.evname;
+        node.formindex = config.formindex;
         node.status({});
         node.debug(`node config: ${JSON.stringify(node)}`);
         const username = node.credentials.username;
         const password = node.credentials.password;
         const token = node.credentials.token;
-        const auth = {};
-        // if username and password is set, use it.
-        if (username && password) {
-            auth.user = username;
-            auth.pass = password;
-            auth.sendImmediately = true;
-        } else if (token) {
-            auth.bearer = token
-            auth.sendImmediately = true;
-        }
      
-        node.td = JSON.parse(`{{&tdstr}}`);
-        const normTd = normalizeTdForm(node.td);
+        node.td = {{{tdstr}}};
+        const normTd = {{{normtd}}};
         if (node.interactiontype === "property") {
             if (node.proptype === "read") {
                 node.on("input", (msg) => {
                     const prop = normTd.properties[node.propname];
-                    const form = formSelection("property-read", prop.forms);
+                    const form = prop.forms[node.formindex];// formSelection("property-read", prop.forms);
+                    const auth = makeauth(normTd, form, username, password, token);
                     const urivars = prop.hasOwnProperty("uriVariables") ? msg.payload : {};
-                    bindingHttp(node, form, {interaction:"property-read", auth, msg, urivars});
+                    if (prop.uriVariables) {
+                        const ajv = new Ajv();
+                        if (!ajv.validate(prop.uriVariables, urlvars)) {
+                            node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
+                        }
+                    }
+                    bindingHttp(node, form, {interaction:"property-read", auth, msg, urivars, outschema: prop});
                 });
             } else if (node.proptype === "write") {
                 node.on("input", (msg) => {
                     const prop = normTd.properties[node.propname];
-                    const form = formSelection("property-write", prop.forms);
+                    const form = prop.forms[node.formindex];// formSelection("property-write", prop.forms);
+                    const auth = makeauth(normTd, form, username, password, token);
+                    const ajv = new Ajv();
+                    if (!ajv.validate(prop, msg.payload)) {
+                        node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
+                    }
                     // URI template is not supported, because 'write' doesn't use GET method.
                     bindingHttp(node, form, {interaction: "property-write", auth, msg, reqbody: msg.payload});    
                 });
             } else if (node.proptype === "observe") {
                 const prop = normTd.properties[node.propname];
-                const form = formSelection("property-observe", prop.forms);
+                const form = prop.forms[node.formindex];// formSelection("property-observe", prop.forms);
+                const auth = makeauth(normTd, form, username, password, token);
                 const urivars = prop.hasOwnProperty("uriVariables") ? msg.payload : {};
+                if (prop.uriVariables) {
+                    const ajv = new Ajv();
+                    if (!ajv.validate(prop.uriVariables, urivars)) {
+                        node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
+                    }
+                }
                 if (form.href.match(/^wss?:/)) { // websocket
-                    bindingWebSocket(node, form, {auth, urivars});
+                    bindingWebSocket(node, form, {auth, urivars, outschema: prop});
                 } else { // long polling
-                    bindingLongPoll(node, form, {auth, urivars});
+                    bindingLongPoll(node, form, {auth, urivars, outschema: prop});
                 }               
             }
         } else if (node.interactiontype === "action") {
             node.on("input", (msg) => {
                 const act = normTd.actions[node.actname];
-                const form = formSelection("action", act.forms);
-                const urivars = act.hasOwnProperty("uriVariables") ? msg.payload : {};  
+                const form = act.forms[node.formindex];// formSelection("action", act.forms);
+                const auth = makeauth(normTd, form, username, password, token);
+                const urivars = act.hasOwnProperty("uriVariables") ? msg.payload : {};
+                if (act.uriVariables) {
+                    const ajv = new Ajv();
+                    if (!ajv.validate(act.uriVariables, urivars)) {
+                        node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
+                    }
+                }
+                if (act.input) {
+                    const ajv = new Ajv();
+                    if (!ajv.validate(act.input, msg.payload)) {
+                        node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
+                    }
+                }
                 bindingHttp(node, form, {interaction: "action", auth, msg, urivars, reqbody:msg.payload});                
             });
         } else if (node.interactiontype === "event") {
             const ev = normTd.events[node.evname];
-            const form = formSelection("event", ev.forms);
+            const form = ev.forms[node.formindex];// formSelection("event", ev.forms);
+            const auth = makeauth(normTd, form, username, password, token);
             const urivars = ev.hasOwnProperty("uriVariables") ? msg.payload : {};
+            if (ev.uriVariables) {
+                const ajv = new Ajv();
+                if (!ajv.validate(ev.uriVariables, urivars)) {
+                    node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
+                }
+            }
             if (form.href.match(/^wss?:/)) { // websocket
                 bindingWebSocket(node, form, {auth, urivars});
             } else { // long polling
                 bindingLongPoll(node, form, {auth, urivars});
             }               
         }
-    };
+    }
+    
     RED.nodes.registerType("{{&nodeName}}", Node, {
         credentials: {
             token: {type:"password"},

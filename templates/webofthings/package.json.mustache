@@ -19,12 +19,18 @@
     "dependencies": {
         "https-proxy-agent": "^2.2.1",
         "request": "^2.88.0",
-        "ws": "^6.1.0",
-        "url-template": "^2.0.8"
+        "ws": "^6.1.2",
+        "url-template": "^2.0.8",
+        "ajv": "^6.7.0"
     },
     "devDependencies": {
-        "node-red": "0.19.4",
-        "node-red-node-test-helper": "0.1.8"
+        "node-red": "^0.19.5",
+        "node-red-node-test-helper": "^0.1.8"
     },
-    "license": "{{&licenseName}}"
+    "license": "{{&licenseName}}",
+    "wot": {
+        {{#wotmeta}}
+        "{{name}}": "{{value}}"{{^last}}, {{/last}}
+        {{/wotmeta}}
+    }
 }
