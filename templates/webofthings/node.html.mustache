@@ -110,36 +110,45 @@
                 $('#node-input-proptype').change();
             });
             $('#node-input-proptype').change(function() {
-                var formindex = $("#node-input-formindex").val();
-                var propname = $("#node-input-propname").val();
-                var proptype = $("#node-input-proptype").val();
-                if (formsel.property[propname] && formsel.property[propname][proptype] &&
-                    formsel.property[propname][proptype].find(function(e){return e.index==formindex})) {
-                    prepareforms(formindex);
-                } else {
-                    prepareforms(null);
+                var inttype = $("#node-input-interactiontype").val();
+                if (inttype === "property") {
+                    var formindex = $("#node-input-formindex").val();
+                    var propname = $("#node-input-propname").val();
+                    var proptype = $("#node-input-proptype").val();
+                    if (formsel.property[propname] && formsel.property[propname][proptype] &&
+                          formsel.property[propname][proptype].find(function(e){return e.index==formindex})) {
+                        prepareforms(formindex);
+                    } else {
+                        prepareforms(null);
+                    }
                 }
                 $('#node-input-formindex').change();
             });
             $('#node-input-actname').change(function() {
-                var actname = $("#node-input-actname").val();
-                var formindex = $("#node-input-formindex").val();
-                if (formsel.action[actname] &&
-                    formsel.action[actname].find(function(e){return e.index==formindex})) {
-                    prepareforms(formindex);
-                } else {
-                    prepareforms(null);
+                var inttype = $("#node-input-interactiontype").val();
+                if (inttype === "action") {
+                    var actname = $("#node-input-actname").val();
+                    var formindex = $("#node-input-formindex").val();
+                    if (formsel.action[actname] &&
+                        formsel.action[actname].find(function(e){return e.index==formindex})) {
+                        prepareforms(formindex);
+                    } else {
+                        prepareforms(null);
+                    }
                 }
                 $('#node-input-formindex').change();
             });
             $('#node-input-evname').change(function() {
-                var evname = $("#node-input-evname").val();
-                var formindex = $("#node-input-formindex").val();
-                if (formsel.event[evname] &&
-                    formsel.event[evname].find(function(e){return e.index==formindex})) {
-                    prepareforms(formindex);
-                } else {
-                    prepareforms(null);
+                var inttype = $("#node-input-interactiontype").val();
+                if (inttype === "event") {
+                    var evname = $("#node-input-evname").val();
+                    var formindex = $("#node-input-formindex").val();
+                    if (formsel.event[evname] &&
+                        formsel.event[evname].find(function(e){return e.index==formindex})) {
+                        prepareforms(formindex);
+                    } else {
+                        prepareforms(null);
+                    }
                 }
                 $('#node-input-formindex').change();
             });
@@ -233,7 +242,7 @@
         </select>
     </div>
     <div class="form-row int-form-sel">
-        <label for="node-input-formindex"><i class=fa fa-pencil"></i> Form</label>
+        <label for="node-input-formindex"><i class="fa fa-pencil"></i> Form</label>
         <select id="node-input-formindex">
         </select>
     </div>
@@ -254,52 +263,76 @@
 </script>
 
 <script type="text/x-red" data-help-name="{{&nodeName}}">
-{{id}}
+<p>{{description}}</p>
 
-<p>{{ufName}}</p>
-{{description}}
+<h3>Inputs</h3>
+  <dl class="message-properties">
+    <dt class="optional">payload<span class="property-type">object</span></dt>
+    <dd><p>read: argument for urlVariable, as an object.</p>
+        <p>write: Values to write.</p>
+        <p>action: Argument for action.</p>
+    </dd>
+  </dl>
 
-<h2>Properties</h2>
-<ul>
+<h3>Outputs</h3>
+  <dl class="message-properties">
+    <dt>payload<span class="property-type">object</span></dt>
+    <dd>result</dd>
+  </dl>
+
+<h3>Details</h3>
+
+<h4>Properties</h4>
+<p>To read a property, send message to a node as a trigger.
+To write a property, send value to a node.  
+To observe a property, a node emit messages when value changes.</p>
+<dl>
 {{#properties}}
-  <li>
-  {{title}}: {{description}}
-   <ul>
-    {{#forms}}
-     <li>{{index}}: <code>{{href}}</code></li>
-    {{/forms}}
-   </ul> 
-  </li>
+ <dt>{{title}}: {{description}}</dt>
+ <dd>
+  <ul>
+   {{#forms}}
+    <li><code>{{href}}</code></li>
+   {{/forms}}
+  </ul> 
+ </dd>
 {{/properties}}
-</ul>
+</dl>
 
-<h2>Actions</h2>
-<ul>
+<h4>Actions</h4>
+<p>To invoke an action, send message to a node with arguments in payload.</p> 
+<dl>
 {{#actions}}
-  <li>{{title}}: {{description}}
+  <dt>{{title}}: {{description}} {{#safe}}<code>safe</code>{{/safe}}{{#idempotent}}<code>idempotent</code>{{/idempotent}}</dt>
+  <dd>
    <ul>
     {{#forms}}
-     <li>{{index}}: <code>{{href}}</code></li>
+     <li><code>{{href}}</code></li>
     {{/forms}}
-   </ul> 
-</li>
+   </ul>
+  </dd>
 {{/actions}}
-</ul>
+</dl>
 
-<h2>Events</h2>
-<ul>
+<h4>Events</h4>
+<p>A node emit messages when event occurred.</p>
+<dl>
 {{#events}}
-  <li>{{title}}: {{description}}
+  <dt>{{title}}: {{description}}</dt>
+  <dd>
    <ul>
     {{#forms}}
-     <li>{{index}}: <code>{{href}}</code></li>
+     <li><code>{{href}}</code></li>
     {{/forms}}
    </ul> 
-  </li>
+  </dd>
 {{/events}}
-</ul>
+</dl>
 
-<h2>Related Resources</h2>
+<h3>Support Information</h3>
+<p>{{support}}</p>
+
+<h3>References</h3>
 <ul>
 {{#links}}
   <li><a href="{{href}}" target="_blank">{{rel}}</a></li>
