@@ -81,6 +81,7 @@ module.exports = function (RED) {
                 nodeParam = node.{{&methodName}}_{{&camelCaseName}};
                 nodeParamType = node.{{&methodName}}_{{&camelCaseName}}Type;
                 parameters.{{&camelCaseName}} = nodeParamType === 'str' ? nodeParam || '' : RED.util.getMessageProperty(msg, nodeParam);
+                parameters.{{&camelCaseName}} = !!parameters.{{&camelCaseName}} ? parameters.{{&camelCaseName}} : msg.payload;
                 {{/isNotBodyParam}}
                 {{/parameters}}
 
