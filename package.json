@@ -85,7 +85,6 @@
         "mustache": "2.3.0",
         "request": "2.83.0",
         "swagger-js-codegen-formdata": "^0.15.4",
-        "upgrade": "^1.1.0",
         "when": "3.7.8",
         "yamljs": "0.3.0"
     },
