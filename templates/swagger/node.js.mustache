@@ -86,6 +86,7 @@ module.exports = function (RED) {
                 } else {
                     {{&methodName}}_parameters.{{&camelCaseName}} = RED.util.getMessageProperty(msg, {{&methodName}}_nodeParam);
                 }
+                {{&methodName}}_parameters.{{&camelCaseName}} = !!{{&methodName}}_parameters.{{&camelCaseName}} ? {{&methodName}}_parameters.{{&camelCaseName}} : msg.payload;
                 {{/isNotBodyParam}}
                 {{/parameters}}
                 result = client.{{&methodName}}({{&methodName}}_parameters);
