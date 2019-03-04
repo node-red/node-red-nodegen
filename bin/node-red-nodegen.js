@@ -62,9 +62,9 @@ function help() {
         '   Node generator for Node-RED\n' +
         '\n' +
         'Supported source:'.bold + '\n' +
-        '   - Function node (js file in library, "~/.node-red/lib/function/")\n' +
+        '   - Open API document\n' +
         // '   - Subflow node (json file of subflow)\n' +
-        '   - Swagger definition\n' +
+        '   - Function node (js file in library, "~/.node-red/lib/function/")\n' +
         '\n' +
         'Options:\n'.bold +
         '   -o : Destination path to save generated node (default: current directory)\n' +
@@ -74,8 +74,8 @@ function help() {
         '   --version : Node version (format: "number.number.number" like "4.5.1")\n' +
         '   --keywords : Additional keywords (format: comma separated string, default: "node-red-nodegen")\n' +
         '   --category : Node category (default: "function")\n' +
-        '   --icon : png or gif file for node appearance (image size should be 10x20)\n' +
-        '   --color : color for node appearance (format: color hexadecimal numbers like "A6BBCF")\n' +
+        '   --icon : PNG file for node appearance (image size should be 10x20)\n' +
+        '   --color : Color for node appearance (format: color hexadecimal numbers like "A6BBCF")\n' +
         '   --tgz : Save node as tgz file\n' +
         '   --help : Show help\n' +
         '   -v : Show node generator version\n';

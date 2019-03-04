@@ -66,43 +66,66 @@ module.exports = function (RED) {
             var result;
             {{#methods}}
             if (!errorFlag && node.method === '{{&methodName}}') {
-                var parameters = [], nodeParam, nodeParamType;
+                var {{&methodName}}_parameters = [];
+                var {{&methodName}}_nodeParam;
+                var {{&methodName}}_nodeParamType;
                 {{#parameters}}
                 {{#isBodyParam}}
                 if (typeof msg.payload === 'object') {
-                    parameters.{{&camelCaseName}} = msg.payload;
+                    {{&methodName}}_parameters.{{&camelCaseName}} = msg.payload;
                 } else {
-                    node.error('Unsupported type: \'' + (typeof msg.payload) + '\', '
-                             + 'msg.payload must be JSON object or buffer.', msg);
+                    node.error('Unsupported type: \'' + (typeof msg.payload) + '\', ' + 'msg.payload must be JSON object or buffer.', msg);
                     errorFlag = true;
                 }
                 {{/isBodyParam}}
                 {{#isNotBodyParam}}
-                nodeParam = node.{{&methodName}}_{{&camelCaseName}};
-                nodeParamType = node.{{&methodName}}_{{&camelCaseName}}Type;
-                parameters.{{&camelCaseName}} = nodeParamType === 'str' ? nodeParam || '' : RED.util.getMessageProperty(msg, nodeParam);
-                parameters.{{&camelCaseName}} = !!parameters.{{&camelCaseName}} ? parameters.{{&camelCaseName}} : msg.payload;
+                {{&methodName}}_nodeParam = node.{{&methodName}}_{{&camelCaseName}};
+                {{&methodName}}_nodeParamType = node.{{&methodName}}_{{&camelCaseName}}Type;
+                if ({{&methodName}}_nodeParamType === 'str') {
+                    {{&methodName}}_parameters.{{&camelCaseName}} = {{&methodName}}_nodeParam || '';
+                } else {
+                    {{&methodName}}_parameters.{{&camelCaseName}} = RED.util.getMessageProperty(msg, {{&methodName}}_nodeParam);
+                }
+                {{&methodName}}_parameters.{{&camelCaseName}} = !!{{&methodName}}_parameters.{{&camelCaseName}} ? {{&methodName}}_parameters.{{&camelCaseName}} : msg.payload;
                 {{/isNotBodyParam}}
                 {{/parameters}}
-
-                result = client.{{&methodName}}(parameters);
+                result = client.{{&methodName}}({{&methodName}}_parameters);
             }
             {{/methods}}
             if (!errorFlag && result === undefined) {
                 node.error('Method is not specified.', msg);
                 errorFlag = true;
             }
-
+            var setData = function (msg, data) {
+                if (data) {
+                    if (data.response) {
+                        if (data.response.statusCode) {
+                            msg.statusCode = data.response.statusCode;
+                        }
+                        if (data.response.headers) {
+                            msg.headers = data.response.headers;
+                        }
+                        if (data.response.request && data.response.request.uri && data.response.request.uri.href) {
+                            msg.responseUrl = data.response.request.uri.href;
+                        }
+                    }
+                    if (data.body) {
+                        msg.payload = data.body;
+                    }
+                }
+                return msg;
+            };
             if (!errorFlag) {
                 node.status({ fill: 'blue', shape: 'dot', text: '{{&className}}.status.requesting' });
-                result.then(function (response) {
-                    if (response.body !== null && response.body !== undefined) {
-                        msg.payload = response.body;
-                    }
-                    node.send(msg);
+                result.then(function (data) {
+                    node.send(setData(msg, data));
                     node.status({});
                 }).catch(function (error) {
-                    node.error(error, msg);
+                    var message = null;
+                    if (error && error.body && error.body.message) {
+                        message = error.body.message;
+                    }
+                    node.error(message, setData(msg, error));
                     node.status({ fill: 'red', shape: 'ring', text: 'node-red:common.status.error' });
                 });
             }
