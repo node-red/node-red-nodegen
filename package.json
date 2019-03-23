@@ -76,7 +76,7 @@
         "swagger-codegen"
     ],
     "dependencies": {
-        "ajv": "^6.7.0",
+        "ajv": "^6.10.0",
         "colors": "1.1.2",
         "csv-string": "3.1.2",
         "javascript-obfuscator": "0.16.0",
@@ -91,12 +91,12 @@
     },
     "devDependencies": {
         "del": "3.0.0",
-        "grunt": "1.0.1",
+        "grunt": "^1.0.3",
         "grunt-mocha-istanbul": "5.0.2",
         "grunt-shell": "2.1.0",
         "grunt-simple-mocha": "0.4.1",
         "istanbul": "0.4.5",
-        "node-red": "0.18.4",
+        "node-red": "^0.20.3",
         "node-red-node-test-helper": "0.1.8",
         "q": "1.5.1",
         "should": "13.1.3",

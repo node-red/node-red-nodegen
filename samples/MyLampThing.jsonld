@@ -1,43 +1,39 @@
-{
-    "@context": ["http://www.w3.org/ns/td", 
-                {"iot": "http://iotschema.org/"}],
-    "@type" : "Thing",
-    "id": "urn:dev:wot:com:example:servient:lamp",
-    "name": "MyLampThing",
-    "description" : "MyLampThing uses JSON-LD 1.1 serialization",
-    "security": [{"scheme": "psk"}],
-    "properties": {
-        "status": {
-            "@type" : "iot:SwitchStatus",
-            "description" : "Shows the current status of the lamp",
-            "writable": false,
-            "observable": false,
-            "type": "string",
-            "forms": [{
-                "href": "coaps://mylamp.example.com/status",
-                "mediaType": "application/json"
-            }]
-        }
-    },
-    "actions": {
-        "toggle": {
-            "@type" : "iot:SwitchStatus",
-            "description" : "Turn on or off the lamp",
-            "forms": [{
-                "href": "coaps://mylamp.example.com/toggle",
-                "mediaType": "application/json"
-            }]
-        }
-    },
-    "events": {
-        "overheating": {
-            "@type" : "iot:TemperatureAlarm",
-            "description" : "Lamp reaches a critical temperature (overheating)",
-            "type": "string",
-            "forms": [{
-                "href": "coaps://mylamp.example.com/oh",
-                "mediaType": "application/json"
-            }]
+ {
+        "@context": [
+            "http://www.w3.org/ns/td",
+            {"http": "http://www.w3.org/2011/http#"}
+        ],
+        "id": "urn:dev:wot:com:example:servient:lamp",
+        "name": "MyLampThing",
+        "securityDefinitions": {"basic_sc": {
+            "scheme": "basic",
+            "in": "header"
+        }},
+        "security": ["basic_sc"],
+        "properties": {
+            "status": {
+                "type": "string",
+                "forms": [{
+                    "href": "https://mylamp.example.com/status",
+                    "http:methodName": "GET"
+                }]
+            }
+        },
+        "actions": {
+            "toggle": {
+                "forms": [{
+                    "href": "https://mylamp.example.com/toggle",
+                    "http:methodName": "POST"
+                }]
+            }
+        },
+        "events": {
+            "overheating": {
+                "data": {"type": "string"},
+                "forms": [{
+                    "href": "https://mylamp.example.com/oh",
+                    "subprotocol": "longpoll"
+                }]
+            }
         }
     }
-}
