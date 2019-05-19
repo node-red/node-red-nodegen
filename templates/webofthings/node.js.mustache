@@ -1,6 +1,6 @@
 module.exports = function (RED) {
     "use strict";
-    const request = require("request");
+    const request = require('request');
     const url = require('url');
     const HttpsProxyAgent = require('https-proxy-agent');
     const WebSocket = require('ws');
@@ -20,6 +20,129 @@ module.exports = function (RED) {
             }
         }
         return "application/json";
+    }
+
+    function coapMethodCodeToName(methodCode) {
+        switch (methodCode) {
+            case '1':
+            case '0.01':
+            case 'get':
+            case 'GET':
+                return 'get';
+                break;
+            case '2':
+            case '0.02':
+            case 'post':
+            case 'POST':
+                return 'post';
+                break;
+            case '3':
+            case '0.03':
+            case 'put':
+            case 'PUT':
+                return 'put';
+                break;
+            case '4':
+            case '0.04':
+            case 'delete':
+            case 'DELETE':
+                return 'delete';
+                break;
+            default:
+                return 'get';
+                break;
+        }
+    }
+
+    function bindingCoap(node, form, options={}) { // options.psk
+        const coap = require("node-coap-client").CoapClient;
+        node.trace("bindingCoap called");
+        const msg = options.msg || {};
+        const resource = extractTemplate(form.href, options.urivars);
+        let payload = null;
+        let method = null;
+
+        if (options.interaction === "property-read") {
+            method = form.hasOwnProperty("cov:methodName") ?
+                coapMethodCodeToName(form['cov:methodName']) : 'get';
+        } else if (options.interaction === "property-write") {
+            method = form.hasOwnProperty("cov:methodName") ?
+                coapMethodCodeToName(form['cov:methodName']) : 'put';
+            payload = options.reqbody;
+        } else { // assume "action"
+            method = form.hasOwnProperty("cov:methodName") ?
+                coapMethodCodeToName(form['cov:methodName']) : 'post';
+            payload = options.reqbody;
+        }
+
+        node.trace(`CoAP request: resource=${resource}, method=${method}, payload=${payload}`);
+        coap.request(resource, method, payload)
+        .then(response => {  // code, format, payload
+            node.trace(`CoAP response: code=${response.code.toString()}, format=${response.format}, payload=${response.payload}`);
+            if (response.format === 50) {  // application/json; rfc7252 section 12.3, table 9
+                try {
+                    msg.payload = JSON.parse(response.payload);
+                } catch (e) {
+                    msg.payload = response.payload;
+                }
+            } else {
+                msg.payload = response.payload;
+            }
+            if (options.outschema) {
+                const ajv = new Ajv({allErrors: true});
+                if (!ajv.validate(options.outschema, msg.payload)) {
+                    node.warn(`output schema validation error: ${ajv.errorsText()}`, msg);
+                }
+            }
+            node.send(msg);
+        })
+        .catch(err => {
+            node.log(`Error: ${err.toString()}`);
+            msg.payload = `${err.toString()}: ${resource}`;
+            node.send(msg);
+        });        
+    }
+
+    function bindingCoapObserve(node, form, options={}) {
+        const coap = require("node-coap-client").CoapClient;
+        node.status({fill:"yellow",shape:"dot",text:"CoAP try to observe ..."});
+        const resource = extractTemplate(form.href,options.urivars);
+        const method = form.hasOwnProperty("cov:methodName") ?
+            coapMethodCodeToName(form['cov:methodName']) : 'get';
+        const payload = options.reqbody;
+        const callback = response => { // code, format, payload
+            const msg = {};
+            node.trace(`CoAP observe: code=${response.code.toString()}, format=${response.format}, payload=${response.payload}`);
+            if (response.format === 50) {  // application/json; rfc7252 section 12.3, table 9
+                try {
+                    msg.payload = JSON.parse(response.payload);
+                } catch (e) {
+                    msg.payload = response.payload;
+                }
+            } else {
+                msg.payload = response.payload;
+            }
+            if (options.outschema) {
+                const ajv = new Ajv({allErrors: true});
+                if (!ajv.validate(options.outschema, msg.payload)) {
+                    node.warn(`output schema validation error: ${ajv.errorsText()}`, msg);
+                }
+            }
+            node.send(msg);
+        };
+        coap.observe(resource,method,callback,payload,options)
+        .then(() => {
+            node.status({fill:"green",shape:"dot",text:"CoAP Observing"});
+        })
+        .catch(err => {
+            node.status({fill:"red",shape:"dot",text:`CoAP Error: ${err}`});
+            node.log(`Error: ${err.toString()}`);
+        });
+        node.on('close', () => {
+            node.trace('Close node');
+            coap.stopObserving(resource);
+            node.status({});
+        });
     }
 
     function bindingWebSocket(node, form, options={}) {
@@ -74,7 +197,7 @@ module.exports = function (RED) {
                 if (options.outschema) {
                     const ajv = new Ajv({allErrors: true});
                     if (!ajv.validate(options.outschema, msg.payload)) {
-                        node.warn(`ouput schema validation error: ${ajv.errorsText()}`, msg);
+                        node.warn(`output schema validation error: ${ajv.errorsText()}`, msg);
                     }
                 }     
                 node.send(msg)
@@ -106,7 +229,7 @@ module.exports = function (RED) {
             if (options && options.auth && (options.auth.user || options.auth.bearer)) {
                 reqoptions.auth = options.auth;
             }
-            reqoptions.method = form.hasOwnProperty("http:methodName") ? form["http:methodName"] : "GET";
+            reqoptions.method = form.hasOwnProperty("htv:methodName") ? form["htv:methodName"] : "GET";
             node.trace(`LongPoll Request options: ${JSON.stringify(reqoptions)}`);
             needReconnect = true;
             reqObj = request(reqoptions, (err, res, body) => {
@@ -138,7 +261,7 @@ module.exports = function (RED) {
                     if (options.outschema) {
                         const ajv = new Ajv();
                         if (!ajv.validate(options.outschema, msg.payload)) {
-                            node.warn(`ouput schema validation error: ${ajv.errorsText()}`, msg);
+                            node.warn(`output schema validation error: ${ajv.errorsText()}`, msg);
                         }
                     }     
                     node.send(msg);
@@ -170,9 +293,9 @@ module.exports = function (RED) {
             reqoptions.auth = options.auth;
         }
         if (options.interaction === "property-read") {
-            reqoptions.method = form.hasOwnProperty("http:methodName") ? form["http:methodName"] : "GET";
+            reqoptions.method = form.hasOwnProperty("htv:methodName") ? form["htv:methodName"] : "GET";
         } else if (options.interaction === "property-write") {
-            reqoptions.method = form.hasOwnProperty("http:methodName") ? form["http:methodName"] : "PUT";
+            reqoptions.method = form.hasOwnProperty("htv:methodName") ? form["htv:methodName"] : "PUT";
             switch (reqoptions.method) {
                 case "GET":
                     break;
@@ -184,7 +307,7 @@ module.exports = function (RED) {
                     break;
             }
         } else { // assume "action"
-            reqoptions.method = form.hasOwnProperty("http:methodName") ? form["http:methodName"] : "POST";
+            reqoptions.method = form.hasOwnProperty("htv:methodName") ? form["htv:methodName"] : "POST";
             switch (reqoptions.method) {
                 case "GET":
                     break;
@@ -279,7 +402,11 @@ module.exports = function (RED) {
                             node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
                         }
                     }
-                    bindingHttp(node, form, {interaction:"property-read", auth, msg, urivars, outschema: prop});
+                    if (form.href.match(/^https?:/)) {
+                        bindingHttp(node, form, {interaction:"property-read", auth, msg, urivars, outschema: prop});
+                    } else if (form.href.match(/^coaps?:/)) {
+                        bindingCoap(node, form, {interaction:"property-read", auth, msg, urivars, outschema: prop});
+                    }
                 });
             } else if (node.proptype === "write") {
                 node.on("input", (msg) => {
@@ -291,7 +418,11 @@ module.exports = function (RED) {
                         node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
                     }
                     // URI template is not supported, because 'write' doesn't use GET method.
-                    bindingHttp(node, form, {interaction: "property-write", auth, msg, reqbody: msg.payload});    
+                    if (form.href.match(/^https?:/)) {
+                        bindingHttp(node, form, {interaction: "property-write", auth, msg, reqbody: msg.payload}); 
+                    } else if (form.href.match(/^coaps?:/)) {
+                        bindingCoap(node, form, {interaction: "property-write", auth, msg, reqbody: msg.payload}); 
+                    }
                 });
             } else if (node.proptype === "observe") {
                 const prop = normTd.properties[node.propname];
@@ -306,6 +437,8 @@ module.exports = function (RED) {
                 }
                 if (form.href.match(/^wss?:/)) { // websocket
                     bindingWebSocket(node, form, {auth, urivars, outschema: prop});
+                } else if (form.href.match(/^coaps?:/)) { // CoAP observe
+                    bindingCoapObserve(node, form, {auth, urivars, outschema: prop});
                 } else { // long polling
                     bindingLongPoll(node, form, {auth, urivars, outschema: prop});
                 }               
@@ -328,7 +461,11 @@ module.exports = function (RED) {
                         node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
                     }
                 }
-                bindingHttp(node, form, {interaction: "action", auth, msg, urivars, reqbody:msg.payload});                
+                if (form.href.match(/^https?:/)) {
+                    bindingHttp(node, form, {interaction: "action", auth, msg, urivars, reqbody:msg.payload});
+                } else if (form.href.match(/^coaps?/)) {
+                    bindingCoap(node, form, {interaction: "action", auth, msg, urivars, reqbody:msg.payload});
+                }                
             });
         } else if (node.interactiontype === "event") {
             const ev = normTd.events[node.evname];
@@ -343,6 +480,8 @@ module.exports = function (RED) {
             }
             if (form.href.match(/^wss?:/)) { // websocket
                 bindingWebSocket(node, form, {auth, urivars});
+            } else if (form.href.match(/^coaps?:/)) {
+                bindingCoapObserve(node, form, {auth, urivars});
             } else { // long polling
                 bindingLongPoll(node, form, {auth, urivars});
             }               
