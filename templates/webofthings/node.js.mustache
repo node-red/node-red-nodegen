@@ -22,6 +22,20 @@ module.exports = function (RED) {
         return "application/json";
     }
 
+    function isBinaryType(contentType) {
+        let result;
+        switch (contentType) {
+            case "image/jpeg":
+            case "application/octet-stream":
+                result = true;
+                break;
+            default:
+                result = false;
+                break;
+        }
+        return result;
+    }
+
     function coapMethodCodeToName(methodCode) {
         switch (methodCode) {
             case '1':
@@ -230,6 +244,9 @@ module.exports = function (RED) {
                 reqoptions.auth = options.auth;
             }
             reqoptions.method = form.hasOwnProperty("htv:methodName") ? form["htv:methodName"] : "GET";
+            if (isBinaryType(form.contentType)) {
+                reqoptions.encoding = null;
+            }
             node.trace(`LongPoll Request options: ${JSON.stringify(reqoptions)}`);
             needReconnect = true;
             reqObj = request(reqoptions, (err, res, body) => {
@@ -316,8 +333,14 @@ module.exports = function (RED) {
                     reqoptions.json = form.contentType === "application/json";
                     reqoptions.body = options.reqbody;
                     reqoptions.headers = {'Content-Type': form.contentType};
+                    if (form.hasOwnProperty("response") && isBinaryType(form.response.contentType)) {
+                        reqoptions.encoding = null;
+                    }
                     break;
             }
+        }
+        if (isBinaryType(form.contentType)) {
+            reqoptions.encoding = null;
         }
         node.trace(`HTTP request options: ${JSON.stringify(reqoptions)}`);
         request(reqoptions, (err, res, body) => {
