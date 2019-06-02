@@ -56,6 +56,8 @@ function help() {
         ' [--color <node color>]' +
         ' [--tgz]' +
         ' [--help]' +
+        ' [--wottd]' +
+        ' [--lang <accept-language>]' +
         ' [-v]\n' +
         '\n' +
         'Description:'.bold + '\n' +
@@ -79,6 +81,8 @@ function help() {
         '   --color : color for node appearance (format: color hexadecimal numbers like "A6BBCF")\n' +
         '   --tgz : Save node as tgz file\n' +
         '   --help : Show help\n' +
+        '   --wottd : Get Thing Description via HTTP\n' +
+        '   --lang : Language negotiation\n' +
         '   -v : Show node generator version\n';
     console.log(helpText);
 }
@@ -95,11 +99,32 @@ if (argv.help || argv.h) {
 } else {
     var sourcePath = argv._[0];
     if (sourcePath) {
-        if (sourcePath.startsWith('http://') || sourcePath.startsWith('https://')) {
+        if (!argv.wottd && (sourcePath.startsWith('http://') || sourcePath.startsWith('https://'))) {
             request(sourcePath, function (error, response, body) {
                 if (!error) {
                     data.src = JSON.parse(body);
                     nodegen.swagger2node(data, options).then(function (result) {
+                        console.log('Success: ' + result);
+                    }).catch(function (error) {
+                        console.log('Error: ' + error);
+                    });
+                } else {
+                    console.error(error);
+                }
+            });
+        } else if (argv.wottd && (sourcePath.startsWith('http://') || sourcePath.startsWith('https://'))) {
+            const req = {
+                url: sourcePath,
+            }
+            if (argv.lang) {
+                req.headers = {
+                    'Accept-Language': argv.lang
+                }
+            }
+            request(req, function (error, response, body) {
+                if (!error) {
+                    data.src = JSON.parse(body);
+                    nodegen.wottd2node(data, options).then(function (result) {
                         console.log('Success: ' + result);
                     }).catch(function (error) {
                         console.log('Error: ' + error);
