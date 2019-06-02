@@ -81,8 +81,8 @@ function help() {
         '   --color : color for node appearance (format: color hexadecimal numbers like "A6BBCF")\n' +
         '   --tgz : Save node as tgz file\n' +
         '   --help : Show help\n' +
-        '   --wottd : Get Thing Description via HTTP\n' +
-        '   --lang : Language negotiation\n' +
+        '   --wottd : explicitly instruct source file/URL points a Thing Description\n' +
+        '   --lang : Language negotiation information when retrieve a Thing Description\n' +
         '   -v : Show node generator version\n';
     console.log(helpText);
 }
@@ -133,7 +133,7 @@ if (argv.help || argv.h) {
                     console.error(error);
                 }
             });
-        } else if (sourcePath.endsWith('.json')) {
+        } else if (sourcePath.endsWith('.json') && !argv.wottd) {
             data.src = JSON.parse(fs.readFileSync(sourcePath));
             nodegen.swagger2node(data, options).then(function (result) {
                 console.log('Success: ' + result);
@@ -154,7 +154,7 @@ if (argv.help || argv.h) {
             }).catch(function (error) {
                 console.log('Error: ' + error);
             });
-        } else if (sourcePath.endsWith('.jsonld')) {
+        } else if (sourcePath.endsWith('.jsonld') || argv.wottd) {
             data.src = JSON.parse(fs.readFileSync(sourcePath));
             nodegen.wottd2node(data, options).then(function (result) {
                 console.log('Success: ' + result);

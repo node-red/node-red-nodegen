@@ -37,8 +37,8 @@ You may need to run this with `sudo`, or from within an Administrator command sh
        --category : Node category (default: "function")
        --tgz : Save node as tgz file
        --help : Show help
-       --wottd : Get Thing Description via HTTP
-       --lang : Language negotiation
+       --wottd : explicitly instruct that source file/URL points a Thing Description
+       --lang : Language negotiation information when retrieve a Thing Description
 
 ### Example 1. Create original node from Swagger definition
 
