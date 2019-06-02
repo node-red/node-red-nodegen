@@ -37,6 +37,8 @@ You may need to run this with `sudo`, or from within an Administrator command sh
        --category : Node category (default: "function")
        --tgz : Save node as tgz file
        --help : Show help
+       --wottd : Get Thing Description via HTTP
+       --lang : Language negotiation
 
 ### Example 1. Create original node from Swagger definition
 
@@ -72,6 +74,16 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 
 -> You can use Example Thing node on Node-RED flow editor.
 
+### Example 4. Create original node from Thing Description via HTTP
+
+- node-red-nodegen http://example.com/td.jsonld --wottd --lang "en-US,en;q=0.5"
+- cd node-red-contrib-example-thing
+- sudo npm link
+- cd ~/.node-red
+- npm link node-red-contrib-example-thing
+- node-red
+
+-> You can use Example Thing node on Node-RED flow editor.
 
 ## Documentation
 - [Use cases](docs/index.md#use-cases) ([Japanese](docs/index_ja.md#use-cases))
