@@ -25,7 +25,7 @@ You may need to run this with `sudo`, or from within an Administrator command sh
     Supported source:
        - Function node (js file in library, "~/.node-red/lib/function/")
        - Swagger definition
-       - Thing Description of W3C Web of Things (jsonld file in library, or URL that points jsonld file)
+       - Thing Description of W3C Web of Things (jsonld file or URL that points jsonld file)
 
     Options:
        -o : Destination path to save generated node (default: current directory)
