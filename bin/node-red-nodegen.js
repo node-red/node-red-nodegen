@@ -92,6 +92,16 @@ function version() {
     console.log(packageJson.version);
 }
 
+function skipBom(body) {
+    if (body[0]===0xEF &&
+        body[1]===0xBB &&
+        body[2]===0xBF) {
+        return body.slice(3);
+    } else {
+        return body;
+    }
+}
+
 if (argv.help || argv.h) {
     help();
 } else if (argv.v) {
@@ -123,7 +133,7 @@ if (argv.help || argv.h) {
             }
             request(req, function (error, response, body) {
                 if (!error) {
-                    data.src = JSON.parse(body);
+                    data.src = JSON.parse(skipBom(body));
                     nodegen.wottd2node(data, options).then(function (result) {
                         console.log('Success: ' + result);
                     }).catch(function (error) {
@@ -155,7 +165,7 @@ if (argv.help || argv.h) {
                 console.log('Error: ' + error);
             });
         } else if (sourcePath.endsWith('.jsonld') || argv.wottd) {
-            data.src = JSON.parse(fs.readFileSync(sourcePath));
+            data.src = JSON.parse(skipBom(fs.readFileSync(sourcePath)));
             nodegen.wottd2node(data, options).then(function (result) {
                 console.log('Success: ' + result);
             }).catch(function (error) {
