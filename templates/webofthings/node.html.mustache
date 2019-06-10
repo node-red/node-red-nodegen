@@ -212,7 +212,7 @@
     </div>
     <div class="form-row int-sel int-prop-sel">
         <label for="node-input-propname"><i class="fa fa-bar-chart"></i> Name</label>
-        <select id="node-input-propname">
+        <select id="node-input-propname" dir="auto">
             {{#properties}}
             <option value="{{name}}">{{title}}</option>
             {{/properties}}
@@ -220,7 +220,7 @@
     </div>
     <div class="form-row int-sel int-act-sel">
         <label for="node-input-actname"><i class="fa fa-bolt"></i> Name</label>
-        <select id="node-input-actname">
+        <select id="node-input-actname" dir="auto">
             {{#actions}}
             <option value="{{name}}">{{title}}</option>
             {{/actions}}
@@ -228,7 +228,7 @@
     </div>
     <div class="form-row int-sel int-ev-sel">
         <label for="node-input-evname"><i class="fa fa-bell"></i> Name</label>
-        <select id="node-input-evname">
+        <select id="node-input-evname" dir="auto">
             {{#events}}
             <option value="{{name}}">{{title}}</option>
             {{/events}}
@@ -264,7 +264,7 @@
 </script>
 
 <script type="text/x-red" data-help-name="{{&nodeName}}">
-<p>{{description}}</p>
+<p dir="auto">{{description}}</p>
 
 <h3>Inputs</h3>
   <dl class="message-properties">
@@ -287,7 +287,7 @@
 <p>To read a property, send message to a node as a trigger.
 To write a property, send value to a node.  
 To observe a property, a node emit messages when value changes.</p>
-<dl>
+<dl dir="auto">
 {{#properties}}
  <dt>{{title}}: {{description}}</dt>
  <dd>
@@ -302,7 +302,7 @@ To observe a property, a node emit messages when value changes.</p>
 
 <h4>Actions</h4>
 <p>To invoke an action, send message to a node with arguments in payload.</p> 
-<dl>
+<dl dir="auto">
 {{#actions}}
   <dt>{{title}}: {{description}} {{#safe}}<code>safe</code>{{/safe}}{{#idempotent}}<code>idempotent</code>{{/idempotent}}</dt>
   <dd>
@@ -317,7 +317,7 @@ To observe a property, a node emit messages when value changes.</p>
 
 <h4>Events</h4>
 <p>A node emit messages when event occurred.</p>
-<dl>
+<dl dir="auto">
 {{#events}}
   <dt>{{title}}: {{description}}</dt>
   <dd>
@@ -331,10 +331,10 @@ To observe a property, a node emit messages when value changes.</p>
 </dl>
 
 <h3>Support Information</h3>
-<p>{{support}}</p>
+<p dir="auto">{{support}}</p>
 
 <h3>References</h3>
-<ul>
+<ul dir="auto">
 {{#links}}
   <li><a href="{{href}}" target="_blank">{{rel}}</a></li>
 {{/links}}
