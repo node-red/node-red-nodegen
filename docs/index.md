@@ -1,7 +1,7 @@
 Node generator
 ----
-Node generator is a command line tool to generate Node-RED node modules from several various sources, including Open API document and function node's source.
-Using this tool, node developers can dramatically reduce their time to implement Node-RED node modules.
+Node generator is a command line tool to generate Node-RED nodes based on various sources such as an Open API document or a Function node.
+It helps developers dramatically reduce the time to implement Node-RED nodes.
 
 ## Use cases
 Node-RED is useful for rapid development using existing nodes in the [flow library](https://flows.nodered.org).
@@ -11,29 +11,29 @@ There are four types of use cases for Node generator.
 
 #### (1) Connection to cloud services
 The http request node can easily connect to cloud services via REST API.
-But in terms of marketing, instead of http request node, the original node for the cloud services will be effective to increase the number of users because details of node properties, node information and documents will contribute to the usability of the node.
-In general, cloud service providers publish Open API document with REST API for users to test it on Swagger UI.
-Node generator uses this Open API document to create nodes for connection to the cloud service.
+From a marketing perspective, having a dedicated node for a cloud service is more attractive to users because having preset node properties, and targeted information and documents can help improve the usability of the node.
+In general, cloud service providers publish Open API document with REST API for users to test on Swagger UI.
+Node generator can use the Open API document to create nodes for connection to a cloud service.
 Therefore, cloud service providers can release their original nodes without node development cost.
 
 #### (2) Reuse of function node as original node
-Node-RED users use the function node to write simple handling with JavaScript code.
-But sometimes they tend to add many JavaScript codes into a function node when they gradually improve their flow with trial and error method.
-If this function node has useful functionality, reuse of such node for other Node-RED users will be the best option because other users do not need to create the same functionality and are able to concentrate on the development of their flow.
-In this case, Node generator supports the development of the original node from existing function node.
+Node-RED users use the function node to write basic functionality with JavaScript code.
+Through trial and error of enhancing a flow, often times too many lines of Javascript code gets added into a function node.
+If the function node has useful functionality, sharing such a node for other Node-RED users will be useful because other users can just use the shared node without worrying about creating the same functionality and are able to concentrate on the development of their flow.
+In this case, Node generator supports the development of an original node from an existing function node.
 
 #### (3) Reuse of subflow as original node (future functionality)
-In terms of reuse, the unit of subflow is suitable for sharing with other Node-RED users.
-In the future, Node generator will support functionality for creating the original node from subflow.
+In terms of reusability, the unit of subflow is suitable for sharing with other Node-RED users.
+In the future, Node generator will support functionality for creating an original node from a subflow.
 Node-RED users can encapsulate their flow as an original node.
 For example, both template node which has an authentication header and http request node which has URL is a typical pair which a lot of Node-RED users use to connect to cloud services.
-Node generator can generate an original node from subflow that contains the flow.
+Node generator can generate an original node from a subflow that contains the flow.
 And Node-RED users can easily share their original node with other Node-RED users via flow library.
 
 #### (4) Connection to devices (future functionality)
 Web of Things (WoT) is a standard specification to connect IoT devices.
-Node generator will support Web of Things description to create original nodes.
-Currently, there are [the slide](https://github.com/w3c/wot/blob/master/plugfest/2018-bundang/images/Plugfest-Bundang-WoT.pdf) and [the screenshot](https://github.com/w3c/wot/blob/master/plugfest/2018-bundang/result-hitachi.md) of the prototype implementation on GitHub.
+Node generator will support the Web of Things specification to create original nodes.
+Currently, there is [a slide](https://github.com/w3c/wot/blob/master/plugfest/2018-bundang/images/Plugfest-Bundang-WoT.pdf) and [a screenshot](https://github.com/w3c/wot/blob/master/plugfest/2018-bundang/result-hitachi.md) of the prototype implementation on GitHub.
 
 ## How to use Node generator
 To install Node generator to your local PC, you need to input the following "npm install" command on command prompt (Windows) or terminal (macOS/Linux).
@@ -42,7 +42,7 @@ Because the command execution needs root permission, "sudo" is required before "
     npm install -g node-red-nodegen
 
 The current version of Node generator supports function node and Open API document as source files.
-Simply, Node generator command, node-red-nodegen converts to a node from the file which is specified in the argument of the command as follows.
+node-red-nodegen creates a node from the file which is specified in the argument of the command as follows.
 
     node-red-nodegen <source file> -> The command tool outputs the node from the source file
 
@@ -52,8 +52,8 @@ The following documentation explains methods of creating nodes from two types of
  - [How to create a node from function node](#how-to-create-a-node-from-function-node)
 
 ## Generated files which node package contains
-The following is a typical directory structure of node package generated by Node generator.
-After generating the node, you can install it to your local PC or publish it on the flow library without additional development.
+The following is a typical directory structure of the node package generated by Node generator.
+After generating the node, you can install it on your local PC or publish it on the flow library.
 
     - node.js         <- JavaScript file for node processing
     - node.html       <- HTML file for node property UI
@@ -75,7 +75,7 @@ After generating the node, you can install it to your local PC or publish it on 
           |-node.json <- Message catalog for German language
 
 ## How to create a node from Open API document
-You can specify the URL or file path of Open API document as the first argument of the node-red-nodegen command.
+You can specify the URL or file path of an Open API document as the first argument of the node-red-nodegen command.
 
 (1) Generate node using node-red-nodegen command
 
@@ -115,12 +115,12 @@ Node-RED users typically import the generated node to the palette of Node-RED fl
 
 (10) Create flow on the Node-RED flow editor
 
--> The flow which consists of inject node, the generated node and debug node are suitable for the first step.
+-> The flow which consists of inject node, the generated node and debug node are suitable as a first step.
 (If the generated node uses POST method, you need to set JSON data to msg.payload of the inject node)
 
 (11) Run the flow
 
--> In this example, After clicking the button on the inject node, you can get the received data on debug tab.
+-> In this example, After clicking the button on the inject node, you can check the received data from the debug tab.
 
 ### Command line options
 If you want to customize the generated node, the following procedures and command line options will be helpful.
@@ -159,13 +159,13 @@ Node generator will replace uppercase characters and spaces with hyphens to conv
 }
 ```
 
-If you want to change the default name, you can set node name using --name option.
-Especially, you need to specify node name using --name option when "info.title" value contains a double-byte character instead of alphabet and number because Node generator cannot create node correctly.
+If you want to change the default name, you can set the node name using --name option.
+If "info.title" value contains a double-byte character instead of alphabet and number, you need to specify the node name using --name option in order for Node generator to generate the name correctly.
 
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --name new-node-name
 
 #### Version
-As the default, Node generator uses "info.version" value as the module version number.
+By default, Node generator uses "info.version" value as the module version number.
 
 ##### Example of Open API document
 ```
@@ -190,14 +190,14 @@ As the default, Node generator uses "info.version" value as the module version n
 ```
 
 When you update the version number of the module without incrementing the version number in Open API document, you need to specify --version option.
-Especially, conflict error will occur when you publish the module which has the same version number as the previously published module using "npm publish" command.
+A conflict error will occur when you publish a module that has the same version number as the previously published module when using "npm publish" command.
 In this case, the --version option needs to be specified to update the version number of the module.
 
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --version 0.0.2
 
 #### Keywords
 --keywords is a useful option for keywords of the module in the flow library.
-On the flow library website, visitors will search the module using the keywords.
+On the flow library website, visitors can search the module using keywords.
 For example, if you want to use "petstore" as a keyword, you can specify the word using --keywords option.
 By default, Node generator uses "node-red-nodegen" as a keyword. 
 
@@ -212,9 +212,9 @@ When "--keywords node-red" is specified before publishing the generated node, yo
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --keywords petstore,petshop,node-red
 
 #### Category
-On the palette of Node-RED flow editor, the generated node is in the function category as the default.
+On the palette of Node-RED flow editor, the generated node is in the function category by default.
 To change the category or use the product name, you can use --category option.
-For example, the generated node which the following command outputs will be in the "analysis" category on the Node-RED flow editor.
+For example, the node generated from the following command can be viewed in the "analysis" category on the Node-RED flow editor.
 
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --category analysis
 
@@ -225,7 +225,7 @@ You can use PNG file path or [file name of stock icons](https://nodered.org/docs
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --icon <PNG file or stock icon>
 
 #### Node color
-In the default, Node generator uses default node color defined in the node templates. If you need to change it, you can use the --color option of the command line. The option value should be the sequence of the hexadecimal numbers ("RRGGBB" formats) which represents node color.
+By default, Node generator uses default node color defined in the node templates. If you need to change it, you can use the --color option of the command line. The option value should be the sequence of the hexadecimal numbers ("RRGGBB" formats) which represents node color.
 
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --color FFFFFF
 
@@ -285,9 +285,9 @@ If you want to modify node information in info tab, you can manually edit the no
 ```
 
 #### README
-To explain the details of the node, you need to write documentation in README.md file.
+To explain the details of the node, you can write documentation in a README.md file.
 The documentation will be used in the flow library website if you publish your node on the flow library.
-Because the Node generator outputs the template file of README.md, you just modify it.
+The Node generator outputs the template file of README.md so you can just modify it.
 
     vi node-red-contrib-swagger-petstore/README.md
 
@@ -308,7 +308,7 @@ Run the following command in your Node-RED home directory, typically `~/.node-re
 ```
 
 #### Test cases
-The set of test cases is the most important to maintain the quality of the generated node in production use.
+The set of test cases is important in order to maintain the quality of the generated node in production use.
 Node generator outputs the template file ("test/node_spec.js") of test cases into the generated directory.
 You need to modify the following three lines, (1),(2) and (3) in the test case file.
 If Open API document does not contain hostname in "info" section, you need to write hostname as (4) in each test case manually.
@@ -350,8 +350,8 @@ You can run the test cases using the "npm test" command under the generated dire
     npm test
 
 #### Message catalogs
-As the default, Node generator outputs template files of English, Japanese, Chinese and German languages.
-When you want to support internationalization of node properties, you need to add language messages of parameters into the files.
+By default, Node generator outputs template files in English, Japanese, Chinese and German languages.
+If you want to support internationalization of node properties, you need to add language messages of parameters into the files.
 
     vi node-red-contrib-swagger-petstore/locales/ja/node.json
 
@@ -410,8 +410,8 @@ To make the configuration node enable, you need to delete `host`, `basePath` and
 }
 ```
 
-This configuration node will be suitable for REST API which has different URL by data center region on the cloud services.
-It will also be useful for edge computing use cases to switch from the cloud service endpoint to the local endpoint which has the same functionality as the cloud service.
+This configuration node is suitable for REST API which have different URLs depending on the data center region on the cloud services.
+It will also be useful for edge computing use cases to switch from a cloud service endpoint to a local endpoint which has the same functionality as the cloud service.
 
 ### Open API Specification 3.0
 If you want to use Open API Specification 3.0 to generate a node, you need to convert data format from 3.0 to 2.0 using [api-spec-converter](https://www.npmjs.com/package/api-spec-converter) command.
@@ -472,11 +472,11 @@ Node-RED users typically import generated node to the palette of Node-RED flow e
 
 (10) Create flow on the Node-RED flow editor
 
--> The flow which consists of inject node, the generated node and debug node are suitable for the first step.
+-> The flow which consists of inject node, the generated node and debug node are suitable as a first step.
 
 (11) Run the flow
 
--> In this example, After clicking the button on the inject node, you can get the received data on debug tab.
+-> In this example, After clicking the button on the inject node, you can check the received data from the debug tab.
 
 ### Command line options
 If you want to customize the generated node, the following procedures and command line options will be helpful.
@@ -496,9 +496,9 @@ If you want to change the default name, you can set node name using --name optio
     node-red-nodegen ~/.node-red/lib/functions/lower-case.js --name new-node-name
 
 #### Version
-As the default, the version number of the module is always "0.0.1".
+By default, the version number of the module is always "0.0.1".
 When you update the version number of the module, you need to specify --version option.
-Especially, conflict error will occur when you publish the module which has the same version number as the previously published module using "npm publish" command.
+A conflict error will occur when you publish a module that has the same version number as the previously published module when using "npm publish" command.
 In this case, the --version option needs to be specified to update the version number of the module.
 
     node-red-nodegen ~/.node-red/lib/functions/lower-case.js --version 0.0.2
@@ -515,14 +515,14 @@ To add more than two keywords, you can also use comma-separated keywords.
 
     node-red-nodegen ~/.node-red/lib/functions/lower-case.js --keywords lower-case,function
 
-When "--keywords node-red" is specified before publishing the generated node, your node will be registered on flow library and you can install the node via Node-RED flow editor.
+When "--keywords node-red" is specified before publishing the generated node, your node will be registered on the flow library and you can install the node via Node-RED flow editor.
 
     node-red-nodegen ~/.node-red/lib/functions/lower-case.js --keywords lower-case,function,node-red
 
 #### Category
 On the palette of Node-RED flow editor, the generated node is in the function category as the default.
 To change the category or use product name, you can use --category option.
-For example, the generated node which the following command outputs will be in the "analysis" category on Node-RED flow editor.
+For example, the node generated from the following command can be viewed in the "analysis" category on the Node-RED flow editor.
 
     node-red-nodegen ~/.node-red/lib/functions/lower-case.js --category analysis
 
@@ -533,7 +533,7 @@ You can use PNG file path or [file name of stock icons](https://nodered.org/docs
     node-red-nodegen ~/.node-red/lib/functions/lower-case.js --icon <PNG file or stock icon>
 
 #### Node color
-In the default, Node generator uses default node color defined in the node templates. If you need to change it, you can use the --color option of the command line. The option value should be hexadecimal numbers ("RRGGBB" formats) which represent node color.
+By default, Node generator uses default node color defined in the node templates. If you need to change it, you can use the --color option of the command line. The option value should be hexadecimal numbers ("RRGGBB" formats) which represent node color.
 
     node-red-nodegen ~/.node-red/lib/functions/lower-case.js --color FFFFFF
 
@@ -567,15 +567,15 @@ You need to modify the template along with your node.
 </script>
 ```
 
-In the template, there are both a summary of the node and three sections.
+In the template, there is a summary of the node and three sections.
 Inputs section has properties information of inputted messages.
 Outputs section has properties explanation of outputted messages.
 Details section will contain additional information about the generated node.
 
 #### README
-To explain the details of the node, you need to write documentation in README.md file.
+To explain the details of the node, you can write documentation in a README.md file.
 The documentation will be used in the flow library website if you publish your node on npmjs.
-Because Node generator outputs the README.md template file, you just modify it.
+The Node generator outputs the template file of README.md so you can just modify it.
 
     vi node-red-contrib-lower-case/README.md
 
@@ -594,7 +594,7 @@ Run the following command in your Node-RED home directory, typically `~/.node-re
 ```
 
 #### Test cases
-The set of test cases is the most important to maintain the quality of the generated node in production use.
+The set of test cases is important in order to maintain the quality of the generated node in production use.
 Node generator outputs the template file of test cases into the file, "test/node_spec.js" under the generated directory.
 You need to modify the following two lines, (1) and (2) in the test case file.
 
@@ -631,7 +631,7 @@ When loading external module to a function node, Node-RED users generally add th
 Current Node generator does not support exporting this setting to the generated node.
 Therefore, you need to modify node.js file and package.json file before you share the generated node with other Node-RED environments.
 
-The following example is the procedure to generate the node from the function node which uses the moment module.
+The following example is the procedure to generate a node from the function node that requires the moment module.
 
 (1) Add external module into settings.js file (around line number 214)
 
