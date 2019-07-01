@@ -1,7 +1,7 @@
 # Node generator for Node-RED
 
-Node generator is a command line tool to generate Node-RED node modules from several various sources, including Open API document and function node's source.
-Using this tool, node developers can dramatically reduce their time to implement Node-RED node modules.
+Node generator is a command line tool to generate Node-RED nodes based on various sources such as an Open API document or a Function node.
+It helps developers dramatically reduce the time to implement Node-RED nodes.
 
 ## Installation
 
