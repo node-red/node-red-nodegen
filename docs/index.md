@@ -1,7 +1,7 @@
 Node generator
 ----
-Node generator is a command line tool to generate Node-RED nodes based on various source code such as an Open API document or a Function node.
-It helps Node developers dramatically reduce the time to implement Node-RED nodes.
+Node generator is a command line tool to generate Node-RED nodes based on various sources such as an Open API document or a Function node.
+It helps developers dramatically reduce the time to implement Node-RED nodes.
 
 ## Use cases
 Node-RED is useful for rapid development using existing nodes in the [flow library](https://flows.nodered.org).
@@ -11,7 +11,7 @@ There are four types of use cases for Node generator.
 
 #### (1) Connection to cloud services
 The http request node can easily connect to cloud services via REST API.
-From a marketing perspective, instead of using the http request node, an original node for a cloud service is more effective to increase the number of users because having details of node properties, node information and documents can help contribute to the usability of the node.
+From a marketing perspective, having a dedicated node for a cloud service is more attractive to users because having preset node properties, and targeted information and documents can help improve the usability of the node.
 In general, cloud service providers publish Open API document with REST API for users to test on Swagger UI.
 Node generator can use the Open API document to create nodes for connection to a cloud service.
 Therefore, cloud service providers can release their original nodes without node development cost.
@@ -33,7 +33,7 @@ And Node-RED users can easily share their original node with other Node-RED user
 #### (4) Connection to devices (future functionality)
 Web of Things (WoT) is a standard specification to connect IoT devices.
 Node generator will support the Web of Things specification to create original nodes.
-Currently, there is [the slide](https://github.com/w3c/wot/blob/master/plugfest/2018-bundang/images/Plugfest-Bundang-WoT.pdf) and [the screenshot](https://github.com/w3c/wot/blob/master/plugfest/2018-bundang/result-hitachi.md) of the prototype implementation on GitHub.
+Currently, there is [a slide](https://github.com/w3c/wot/blob/master/plugfest/2018-bundang/images/Plugfest-Bundang-WoT.pdf) and [a screenshot](https://github.com/w3c/wot/blob/master/plugfest/2018-bundang/result-hitachi.md) of the prototype implementation on GitHub.
 
 ## How to use Node generator
 To install Node generator to your local PC, you need to input the following "npm install" command on command prompt (Windows) or terminal (macOS/Linux).
@@ -42,7 +42,7 @@ Because the command execution needs root permission, "sudo" is required before "
     npm install -g node-red-nodegen
 
 The current version of Node generator supports function node and Open API document as source files.
-The Node generator command, node-red-nodegen creates a node from the file which is specified in the argument of the command as follows.
+node-red-nodegen creates a node from the file which is specified in the argument of the command as follows.
 
     node-red-nodegen <source file> -> The command tool outputs the node from the source file
 
@@ -214,7 +214,7 @@ When "--keywords node-red" is specified before publishing the generated node, yo
 #### Category
 On the palette of Node-RED flow editor, the generated node is in the function category by default.
 To change the category or use the product name, you can use --category option.
-For example, the generated node from the following command can be viewed in the "analysis" category on the Node-RED flow editor.
+For example, the node generated from the following command can be viewed in the "analysis" category on the Node-RED flow editor.
 
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --category analysis
 
@@ -308,7 +308,7 @@ Run the following command in your Node-RED home directory, typically `~/.node-re
 ```
 
 #### Test cases
-The set of test cases is important to maintaining the quality of the generated node in production use.
+The set of test cases is important in order to maintain the quality of the generated node in production use.
 Node generator outputs the template file ("test/node_spec.js") of test cases into the generated directory.
 You need to modify the following three lines, (1),(2) and (3) in the test case file.
 If Open API document does not contain hostname in "info" section, you need to write hostname as (4) in each test case manually.
@@ -522,7 +522,7 @@ When "--keywords node-red" is specified before publishing the generated node, yo
 #### Category
 On the palette of Node-RED flow editor, the generated node is in the function category as the default.
 To change the category or use product name, you can use --category option.
-For example, the generated node from the following command can be viewed in the "analysis" category on the Node-RED flow editor.
+For example, the node generated from the following command can be viewed in the "analysis" category on the Node-RED flow editor.
 
     node-red-nodegen ~/.node-red/lib/functions/lower-case.js --category analysis
 
@@ -594,7 +594,7 @@ Run the following command in your Node-RED home directory, typically `~/.node-re
 ```
 
 #### Test cases
-The set of test cases is important to maintaining the quality of the generated node in production use.
+The set of test cases is important in order to maintain the quality of the generated node in production use.
 Node generator outputs the template file of test cases into the file, "test/node_spec.js" under the generated directory.
 You need to modify the following two lines, (1) and (2) in the test case file.
 
