@@ -29,7 +29,7 @@ To help us understand the issue, please fill-in as much of the following informa
 
 - [ ] Node generator version:
 - [ ] Node-RED version:
-- [ ] node.js version:
+- [ ] Node.js version:
 - [ ] npm version:
 - [ ] Platform/OS:
 - [ ] Browser:
