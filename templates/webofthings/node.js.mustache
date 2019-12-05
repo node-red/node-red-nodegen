@@ -68,7 +68,7 @@ module.exports = function (RED) {
         }
     }
 
-    function bindingCoap(node, form, options={}) { // options.psk
+    function bindingCoap(node, send, done, form, options={}) { // options.psk
         const coap = require("node-coap-client").CoapClient;
         node.trace("bindingCoap called");
         const msg = options.msg || {};
@@ -108,12 +108,18 @@ module.exports = function (RED) {
                     node.warn(`output schema validation error: ${ajv.errorsText()}`, msg);
                 }
             }
-            node.send(msg);
+            send(msg);
+            if (done) {
+                done();
+            }
         })
         .catch(err => {
             node.log(`Error: ${err.toString()}`);
             msg.payload = `${err.toString()}: ${resource}`;
-            node.send(msg);
+            send(msg);
+            if (done) {
+                done();
+            }
         });        
     }
 
@@ -300,7 +306,7 @@ module.exports = function (RED) {
         });
     }
 
-    function bindingHttp(node, form, options={}) { // options.interaction, options.auth, options.reqbody, options.msg
+    function bindingHttp(node, send, done, form, options={}) { // options.interaction, options.auth, options.reqbody, options.msg
         const msg = options.msg || {};
         const reqoptions = {}; 
         reqoptions.uri = extractTemplate(form.href, options.urivars);
@@ -348,7 +354,7 @@ module.exports = function (RED) {
                 node.log(`Error: ${err.toString()}`);
                 msg.payload = `${err.toString()}: ${reqoptions.uri}`;
                 msg.statusCode = err.code;
-                node.send(msg); 
+                send(msg); 
             } else {
                 msg.statusCode = res.statusCode;
                 msg.headers = res.headers;
@@ -366,10 +372,13 @@ module.exports = function (RED) {
                 if (options.outschema) {
                     const ajv = new Ajv({allErrors: true});
                     if (!ajv.validate(options.outschema, msg.payload)) {
-                        node.warn(`ouput schema validation error: ${ajv.errorsText()}`, msg);
+                        node.warn(`output schema validation error: ${ajv.errorsText()}`, msg);
                     }
                 }    
-                node.send(msg); 
+                send(msg); 
+            }
+            if (done) {
+                done();
             }
         });
     }
@@ -414,7 +423,8 @@ module.exports = function (RED) {
         const normTd = {{{normtd}}};
         if (node.interactiontype === "property") {
             if (node.proptype === "read") {
-                node.on("input", (msg) => {
+                node.on("input", (msg, send, done) => {
+                    send = send || function() { node.send.apply(node,arguments) };
                     const prop = normTd.properties[node.propname];
                     const form = prop.forms[node.formindex];// formSelection("property-read", prop.forms);
                     const auth = makeauth(normTd, form, username, password, token);
@@ -426,13 +436,14 @@ module.exports = function (RED) {
                         }
                     }
                     if (form.href.match(/^https?:/)) {
-                        bindingHttp(node, form, {interaction:"property-read", auth, msg, urivars, outschema: prop});
+                        bindingHttp(node, send, done, form, {interaction:"property-read", auth, msg, urivars, outschema: prop});
                     } else if (form.href.match(/^coaps?:/)) {
-                        bindingCoap(node, form, {interaction:"property-read", auth, msg, urivars, outschema: prop});
+                        bindingCoap(node, send, done, form, send, done, {interaction:"property-read", auth, msg, urivars, outschema: prop});
                     }
                 });
             } else if (node.proptype === "write") {
-                node.on("input", (msg) => {
+                node.on("input", (msg, send, done) => {
+                    send = send || function() { node.send.apply(node,arguments) };
                     const prop = normTd.properties[node.propname];
                     const form = prop.forms[node.formindex];// formSelection("property-write", prop.forms);
                     const auth = makeauth(normTd, form, username, password, token);
@@ -442,9 +453,9 @@ module.exports = function (RED) {
                     }
                     // URI template is not supported, because 'write' doesn't use GET method.
                     if (form.href.match(/^https?:/)) {
-                        bindingHttp(node, form, {interaction: "property-write", auth, msg, reqbody: msg.payload}); 
+                        bindingHttp(node, send, done, form, {interaction: "property-write", auth, msg, reqbody: msg.payload}); 
                     } else if (form.href.match(/^coaps?:/)) {
-                        bindingCoap(node, form, {interaction: "property-write", auth, msg, reqbody: msg.payload}); 
+                        bindingCoap(node, send, done, form, {interaction: "property-write", auth, msg, reqbody: msg.payload}); 
                     }
                 });
             } else if (node.proptype === "observe") {
@@ -467,7 +478,8 @@ module.exports = function (RED) {
                 }               
             }
         } else if (node.interactiontype === "action") {
-            node.on("input", (msg) => {
+            node.on("input", (msg, send, done) => {
+                send = send || function() { node.send.apply(node,arguments) };
                 const act = normTd.actions[node.actname];
                 const form = act.forms[node.formindex];// formSelection("action", act.forms);
                 const auth = makeauth(normTd, form, username, password, token);
@@ -485,9 +497,9 @@ module.exports = function (RED) {
                     }
                 }
                 if (form.href.match(/^https?:/)) {
-                    bindingHttp(node, form, {interaction: "action", auth, msg, urivars, reqbody:msg.payload});
+                    bindingHttp(node, send, done, form, {interaction: "action", auth, msg, urivars, reqbody:msg.payload});
                 } else if (form.href.match(/^coaps?/)) {
-                    bindingCoap(node, form, {interaction: "action", auth, msg, urivars, reqbody:msg.payload});
+                    bindingCoap(node, send, done, form, {interaction: "action", auth, msg, urivars, reqbody:msg.payload});
                 }                
             });
         } else if (node.interactiontype === "event") {

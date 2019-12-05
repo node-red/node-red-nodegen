@@ -1,5 +1,5 @@
 {
-    "title": "WoT TD Schema - 08 May 2019",
+    "title": "WoT TD Schema - 16 October 2019",
     "description": "JSON Schema for validating TD instances against the TD model. TD instances can be with or without terms that have default values",
     "$schema ": "http://json-schema.org/draft-07/schema#",
     "definitions": {
@@ -944,7 +944,8 @@
                         }
                     },
                     "required": [
-                        "scheme"
+                        "scheme",
+                        "flow"
                     ]
                 },
                 {
@@ -1144,7 +1145,6 @@
     },
     "required": [
         "title",
-        "id",
         "security",
         "securityDefinitions",
         "@context"

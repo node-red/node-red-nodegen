@@ -4,7 +4,7 @@
   "description": "Node-RED node for {{&nodeName}}",
   "main": "node.js",
   "scripts": {
-    "test": "mocha \"test/**/*_spec.js\""
+    "test": "mocha \"test/**/*_spec.js\" --timeout 3000"
   },
   "node-red": {
     "nodes": {
@@ -17,8 +17,9 @@
     {{/keywords}}
   ],
   "devDependencies": {
-    "node-red": "0.18.7",
-    "node-red-node-test-helper": "0.1.8"
+    "mocha": "6.2.0",
+    "node-red": "0.20.7",
+    "node-red-node-test-helper": "0.2.3"
   },
   "license": "Apache-2.0"
 }
