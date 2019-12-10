@@ -56,6 +56,8 @@ function help() {
         ' [--color <node color>]' +
         ' [--tgz]' +
         ' [--help]' +
+        ' [--wottd]' +
+        ' [--lang <accept-language>]' +
         ' [-v]\n' +
         '\n' +
         'Description:'.bold + '\n' +
@@ -64,6 +66,8 @@ function help() {
         'Supported source:'.bold + '\n' +
         '   - Open API document\n' +
         // '   - Subflow node (json file of subflow)\n' +
+        '   - Swagger definition\n' +
+        '   - Thing Description (jsonld file or URL that points jsonld file)\n' +
         '   - Function node (js file in library, "~/.node-red/lib/function/")\n' +
         '\n' +
         'Options:\n'.bold +
@@ -78,6 +82,8 @@ function help() {
         '   --color : Color for node appearance (format: color hexadecimal numbers like "A6BBCF")\n' +
         '   --tgz : Save node as tgz file\n' +
         '   --help : Show help\n' +
+        '   --wottd : explicitly instruct source file/URL points a Thing Description\n' +
+        '   --lang : Language negotiation information when retrieve a Thing Description\n' +
         '   -v : Show node generator version\n';
     console.log(helpText);
 }
@@ -87,6 +93,16 @@ function version() {
     console.log(packageJson.version);
 }
 
+function skipBom(body) {
+    if (body[0]===0xEF &&
+        body[1]===0xBB &&
+        body[2]===0xBF) {
+        return body.slice(3);
+    } else {
+        return body;
+    }
+}
+
 if (argv.help || argv.h) {
     help();
 } else if (argv.v) {
@@ -94,7 +110,7 @@ if (argv.help || argv.h) {
 } else {
     var sourcePath = argv._[0];
     if (sourcePath) {
-        if (sourcePath.startsWith('http://') || sourcePath.startsWith('https://')) {
+        if (!argv.wottd && (sourcePath.startsWith('http://') || sourcePath.startsWith('https://'))) {
             request(sourcePath, function (error, response, body) {
                 if (!error) {
                     data.src = JSON.parse(body);
@@ -107,7 +123,28 @@ if (argv.help || argv.h) {
                     console.error(error);
                 }
             });
-        } else if (sourcePath.endsWith('.json')) {
+        } else if (argv.wottd && (sourcePath.startsWith('http://') || sourcePath.startsWith('https://'))) {
+            const req = {
+                url: sourcePath,
+            }
+            if (argv.lang) {
+                req.headers = {
+                    'Accept-Language': argv.lang
+                }
+            }
+            request(req, function (error, response, body) {
+                if (!error) {
+                    data.src = JSON.parse(skipBom(body));
+                    nodegen.wottd2node(data, options).then(function (result) {
+                        console.log('Success: ' + result);
+                    }).catch(function (error) {
+                        console.log('Error: ' + error);
+                    });
+                } else {
+                    console.error(error);
+                }
+            });
+        } else if (sourcePath.endsWith('.json') && !argv.wottd) {
             data.src = JSON.parse(fs.readFileSync(sourcePath));
             nodegen.swagger2node(data, options).then(function (result) {
                 console.log('Success: ' + result);
@@ -124,6 +161,13 @@ if (argv.help || argv.h) {
         } else if (sourcePath.endsWith('.js')) {
             data.src = fs.readFileSync(sourcePath);
             nodegen.function2node(data, options).then(function (result) {
+                console.log('Success: ' + result);
+            }).catch(function (error) {
+                console.log('Error: ' + error);
+            });
+        } else if (sourcePath.endsWith('.jsonld') || argv.wottd) {
+            data.src = JSON.parse(skipBom(fs.readFileSync(sourcePath)));
+            nodegen.wottd2node(data, options).then(function (result) {
                 console.log('Success: ' + result);
             }).catch(function (error) {
                 console.log('Error: ' + error);

@@ -1,0 +1,37 @@
+{
+    "name": "{{&projectName}}",
+    "version": "{{&projectVersion}}",
+    "description": "Node-RED node for {{&nodeName}}",
+    "main": "node.js",
+    "scripts": {
+        "test": "mocha \"test/**/*_spec.js\""
+    },
+    "node-red": {
+        "nodes": {
+            "{{&nodeName}}": "node.js"
+        }
+    },
+    "keywords": [
+        {{#keywords}}
+        "{{name}}"{{^last}}, {{/last}}
+        {{/keywords}}
+    ],
+    "dependencies": {
+        "https-proxy-agent": "^3.0.1",
+        "request": "^2.88.0",
+        "ws": "^7.2.0",
+        "url-template": "^2.0.8",
+        "ajv": "^6.10.2",
+        "node-coap-client": "^1.0.2"
+    },
+    "devDependencies": {
+        "node-red": "^1.0.3",
+        "node-red-node-test-helper": "^0.2.3"
+    },
+    "license": "{{&licenseName}}",
+    "wot": {
+        {{#wotmeta}}
+        "{{name}}": "{{value}}"{{^last}}, {{/last}}
+        {{/wotmeta}}
+    }
+}

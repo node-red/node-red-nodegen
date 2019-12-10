@@ -1,3 +1,4 @@
+
 # Node generator for Node-RED
 
 Node generator is a command line tool to generate Node-RED nodes based on various sources such as an Open API document or a Function node.
@@ -22,6 +23,8 @@ You may need to run this with `sudo`, or from within an Administrator command sh
     Supported source:
        - Open API document
        - Function node (js file in library, "~/.node-red/lib/function/")
+       - Swagger definition
+       - (Beta) Thing Description of W3C Web of Things (jsonld file or URL that points jsonld file)
 
     Options:
        -o : Destination path to save generated node (default: current directory)
@@ -35,6 +38,8 @@ You may need to run this with `sudo`, or from within an Administrator command sh
        --color : Color for node appearance (format: color hexadecimal numbers like "A6BBCF")
        --tgz : Save node as tgz file
        --help : Show help
+       --wottd : explicitly instruct that source file/URL points a Thing Description
+       --lang : Language negotiation information when retrieve a Thing Description
        -v : Show node generator version
 
 ### Example 1. Create an original node from Open API document
@@ -59,6 +64,28 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 - node-red
 
 -> You can use lower-case node on Node-RED flow editor.
+
+### Example 3. Create original node from Thing Description
+
+- node-red-nodegen example.jsonld
+- cd node-red-contrib-example-thing
+- sudo npm link
+- cd ~/.node-red
+- npm link node-red-contrib-example-thing
+- node-red
+
+-> You can use Example Thing node on Node-RED flow editor.
+
+### Example 4. Create original node from Thing Description via HTTP
+
+- node-red-nodegen http://example.com/td.jsonld --wottd --lang "en-US,en;q=0.5"
+- cd node-red-contrib-example-thing
+- sudo npm link
+- cd ~/.node-red
+- npm link node-red-contrib-example-thing
+- node-red
+
+-> You can use Example Thing node on Node-RED flow editor.
 
 ## Documentation
 - [Use cases](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index.md#use-cases) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index_ja.md#use-cases))
