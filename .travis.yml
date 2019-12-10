@@ -7,6 +7,7 @@ addons:
     - petstore.swagger.io 
 matrix:
   include:
+    - node_js: "12"
     - node_js: "10"
       script:
         - ./node_modules/.bin/grunt && istanbul report text && ( cat coverage/lcov.info | $(npm get prefix)/bin/coveralls || true ) && rm -rf coverage
