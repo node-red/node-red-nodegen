@@ -15,8 +15,7 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 ## Usage
 
     Usage:
-       node-red-nodegen <source file or URL> [-o <path to save>] [--prefix <prefix string>] [--name <node name>] [--module <module name>] [--version <version number>] [--keywords <keywords list>] [--category <node category>] [--icon <png or gif file>] [--color <node
- color>] [--tgz] [--help] [--wottd] [--lang <accept-language>] [-v]
+       node-red-nodegen <source file or URL> [-o <path to save>] [--prefix <prefix string>] [--name <node name>] [--module <module name>] [--version <version number>] [--keywords <keywords list>] [--category <node category>] [--icon <png or gif file>] [--color <node color>] [--tgz] [--help] [--wottd] [--lang <accept-language>] [-v]
 
     Description:
        Node generator for Node-RED
