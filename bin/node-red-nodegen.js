@@ -65,10 +65,9 @@ function help() {
         '\n' +
         'Supported source:'.bold + '\n' +
         '   - Open API document\n' +
-        // '   - Subflow node (json file of subflow)\n' +
-        '   - Swagger definition\n' +
-        '   - Thing Description (jsonld file or URL that points jsonld file)\n' +
         '   - Function node (js file in library, "~/.node-red/lib/function/")\n' +
+        // '   - Subflow node (json file of subflow)\n' +
+        '   - (Beta) Thing Description of W3C Web of Things (jsonld file or URL that points jsonld file)\n' +
         '\n' +
         'Options:\n'.bold +
         '   -o : Destination path to save generated node (default: current directory)\n' +
