@@ -1,7 +1,7 @@
 
 # Node generator for Node-RED
 
-Node generator is a command line tool to generate Node-RED nodes based on various sources such as an Open API document or a Function node.
+Node generator is a command line tool to generate Node-RED nodes based on various sources such as an OpenAPI document or a Function node.
 It helps developers dramatically reduce the time to implement Node-RED nodes.
 
 ## Installation
@@ -21,9 +21,8 @@ You may need to run this with `sudo`, or from within an Administrator command sh
        Node generator for Node-RED
 
     Supported source:
-       - Open API document
+       - OpenAPI document
        - Function node (js file in library, "~/.node-red/lib/function/")
-       - Swagger definition
        - (Beta) Thing Description of W3C Web of Things (jsonld file or URL that points jsonld file)
 
     Options:
@@ -42,7 +41,7 @@ You may need to run this with `sudo`, or from within an Administrator command sh
        --lang : Language negotiation information when retrieve a Thing Description
        -v : Show node generator version
 
-### Example 1. Create an original node from Open API document
+### Example 1. Create an original node from OpenAPI document
 
 - node-red-nodegen http://petstore.swagger.io/v2/swagger.json
 - cd node-red-contrib-swagger-petstore
@@ -91,7 +90,7 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 - [Use cases](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index.md#use-cases) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index_ja.md#use-cases))
 - [How to use Node generator](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index.md#how-to-use-node-generator) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index_ja.md#how-to-use-node-generator))
 - [Generated files which node package contains](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index.md#generated-files-which-node-package-contains) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index_ja.md#generated-files-which-node-package-contains))
-- [How to create a node from Open API document](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index.md#how-to-create-a-node-from-open-api-document) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index_ja.md#how-to-create-a-node-from-open-api-document))
+- [How to create a node from OpenAPI document](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index.md#how-to-create-a-node-from-open-api-document) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index_ja.md#how-to-create-a-node-from-open-api-document))
 - [How to create a node from function node](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index.md#how-to-create-a-node-from-function-node) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index_ja.md#how-to-create-a-node-from-function-node))
 
 Note: Currently node generator supports GET and POST methods using JSON format without authentication.
