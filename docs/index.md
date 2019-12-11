@@ -1,6 +1,6 @@
 Node generator
 ----
-Node generator is a command line tool to generate Node-RED nodes based on various sources such as an Open API document or a Function node.
+Node generator is a command line tool to generate Node-RED nodes based on various sources such as an OpenAPI document or a Function node.
 It helps developers dramatically reduce the time to implement Node-RED nodes.
 
 ## Use cases
@@ -12,8 +12,8 @@ There are four types of use cases for Node generator.
 #### (1) Connection to cloud services
 The http request node can easily connect to cloud services via REST API.
 From a marketing perspective, having a dedicated node for a cloud service is more attractive to users because having preset node properties, and targeted information and documents can help improve the usability of the node.
-In general, cloud service providers publish Open API document with REST API for users to test on Swagger UI.
-Node generator can use the Open API document to create nodes for connection to a cloud service.
+In general, cloud service providers publish OpenAPI document with REST API for users to test on Swagger UI.
+Node generator can use the OpenAPI document to create nodes for connection to a cloud service.
 Therefore, cloud service providers can release their original nodes without node development cost.
 
 #### (2) Reuse of function node as original node
@@ -41,14 +41,14 @@ Because the command execution needs root permission, "sudo" is required before "
 
     npm install -g node-red-nodegen
 
-The current version of Node generator supports function node and Open API document as source files.
+The current version of Node generator supports function node and OpenAPI document as source files.
 node-red-nodegen creates a node from the file which is specified in the argument of the command as follows.
 
     node-red-nodegen <source file> -> The command tool outputs the node from the source file
 
 The following documentation explains methods of creating nodes from two types of source files.
 
- - [How to create a node from Open API document](#how-to-create-a-node-from-open-api-document)
+ - [How to create a node from OpenAPI document](#how-to-create-a-node-from-openapi-document)
  - [How to create a node from function node](#how-to-create-a-node-from-function-node)
 
 ## Generated files which node package contains
@@ -74,8 +74,8 @@ After generating the node, you can install it on your local PC or publish it on 
        |-de-DE
           |-node.json <- Message catalog for German language
 
-## How to create a node from Open API document
-You can specify the URL or file path of an Open API document as the first argument of the node-red-nodegen command.
+## How to create a node from OpenAPI document
+You can specify the URL or file path of an OpenAPI document as the first argument of the node-red-nodegen command.
 
 (1) Generate node using node-red-nodegen command
 
@@ -111,7 +111,7 @@ Node-RED users typically import the generated node to the palette of Node-RED fl
 
 (9) Select a method on the node property setting
 
-(When the Open API document does not contain a hostname or has authentication settings, the node property will have a property to set hostname and authentication settings.)
+(When the OpenAPI document does not contain a hostname or has authentication settings, the node property will have a property to set hostname and authentication settings.)
 
 (10) Create flow on the Node-RED flow editor
 
@@ -134,10 +134,10 @@ If you want to change the default module name, you can specify the module name u
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --prefix node-red-node
 
 #### Node name
-In the case of the node generated from Open API document, "info.title" value in Open API document is used as the generated node's name.
+In the case of the node generated from OpenAPI document, "info.title" value in OpenAPI document is used as the generated node's name.
 Node generator will replace uppercase characters and spaces with hyphens to convert appropriate name for npm module and Node-RED node.
 
-##### Example of Open API document
+##### Example of OpenAPI document
 ```
 {
   "swagger": "2.0",
@@ -167,7 +167,7 @@ If "info.title" value contains a double-byte character instead of alphabet and n
 #### Version
 By default, Node generator uses "info.version" value as the module version number.
 
-##### Example of Open API document
+##### Example of OpenAPI document
 ```
 {
   "swagger": "2.0",
@@ -189,7 +189,7 @@ By default, Node generator uses "info.version" value as the module version numbe
 }
 ```
 
-When you update the version number of the module without incrementing the version number in Open API document, you need to specify --version option.
+When you update the version number of the module without incrementing the version number in OpenAPI document, you need to specify --version option.
 A conflict error will occur when you publish a module that has the same version number as the previously published module when using "npm publish" command.
 In this case, the --version option needs to be specified to update the version number of the module.
 
@@ -230,13 +230,13 @@ By default, Node generator uses default node color defined in the node templates
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --color FFFFFF
 
 #### Node information in info tab
-Node generator automatically generates the node information in the info tab using the following values in Open API document.
+Node generator automatically generates the node information in the info tab using the following values in OpenAPI document.
 
 - info.description : Node description
 - paths.[path].[http method].summary : Method description
 - paths.[path].[http method].operationId : Method name
 
-##### Example of Open API document
+##### Example of OpenAPI document
 ```
 {
   "swagger": "2.0",
@@ -311,7 +311,7 @@ Run the following command in your Node-RED home directory, typically `~/.node-re
 The set of test cases is important in order to maintain the quality of the generated node in production use.
 Node generator outputs the template file ("test/node_spec.js") of test cases into the generated directory.
 You need to modify the following three lines, (1),(2) and (3) in the test case file.
-If Open API document does not contain hostname in "info" section, you need to write hostname as (4) in each test case manually.
+If OpenAPI document does not contain hostname in "info" section, you need to write hostname as (4) in each test case manually.
 
     vi node-red-contrib-swagger-petstore/test/node_spec.js
 
@@ -386,9 +386,9 @@ If your node does not support some languages, you can delete the language direct
 
 ### Configuration node to specify the endpoint
 While creating flow, you can use configuration nodes to change the endpoint of REST API which the generated node access.
-To make the configuration node enable, you need to delete `host`, `basePath` and `schemes` properties from the Open API document before generating node.
+To make the configuration node enable, you need to delete `host`, `basePath` and `schemes` properties from the OpenAPI document before generating node.
 
-##### Example of Open API document
+##### Example of OpenAPI document
 ```
 {
   "swagger": "2.0",
@@ -413,8 +413,8 @@ To make the configuration node enable, you need to delete `host`, `basePath` and
 This configuration node is suitable for REST API which have different URLs depending on the data center region on the cloud services.
 It will also be useful for edge computing use cases to switch from a cloud service endpoint to a local endpoint which has the same functionality as the cloud service.
 
-### Open API Specification 3.0
-If you want to use Open API Specification 3.0 to generate a node, you need to convert data format from 3.0 to 2.0 using [api-spec-converter](https://www.npmjs.com/package/api-spec-converter) command.
+### OpenAPI Specification 3.0
+If you want to use OpenAPI Specification 3.0 to generate a node, you need to convert data format from 3.0 to 2.0 using [api-spec-converter](https://www.npmjs.com/package/api-spec-converter) command.
 
 (1) Install api-spec-converter command
 
@@ -713,4 +713,4 @@ The following example is the procedure to generate a node from the function node
 
 ## Known Issues
 - In the Node generator command, you cannot use --tgz option and --icon option simultaneously because it has an asynchronous problem.
-- The value of `info.title` in the Open API document has to start with an alphabet (not a number) because it will be used in the variable name in the generated code.
+- The value of `info.title` in the OpenAPI document has to start with an alphabet (not a number) because it will be used in the variable name in the generated code.

@@ -15,7 +15,8 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 ## Usage
 
     Usage:
-       node-red-nodegen <source file or URL> [-o <path to save>] [--prefix <prefix string>] [--name <node name>] [--module <module name>] [--version <version number>] [--tgz] [--help]
+       node-red-nodegen <source file or URL> [-o <path to save>] [--prefix <prefix string>] [--name <node name>] [--module <module name>] [--version <version number>] [--keywords <keywords list>] [--category <node category>] [--icon <png or gif file>] [--color <node
+ color>] [--tgz] [--help] [--wottd] [--lang <accept-language>] [-v]
 
     Description:
        Node generator for Node-RED
@@ -37,7 +38,7 @@ You may need to run this with `sudo`, or from within an Administrator command sh
        --color : Color for node appearance (format: color hexadecimal numbers like "A6BBCF")
        --tgz : Save node as tgz file
        --help : Show help
-       --wottd : explicitly instruct that source file/URL points a Thing Description
+       --wottd : explicitly instruct source file/URL points a Thing Description
        --lang : Language negotiation information when retrieve a Thing Description
        -v : Show node generator version
 
@@ -90,7 +91,7 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 - [Use cases](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index.md#use-cases) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index_ja.md#use-cases))
 - [How to use Node generator](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index.md#how-to-use-node-generator) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index_ja.md#how-to-use-node-generator))
 - [Generated files which node package contains](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index.md#generated-files-which-node-package-contains) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index_ja.md#generated-files-which-node-package-contains))
-- [How to create a node from OpenAPI document](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index.md#how-to-create-a-node-from-open-api-document) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index_ja.md#how-to-create-a-node-from-open-api-document))
+- [How to create a node from OpenAPI document](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index.md#how-to-create-a-node-from-openapi-document) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index_ja.md#how-to-create-a-node-from-open-api-document))
 - [How to create a node from function node](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index.md#how-to-create-a-node-from-function-node) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.0.4/docs/index_ja.md#how-to-create-a-node-from-function-node))
 
 Note: Currently node generator supports GET and POST methods using JSON format without authentication.

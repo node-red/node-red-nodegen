@@ -1,6 +1,6 @@
 ノードジェネレータ
 ----
-ノードジェネレータは、Open APIドキュメントやfunctionノードなどのソースコードからNode-REDのノードを生成するためのコマンドラインツールです。
+ノードジェネレータは、OpenAPIドキュメントやfunctionノードなどのソースコードからNode-REDのノードを生成するためのコマンドラインツールです。
 このツールを使用すると、ノード開発者はNode-REDノードの実装時間を大幅に短縮できます。
 
 <a name="use-cases"></a>
@@ -11,11 +11,11 @@ Node-REDには、[フローライブラリ](https://flows.nodered.org)に存在�
 以下の通り、ノードジェネレータには4つの利用ケースがあります。
 
 #### (1) クラウドサービスへの接続
-httpリクエストノードは、REST API経由でクラウドサービスに簡単に接続できます。
-しかし、マーケティングの観点から考えると、httpリスエストの代替として、クラウドサービス向けに専用に独自に開発したノードを公開することは、クラウドサービスのユーザ数を増やすために効果的です。
+http requestノードは、REST API経由でクラウドサービスに簡単に接続できます。
+しかし、マーケティングの観点から考えると、http requestノードの代替として、クラウドサービス向けに専用に独自に開発したノードを公開することは、クラウドサービスのユーザ数を増やすために効果的です。
 なぜなら、クラウドサービスとの接続方法を詳細に解説したノードプロパティ、ノード情報、ドキュメントがユーザビリティに貢献するためです。
-一般的に、クラウドサービスプロバイダは、ユーザがSwagger UIでREST APIをテストできる様、Open APIドキュメントを公開します。
-ノードジェネレータは、このOpen APIドキュメントを使用して、クラウドサービスへの接続用のノードを生成します。
+一般的に、クラウドサービスプロバイダは、ユーザがSwagger UIでREST APIをテストできる様、OpenAPIドキュメントを公開します。
+ノードジェネレータは、このOpenAPIドキュメントを使用して、クラウドサービスへの接続用のノードを生成します。
 したがって、クラウドサービスプロバイダは、ノード開発コストなしで独自のノードを公開できる様になります。
 
 #### (2) functionノードを独自のノードとして再利用
@@ -45,14 +45,14 @@ Web of Things (WoT)は、IoTデバイスを接続するための標準仕様で�
 
     npm install -g node-red-nodegen
 
-ノードジェネレータの現在のバージョンは、functionノードとOpen APIドキュメントをソースファイルとしてサポートしています。
+ノードジェネレータの現在のバージョンは、functionノードとOpenAPIドキュメントをソースファイルとしてサポートしています。
 ノードジェネレータのコマンドであるnode-red-nodegenは、以下の様にコマンドの引数で指定したファイルをノードに変換します。
 
     node-red-nodegen <source file> -> コマンドツールは、ソースファイルからノードを出力します
 
 以降のドキュメントでは、2種類のソースファイルからノードを生成する方法の詳細について説明します。
 
- - [Open APIドキュメントからノードを生成する方法](#how-to-create-a-node-from-open-api-document)
+ - [OpenAPIドキュメントからノードを生成する方法](#how-to-create-a-node-from-openapi-document)
  - [functionノードからノードを生成する方法](#how-to-create-a-node-from-function-node)
 
 <a name="generated-files-which-node-package-contains"></a>
@@ -79,9 +79,9 @@ Node-REDユーザは、自動生成したノードをローカルNode-RED環境�
        |-de-DE
           |-node.json <- ドイツ語のメッセージカタログ
 
-<a name="how-to-create-a-node-from-open-api-document"></a>
-## Open APIドキュメントからノードを生成する方法
-node-red-nodegenコマンドの最初の引数として、Open APIドキュメントのURL又はファイルパスを指定できます。
+<a name="how-to-create-a-node-from-openapi-document"></a>
+## OpenAPIドキュメントからノードを生成する方法
+node-red-nodegenコマンドの最初の引数として、OpenAPIドキュメントのURL又はファイルパスを指定できます。
 
 (1) node-red-nodegenコマンドを使用してノードを生成
 
@@ -117,7 +117,7 @@ Node-REDユーザは通常、以下の手順で生成したノードをNode-RED�
 
 (9) ノードプロパティ設定でメソッドを選択
 
-(Open APIドキュメントにホスト名が含まれていないか、認証設定がある場合、ノードプロパティ設定にてホスト名と認証設定を設定します)
+(OpenAPIドキュメントにホスト名が含まれていないか、認証設定がある場合、ノードプロパティ設定にてホスト名と認証設定を設定します)
 
 (10) Node-REDフローエディタでフローを作成
 
@@ -139,10 +139,10 @@ Node-REDユーザは通常、以下の手順で生成したノードをNode-RED�
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --prefix node-red-node
 
 #### ノード名
-Open APIドキュメントから生成したノードの場合、Open APIドキュメントの "info.title"値が生成ノードの名前として使用します。
+OpenAPIドキュメントから生成したノードの場合、OpenAPIドキュメントの "info.title"値が生成ノードの名前として使用します。
 ノードジェネレータは、npmモジュールとNode-REDノードで利用できる適切な名前を変換するために、大文字とスペースをハイフンに置き換えます。
 
-##### Open APIドキュメントの例
+##### OpenAPIドキュメントの例
 ```
 {
   "swagger": "2.0",
@@ -172,7 +172,7 @@ Open APIドキュメントから生成したノードの場合、Open APIドキ�
 #### バージョン
 デフォルトでは、ノードジェネレータはモジュールのバージョン番号として "info.version"値を使用します。
 
-##### Open APIドキュメントの例
+##### OpenAPIドキュメントの例
 ```
 {
   "swagger": "2.0",
@@ -194,7 +194,7 @@ Open APIドキュメントから生成したノードの場合、Open APIドキ�
 }
 ```
 
-Open APIドキュメントのバージョン番号をインクリメントせずにモジュールのバージョン番号を更新する場合は、--versionオプションを指定します。
+OpenAPIドキュメントのバージョン番号をインクリメントせずにモジュールのバージョン番号を更新する場合は、--versionオプションを指定します。
 特に、"npm publish"コマンドを使用して、以前公開したモジュールと同じバージョン番号を持つモジュールを公開すると、競合エラーが発生します。
 この場合、モジュールのバージョン番号を更新するには、--versionオプションを指定します。
 
@@ -235,13 +235,13 @@ Node-REDフローエディタのパレットでは、生成したノードはデ
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --color FFFFFF
 
 #### 情報タブ内のノードの情報
-ノードジェネレータは、Open APIドキュメントの次の値を使用して、情報タブにノードの情報を自動的に生成します。
+ノードジェネレータは、OpenAPIドキュメントの次の値を使用して、情報タブにノードの情報を自動的に生成します。
 
 - info.description : ノードの説明
 - paths.[path].[http method].summary : メソッドの説明
 - paths.[path].[http method].operationId : メソッド名
 
-##### Open APIドキュメントの例
+##### OpenAPIドキュメントの例
 ```
 {
   "swagger": "2.0",
@@ -317,7 +317,7 @@ Run the following command in your Node-RED user directory - typically `~/.node-r
 テストケースは、本番環境で利用するノードの品質を維持するために最も重要です。
 ノードジェネレータは、生成したディレクトリの下にあるファイル "test/node_spec.js"にテストケースのテンプレートファイルを出力します。
 テストケースファイルでは、以下の（1）、（2）、（3）の3行を変更します。
-もし、Open APIドキュメントの"info"値にホスト名を含まない場合は、各テストケースに手動でホスト名を（4）に記述します。
+もし、OpenAPIドキュメントの"info"値にホスト名を含まない場合は、各テストケースに手動でホスト名を（4）に記述します。
 
     vi node-red-contrib-swagger-petstore/test/node_spec.js
 
@@ -393,9 +393,9 @@ Run the following command in your Node-RED user directory - typically `~/.node-r
 
 ### エンドポイントを指定するための設定ノード
 設定ノードを使用することで、生成されたノードがアクセスするREST APIのエンドポイントをフローの作成中に変更できるようになります。
-設定ノードを有効にするには、ノードを生成する前にOpen APIドキュメントから`host`、`basePath`、`schemes`の各プロパティを削除する必要があります。
+設定ノードを有効にするには、ノードを生成する前にOpenAPIドキュメントから`host`、`basePath`、`schemes`の各プロパティを削除する必要があります。
 
-##### Open APIドキュメントの例
+##### OpenAPIドキュメントの例
 ```
 {
   "swagger": "2.0",
@@ -420,8 +420,8 @@ Run the following command in your Node-RED user directory - typically `~/.node-r
 この設定ノードは、クラウドサービス上のデータセンターのリージョン毎に異なるURLを持つREST APIに適しています。
 その他、クラウドサービスのエンドポイントから、クラウドサービスと同じ機能を持つローカルのエンドポイントへ切り替えることができるため、エッジコンピューティングのユースケースでも役立ちます。
 
-### Open API Specification 3.0
-Open API Specification 3.0を使用してノードを生成する場合は、[api-spec-converter](https://www.npmjs.com/package/api-spec-converter)コマンドを使用してデータ形式を3.0から2.0に変換する必要があります。
+### OpenAPI Specification 3.0
+OpenAPI Specification 3.0を使用してノードを生成する場合は、[api-spec-converter](https://www.npmjs.com/package/api-spec-converter)コマンドを使用してデータ形式を3.0から2.0に変換する必要があります。
 
 (1) api-spec-converterコマンドをインストール
 
@@ -721,4 +721,4 @@ functionノードに外部モジュールをロードする場合、Node-REDユ�
 
 ## 既知の問題点
 - ノードジェネレータのコマンドでは、非同期の問題があるため、--tgzオプションと--iconオプションを同時に使用することはできません。
-- Open APIドキュメントの値`info.title`は生成されたコードの変数名として使われるため、アルファベットの文字（数字ではない）で始める必要があります。
+- OpenAPIドキュメントの値`info.title`は生成されたコードの変数名として使われるため、アルファベットの文字（数字ではない）で始める必要があります。

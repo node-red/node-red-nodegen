@@ -64,7 +64,7 @@ function help() {
         '   Node generator for Node-RED\n' +
         '\n' +
         'Supported source:'.bold + '\n' +
-        '   - Open API document\n' +
+        '   - OpenAPI document\n' +
         '   - Function node (js file in library, "~/.node-red/lib/function/")\n' +
         // '   - Subflow node (json file of subflow)\n' +
         '   - (Beta) Thing Description of W3C Web of Things (jsonld file or URL that points jsonld file)\n' +
