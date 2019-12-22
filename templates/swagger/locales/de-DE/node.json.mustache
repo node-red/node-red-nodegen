@@ -13,9 +13,9 @@
         },
         "parameters": {
             {{#methods}}
-            "{{&methodName}}": "{{&methodName}}",
+            "{{&methodName}}": "{{&method}} {{&path}}",
             {{#parameters}}
-            "{{&camelCaseName}}": "{{&camelCaseName}}",
+            "{{&camelCaseName}}": "{{&name}}",
             {{/parameters}}
             {{/methods}}
             "optionalParameters": "Optionen"
