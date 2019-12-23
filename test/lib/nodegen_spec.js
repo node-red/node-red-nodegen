@@ -17,7 +17,7 @@ describe('nodegen library', function () {
                 fs.statSync(result + '/node.html').size.should.be.above(0);
                 fs.statSync(result + '/node.js').size.should.be.above(0);
                 fs.statSync(result + '/test/node_spec.js').size.should.be.above(0);
-                fs.statSync(result + '/icons/icon.png').size.should.be.above(0);
+                fs.statSync(result + '/icons/icon.svg').size.should.be.above(0);
                 fs.statSync(result + '/README.md').size.should.be.above(0);
                 fs.statSync(result + '/LICENSE').size.should.be.above(0);
                 fs.statSync(result + '/.travis.yml').size.should.be.above(0);
