@@ -17,14 +17,13 @@
         },
         inputs: 1,
         outputs: 1,
+        icon: '{{&icon}}',
         label: function () {
             return this.name || this.method || "{{&nodeName}}";
         },
         labelStyle: function() {
             return this.name?"node_label_italic":"";
         },
-        icon: '{{&icon}}',
-        align: 'left',
         oneditprepare: function () {
             var selectedMethod = $('#node-input-method option:selected');
             if (!selectedMethod.val()) {
@@ -116,7 +115,7 @@
     });
 </script>
 
-<script type="text/x-red" data-template-name="{{&nodeName}}">
+<script type="text/html" data-template-name="{{&nodeName}}">
     {{#hasServiceParams}}
     <div class="form-row">
         <label for="node-input-service"><i class="fa fa-cloud"></i> <span data-i18n="{{&className}}.label.service"></span></label>
@@ -171,13 +170,18 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="{{&nodeName}}">
+<script type="text/html" data-help-name="{{&nodeName}}">
 {{{name}}}
     <p>{{&description}}</p>
-    <h2>Methods</h2>
+    <p><b>Methods</b></p>
     {{#methods}}
-        <h3>{{&methodName}}</h3>
-        <h4>{{&summary}}</h4>
+        <h3>{{&method}} {{&path}}</h3>
+        <p>{{&summary}}</p>
+        <dl class="message-properties">
+        {{#parameters}}
+        <dt>{{&name}} <span class="property-type">{{&type}}</span></dt>
+        {{/parameters}}
+        </dl>
     {{/methods}}
 </script>
 {{#hasServiceParams}}
@@ -251,7 +255,7 @@
     });
 </script>
 
-<script type="text/x-red" data-template-name="{{&nodeName}}-service">
+<script type="text/html" data-template-name="{{&nodeName}}-service">
     {{^domain}}
     <div class="form-row">
         <label for="node-config-input-host"><i class="fa fa-globe"></i> <span data-i18n="{{&className}}.label.host"></span></label>
@@ -295,7 +299,7 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="{{&nodeName}}-service">
+<script type="text/html" data-help-name="{{&nodeName}}-service">
     {{^domain}}
     <p><b>Host</b>: URL to connect</p>
     {{/domain}}
