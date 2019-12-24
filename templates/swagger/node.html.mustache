@@ -209,17 +209,17 @@
         credentials: {
             {{#isSecure}}
             {{#isSecureToken}}
-            secureTokenValue: { type:"password" },
+            secureTokenValue: { type: "password" },
             {{/isSecureToken}}
             {{#isSecureApiKey}}
-            secureApiKeyValue: { type:"password" },
+            secureApiKeyValue: { type: "password" },
             {{/isSecureApiKey}}
             {{#isSecureBasic}}
-            username: { type:"text" },
-            password: { type:"password" },
+            username: { type: "text" },
+            password: { type: "password" },
             {{/isSecureBasic}}
             {{/isSecure}}
-            temp: { type:"text" }
+            temp: { type: "text" }
         },
         label: function () {
             return this.name || this.host;
