@@ -33,7 +33,7 @@ Node-REDユーザは、サブフローを独自のノードとしてカプセル
 ノードジェネレータは、この様なフローを含むサブフローから独自のノードを生成できます。
 そして、Node-REDユーザは、フローライブラリを介して、生成したノードを他のNode-REDユーザと容易に共有できます。
 
-#### (4) デバイスへの接続（将来機能）
+#### (4) デバイスへの接続
 Web of Things (WoT)は、IoTデバイスを接続するための標準仕様です。
 ノードジェネレータはWeb of Thingsの定義から独自のノードを開発することを支援します。
 現在のところ、GitHub上にプロトタイプ実装の[スライド](https://github.com/w3c/wot/blob/master/plugfest/2018-bundang/images/Plugfest-Bundang-WoT.pdf)と[スクリーンショット](https://github.com/w3c/wot/blob/master/plugfest/2018-bundang/result-hitachi.md)があります。

@@ -30,7 +30,7 @@ For example, both template node which has an authentication header and http requ
 Node generator can generate an original node from a subflow that contains the flow.
 And Node-RED users can easily share their original node with other Node-RED users via flow library.
 
-#### (4) Connection to devices (future functionality)
+#### (4) Connection to devices
 Web of Things (WoT) is a standard specification to connect IoT devices.
 Node generator will support the Web of Things specification to create original nodes.
 Currently, there is [a slide](https://github.com/w3c/wot/blob/master/plugfest/2018-bundang/images/Plugfest-Bundang-WoT.pdf) and [a screenshot](https://github.com/w3c/wot/blob/master/plugfest/2018-bundang/result-hitachi.md) of the prototype implementation on GitHub.
