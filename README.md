@@ -54,7 +54,7 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 
 ### Example 2. Create an original node from function node (JavaScript code)
 
-- On Node-RED flow editor, save function node to library with file name (lower-case.js).
+- In Node-RED flow editor, edit the function node and to the right of the 'name' option, click on the book icon and select 'Save to library'. Then fill in the 'Export as' with the file name (lower-case.js).
 - node-red-nodegen ~/.node-red/lib/function/lower-case.js
 - cd node-red-contrib-lower-case
 - sudo npm link
