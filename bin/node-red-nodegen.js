@@ -148,6 +148,7 @@ if (argv.help || argv.h) {
             // if it's a .json flow file with one function node in...
             if (Array.isArray(data.src) && data.src[0].hasOwnProperty("type") && data.src[0].type == "function") {
                 var f = data.src[0];
+                if (!f.name || f.name.length ==0) { console.log('Error: No function name supplied.'); return; }
                 data.name = f.name.toLowerCase();
                 data.icon = f.icon;
                 data.info = f.info;
