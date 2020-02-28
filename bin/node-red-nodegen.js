@@ -152,7 +152,6 @@ if (argv.help || argv.h) {
                 data.name = f.name.toLowerCase();
                 data.icon = f.icon;
                 data.info = f.info;
-                data.inputs = f.inputs;
                 data.outputs = f.outputs;
                 data.inputLabels = f.inputLabels;
                 data.outputLabels = f.outputLabels;
