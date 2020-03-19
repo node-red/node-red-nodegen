@@ -1,115 +1,115 @@
 {
-    "name": "node-red-nodegen",
-    "version": "0.1.0",
-    "description": "Node generator for Node-RED",
-    "homepage": "http://nodered.org",
-    "main": "./lib/nodegen.js",
-    "license": "Apache-2.0",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/node-red/node-red-nodegen.git"
+  "name": "node-red-nodegen",
+  "version": "0.1.0",
+  "description": "Node generator for Node-RED",
+  "homepage": "http://nodered.org",
+  "main": "./lib/nodegen.js",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/node-red/node-red-nodegen.git"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "contributors": [
+    {
+      "name": "Kazuhito Yokoi"
     },
-    "engines": {
-        "node": ">=8"
+    {
+      "name": "Razvan Bordeanu"
     },
-    "contributors": [
-        {
-            "name": "Kazuhito Yokoi"
-        },
-        {
-            "name": "Razvan Bordeanu"
-        },
-        {
-            "name": "Hiroki Uchikawa"
-        },
-        {
-            "name": "Yuki Naganuma"
-        },
-        {
-            "name": "Hiroshi Nasu"
-        },
-        {
-            "name": "Jana Backhus"
-        },
-        {
-            "name": "Kunihiko Toumura"
-        },
-        {
-            "name": "Yu Nakata"
-        },
-        {
-            "name": "Yuma Matsuura"
-        },
-        {
-            "name": "Katsuya Hoshii"
-        },
-        {
-            "name": "Qi Xiu"
-        },
-        {
-            "name": "Masae Okada"
-        },
-        {
-            "name": "Takaya Ide"
-        },
-        {
-            "name": "Kazuki Nakanishi"
-        },
-        {
-            "name": "Hideki Nakamura"
-        },
-        {
-            "name": "Hiroyasu Nishiyama"
-        },
-        {
-            "name": "Nick O'Leary"
-        },
-        {
-            "name": "Dave Conway-Jones"
-        }
-    ],
-    "keywords": [
-        "nodegen",
-        "function",
-        "swagger",
-        "codegen",
-        "swagger-codegen",
-        "wot",
-        "web of things"
-    ],
-    "dependencies": {
-        "ajv": "6.12.0",
-        "cldr": "5.5.4",
-        "colors": "1.4.0",
-        "csv-string": "3.1.8",
-        "javascript-obfuscator": "0.27.2",
-        "jimp": "0.9.6",
-        "js-string-escape": "1.0.1",
-        "minimist": "1.2.5",
-        "mustache": "4.0.1",
-        "request": "2.88.2",
-        "swagger-js-codegen-formdata": "0.15.5",
-        "when": "3.7.8",
-        "yamljs": "0.3.0"
+    {
+      "name": "Hiroki Uchikawa"
     },
-    "devDependencies": {
-        "del": "5.1.0",
-        "grunt": "1.0.4",
-        "grunt-mocha-istanbul": "5.0.2",
-        "grunt-shell": "3.0.1",
-        "grunt-simple-mocha": "0.4.1",
-        "istanbul": "0.4.5",
-        "node-red": "1.0.4",
-        "node-red-node-test-helper": "0.2.3",
-        "q": "1.5.1",
-        "should": "13.2.3",
-        "sinon": "9.0.1",
-        "supertest": "4.0.2"
+    {
+      "name": "Yuki Naganuma"
     },
-    "bin": {
-        "node-red-nodegen": "./bin/node-red-nodegen.js"
+    {
+      "name": "Hiroshi Nasu"
     },
-    "scripts": {
-        "test": "grunt"
+    {
+      "name": "Jana Backhus"
+    },
+    {
+      "name": "Kunihiko Toumura"
+    },
+    {
+      "name": "Yu Nakata"
+    },
+    {
+      "name": "Yuma Matsuura"
+    },
+    {
+      "name": "Katsuya Hoshii"
+    },
+    {
+      "name": "Qi Xiu"
+    },
+    {
+      "name": "Masae Okada"
+    },
+    {
+      "name": "Takaya Ide"
+    },
+    {
+      "name": "Kazuki Nakanishi"
+    },
+    {
+      "name": "Hideki Nakamura"
+    },
+    {
+      "name": "Hiroyasu Nishiyama"
+    },
+    {
+      "name": "Nick O'Leary"
+    },
+    {
+      "name": "Dave Conway-Jones"
     }
+  ],
+  "keywords": [
+    "nodegen",
+    "function",
+    "swagger",
+    "codegen",
+    "swagger-codegen",
+    "wot",
+    "web of things"
+  ],
+  "dependencies": {
+    "ajv": "6.12.0",
+    "cldr": "5.5.4",
+    "colors": "1.4.0",
+    "csv-string": "3.1.8",
+    "javascript-obfuscator": "0.27.2",
+    "jimp": "0.9.6",
+    "js-string-escape": "1.0.1",
+    "minimist": "1.2.5",
+    "mustache": "4.0.1",
+    "request": "2.88.2",
+    "swagger-js-codegen-formdata": "0.15.5",
+    "when": "3.7.8",
+    "yamljs": "0.3.0"
+  },
+  "devDependencies": {
+    "del": "5.1.0",
+    "grunt": "1.0.4",
+    "grunt-mocha-istanbul": "5.0.2",
+    "grunt-shell": "3.0.1",
+    "grunt-simple-mocha": "0.4.1",
+    "istanbul": "0.4.5",
+    "node-red": "1.0.4",
+    "node-red-node-test-helper": "0.2.3",
+    "q": "1.5.1",
+    "should": "13.2.3",
+    "sinon": "9.0.1",
+    "supertest": "4.0.2"
+  },
+  "bin": {
+    "node-red-nodegen": "./bin/node-red-nodegen.js"
+  },
+  "scripts": {
+    "test": "grunt"
+  }
 }
