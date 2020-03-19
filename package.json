@@ -7,66 +7,30 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/node-red/node-red-nodegen.git"
+    "url": "git+https://github.com/node-red/node-red-nodegen.git"
   },
   "engines": {
-    "node": ">=8"
+    "node": ">=10"
   },
   "contributors": [
-    {
-      "name": "Kazuhito Yokoi"
-    },
-    {
-      "name": "Razvan Bordeanu"
-    },
-    {
-      "name": "Hiroki Uchikawa"
-    },
-    {
-      "name": "Yuki Naganuma"
-    },
-    {
-      "name": "Hiroshi Nasu"
-    },
-    {
-      "name": "Jana Backhus"
-    },
-    {
-      "name": "Kunihiko Toumura"
-    },
-    {
-      "name": "Yu Nakata"
-    },
-    {
-      "name": "Yuma Matsuura"
-    },
-    {
-      "name": "Katsuya Hoshii"
-    },
-    {
-      "name": "Qi Xiu"
-    },
-    {
-      "name": "Masae Okada"
-    },
-    {
-      "name": "Takaya Ide"
-    },
-    {
-      "name": "Kazuki Nakanishi"
-    },
-    {
-      "name": "Hideki Nakamura"
-    },
-    {
-      "name": "Hiroyasu Nishiyama"
-    },
-    {
-      "name": "Nick O'Leary"
-    },
-    {
-      "name": "Dave Conway-Jones"
-    }
+    "Kazuhito Yokoi",
+    "Razvan Bordeanu",
+    "Hiroki Uchikawa",
+    "Yuki Naganuma",
+    "Hiroshi Nasu",
+    "Jana Backhus",
+    "Kunihiko Toumura",
+    "Yu Nakata",
+    "Yuma Matsuura",
+    "Katsuya Hoshii",
+    "Qi Xiu",
+    "Masae Okada",
+    "Takaya Ide",
+    "Kazuki Nakanishi",
+    "Hideki Nakamura",
+    "Hiroyasu Nishiyama",
+    "Nick O'Leary",
+    "Dave Conway-Jones"
   ],
   "keywords": [
     "nodegen",
@@ -107,9 +71,17 @@
     "supertest": "4.0.2"
   },
   "bin": {
-    "node-red-nodegen": "./bin/node-red-nodegen.js"
+    "node-red-nodegen": "bin/node-red-nodegen.js"
   },
   "scripts": {
     "test": "grunt"
+  },
+  "bugs": {
+    "url": "https://github.com/node-red/node-red-nodegen/issues"
+  },
+  "directories": {
+    "doc": "docs",
+    "lib": "lib",
+    "test": "test"
   }
 }
