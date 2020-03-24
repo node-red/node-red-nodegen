@@ -1,115 +1,87 @@
 {
-    "name": "node-red-nodegen",
-    "version": "0.1.0",
-    "description": "Node generator for Node-RED",
-    "homepage": "http://nodered.org",
-    "main": "./lib/nodegen.js",
-    "license": "Apache-2.0",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/node-red/node-red-nodegen.git"
-    },
-    "engines": {
-        "node": ">=8"
-    },
-    "contributors": [
-        {
-            "name": "Kazuhito Yokoi"
-        },
-        {
-            "name": "Razvan Bordeanu"
-        },
-        {
-            "name": "Hiroki Uchikawa"
-        },
-        {
-            "name": "Yuki Naganuma"
-        },
-        {
-            "name": "Hiroshi Nasu"
-        },
-        {
-            "name": "Jana Backhus"
-        },
-        {
-            "name": "Kunihiko Toumura"
-        },
-        {
-            "name": "Yu Nakata"
-        },
-        {
-            "name": "Yuma Matsuura"
-        },
-        {
-            "name": "Katsuya Hoshii"
-        },
-        {
-            "name": "Qi Xiu"
-        },
-        {
-            "name": "Masae Okada"
-        },
-        {
-            "name": "Takaya Ide"
-        },
-        {
-            "name": "Kazuki Nakanishi"
-        },
-        {
-            "name": "Hideki Nakamura"
-        },
-        {
-            "name": "Hiroyasu Nishiyama"
-        },
-        {
-            "name": "Nick O'Leary"
-        },
-        {
-            "name": "Dave Conway-Jones"
-        }
-    ],
-    "keywords": [
-        "nodegen",
-        "function",
-        "swagger",
-        "codegen",
-        "swagger-codegen",
-        "wot",
-        "web of things"
-    ],
-    "dependencies": {
-        "ajv": "6.10.2",
-        "cldr": "5.5.4",
-        "colors": "1.4.0",
-        "csv-string": "3.1.8",
-        "javascript-obfuscator": "0.18.6",
-        "jimp": "0.2.28",
-        "js-string-escape": "1.0.1",
-        "minimist": "1.2.0",
-        "mustache": "3.1.0",
-        "request": "2.88.2",
-        "swagger-js-codegen-formdata": "0.15.5",
-        "when": "3.7.8",
-        "yamljs": "0.3.0"
-    },
-    "devDependencies": {
-        "del": "5.1.0",
-        "grunt": "1.0.4",
-        "grunt-mocha-istanbul": "5.0.2",
-        "grunt-shell": "3.0.1",
-        "grunt-simple-mocha": "0.4.1",
-        "istanbul": "0.4.5",
-        "node-red": "1.0.4",
-        "node-red-node-test-helper": "0.2.3",
-        "q": "1.5.1",
-        "should": "13.2.3",
-        "sinon": "7.5.0",
-        "supertest": "4.0.2"
-    },
-    "bin": {
-        "node-red-nodegen": "./bin/node-red-nodegen.js"
-    },
-    "scripts": {
-        "test": "grunt"
-    }
+  "name": "node-red-nodegen",
+  "version": "0.1.0",
+  "description": "Node generator for Node-RED",
+  "homepage": "http://nodered.org",
+  "main": "./lib/nodegen.js",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/node-red/node-red-nodegen.git"
+  },
+  "engines": {
+    "node": ">=10"
+  },
+  "contributors": [
+    "Kazuhito Yokoi",
+    "Razvan Bordeanu",
+    "Hiroki Uchikawa",
+    "Yuki Naganuma",
+    "Hiroshi Nasu",
+    "Jana Backhus",
+    "Kunihiko Toumura",
+    "Yu Nakata",
+    "Yuma Matsuura",
+    "Katsuya Hoshii",
+    "Qi Xiu",
+    "Masae Okada",
+    "Takaya Ide",
+    "Kazuki Nakanishi",
+    "Hideki Nakamura",
+    "Hiroyasu Nishiyama",
+    "Nick O'Leary",
+    "Dave Conway-Jones"
+  ],
+  "keywords": [
+    "nodegen",
+    "function",
+    "swagger",
+    "codegen",
+    "swagger-codegen",
+    "wot",
+    "web of things"
+  ],
+  "dependencies": {
+    "ajv": "6.12.0",
+    "cldr": "5.5.4",
+    "colors": "1.4.0",
+    "csv-string": "3.1.8",
+    "javascript-obfuscator": "0.27.2",
+    "jimp": "0.9.6",
+    "js-string-escape": "1.0.1",
+    "minimist": "1.2.5",
+    "mustache": "4.0.1",
+    "request": "2.88.2",
+    "swagger-js-codegen-formdata": "0.15.5",
+    "when": "3.7.8",
+    "yamljs": "0.3.0"
+  },
+  "devDependencies": {
+    "del": "5.1.0",
+    "grunt": "1.0.4",
+    "grunt-mocha-istanbul": "5.0.2",
+    "grunt-shell": "3.0.1",
+    "grunt-simple-mocha": "0.4.1",
+    "istanbul": "0.4.5",
+    "node-red": "1.0.4",
+    "node-red-node-test-helper": "0.2.3",
+    "q": "1.5.1",
+    "should": "13.2.3",
+    "sinon": "9.0.1",
+    "supertest": "4.0.2"
+  },
+  "bin": {
+    "node-red-nodegen": "bin/node-red-nodegen.js"
+  },
+  "scripts": {
+    "test": "grunt"
+  },
+  "bugs": {
+    "url": "https://github.com/node-red/node-red-nodegen/issues"
+  },
+  "directories": {
+    "doc": "docs",
+    "lib": "lib",
+    "test": "test"
+  }
 }
