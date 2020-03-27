@@ -145,11 +145,30 @@ if (argv.help || argv.h) {
             });
         } else if (sourcePath.endsWith('.json') && !argv.wottd) {
             data.src = JSON.parse(fs.readFileSync(sourcePath));
-            nodegen.swagger2node(data, options).then(function (result) {
-                console.log('Success: ' + result);
-            }).catch(function (error) {
-                console.log('Error: ' + error);
-            });
+            // if it's a .json flow file with one function node in...
+            if (Array.isArray(data.src) && data.src[0].hasOwnProperty("type") && data.src[0].type == "function") {
+                var f = data.src[0];
+                if (!f.name || f.name.length ==0) { console.log('Error: No function name supplied.'); return; }
+                data.name = f.name.toLowerCase();
+                data.icon = f.icon;
+                data.info = f.info;
+                data.outputs = f.outputs;
+                data.inputLabels = f.inputLabels;
+                data.outputLabels = f.outputLabels;
+                data.src = Buffer.from(f.func);
+                nodegen.function2node(data, options).then(function (result) {
+                    console.log('Success: ' + result);
+                }).catch(function (error) {
+                    console.log('Error: ' + error);
+                });
+            }
+            else {
+                nodegen.swagger2node(data, options).then(function (result) {
+                    console.log('Success: ' + result);
+                }).catch(function (error) {
+                    console.log('Error: ' + error);
+                });
+            }
         } else if (sourcePath.endsWith('.yaml')) {
             data.src = yamljs.load(sourcePath);
             nodegen.swagger2node(data, options).then(function (result) {
