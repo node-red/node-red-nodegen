@@ -24,7 +24,7 @@ describe('node-red-contrib-swagger-petstore', function () {
         helper.startServer(done);
     });
 
-    after(function(done) {
+    after(function (done) {
         helper.stopServer(done);
     });
 
@@ -222,7 +222,7 @@ describe('node-red-contrib-swagger-petstore', function () {
             var n2 = helper.getNode('n2');
             n2.on('input', function (msg) {
                 try {
-                    msg.should.have.property('payload', 'foo');
+                    msg.payload.should.eql({ code: 200, type: 'unknown', message: '4513' });
                     msg.should.have.property('topic', 'bar');
                     done();
                 } catch (e) {
@@ -240,7 +240,7 @@ describe('node-red-contrib-swagger-petstore', function () {
             var n2 = helper.getNode('n2');
             n2.on('input', function (msg) {
                 try {
-                    msg.should.have.property('payload', 'foo');
+                    msg.payload.should.eql({ code: 200, type: 'unknown', message: '4513' });
                     msg.should.have.property('topic', 'bar');
                     done();
                 } catch (e) {
@@ -332,7 +332,7 @@ describe('node-red-contrib-swagger-petstore', function () {
             var n2 = helper.getNode('n2');
             n2.on('input', function (msg) {
                 try {
-                    msg.should.have.property('payload', 'foo');
+                    msg.payload.should.eql({ code: 200, type: 'unknown', message: '4147' });
                     msg.should.have.property('topic', 'bar');
                     done();
                 } catch (e) {
@@ -350,16 +350,7 @@ describe('node-red-contrib-swagger-petstore', function () {
             var n2 = helper.getNode('n2');
             n2.on('input', function (msg) {
                 try {
-                    msg.payload.should.eql({
-                        "id": 8110,
-                        "username": "My user name",
-                        "firstName": "My first name",
-                        "lastName": "My last name",
-                        "email": "My e-mail address",
-                        "password": "My password",
-                        "phone": "My phone number",
-                        "userStatus": 0
-                    });
+                    msg.payload.should.eql({ code: 200, type: 'unknown', message: '8110' });
                     done();
                 } catch (e) {
                     done(e);
@@ -387,18 +378,7 @@ describe('node-red-contrib-swagger-petstore', function () {
             var n2 = helper.getNode('n2');
             n2.on('input', function (msg) {
                 try {
-                    msg.payload.should.eql([
-                        {
-                            "id": 8948,
-                            "username": "My user name",
-                            "firstName": "My first name",
-                            "lastName": "My last name",
-                            "email": "My e-mail address",
-                            "password": "My password",
-                            "phone": "My phone number",
-                            "userStatus": 0
-                        }
-                    ]);
+                    msg.payload.should.eql({ code: 200, type: 'unknown', message: 'ok' });
                     done();
                 } catch (e) {
                     done(e);
@@ -428,18 +408,7 @@ describe('node-red-contrib-swagger-petstore', function () {
             var n2 = helper.getNode('n2');
             n2.on('input', function (msg) {
                 try {
-                    msg.payload.should.eql([
-                        {
-                            "id": 8808,
-                            "username": "My user name",
-                            "firstName": "My first name",
-                            "lastName": "My last name",
-                            "email": "My e-mail address",
-                            "password": "My password",
-                            "phone": "My phone number",
-                            "userStatus": 0
-                        }
-                    ]);
+                    msg.payload.should.eql({ code: 200, type: 'unknown', message: 'ok' });
                     done();
                 } catch (e) {
                     done(e);
@@ -469,7 +438,8 @@ describe('node-red-contrib-swagger-petstore', function () {
             var n2 = helper.getNode('n2');
             n2.on('input', function (msg) {
                 try {
-                    msg.payload.should.startWith('logged in user session:');
+                    msg.payload.should.containEql({ code: 200, type: 'unknown' });
+                    msg.payload.message.should.startWith('logged in user session:');
                     done();
                 } catch (e) {
                     done(e);
@@ -486,7 +456,7 @@ describe('node-red-contrib-swagger-petstore', function () {
             var n2 = helper.getNode('n2');
             n2.on('input', function (msg) {
                 try {
-                    msg.should.have.property('payload', 'foo');
+                    msg.payload.should.eql({ code: 200, type: 'unknown', message: 'ok' });
                     msg.should.have.property('topic', 'bar');
                     done();
                 } catch (e) {
@@ -505,7 +475,7 @@ describe('node-red-contrib-swagger-petstore', function () {
             n2.on('input', function (msg) {
                 try {
                     msg.payload.should.eql({
-                        "id": 8808,
+                        "id": 8110,
                         "username": "My user name",
                         "firstName": "My first name",
                         "lastName": "My last name",
@@ -530,16 +500,7 @@ describe('node-red-contrib-swagger-petstore', function () {
             var n2 = helper.getNode('n2');
             n2.on('input', function (msg) {
                 try {
-                    msg.payload.should.eql({
-                        "id": 8808,
-                        "username": "My user name2",
-                        "firstName": "My first name2",
-                        "lastName": "My last name2",
-                        "email": "My e-mail address2",
-                        "password": "My password2",
-                        "phone": "My phone number2",
-                        "userStatus": 0
-                    });
+                    msg.payload.should.eql({ code: 200, type: 'unknown', message: '8808' });
                     done();
                 } catch (e) {
                     done(e);
@@ -567,7 +528,7 @@ describe('node-red-contrib-swagger-petstore', function () {
             var n2 = helper.getNode('n2');
             n2.on('input', function (msg) {
                 try {
-                    msg.should.have.property('payload', 'foo');
+                    msg.payload.should.eql({ code: 200, type: 'unknown', message: 'My user name2' });
                     msg.should.have.property('topic', 'bar');
                     done();
                 } catch (e) {

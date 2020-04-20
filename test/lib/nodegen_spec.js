@@ -86,7 +86,7 @@ describe('nodegen library', function () {
                 del.sync(result);
                 done();
             });
-        });        
+        });
         it('should handle options', function (done) {
             var options = {
                 tgz: true,
@@ -116,7 +116,7 @@ describe('nodegen library', function () {
                 nodegen.swagger2node(data, options).then(function (result) {
                     var packageSourceCode = JSON.parse(fs.readFileSync(result + '/package.json'));
                     packageSourceCode.name.should.equal('node-red-contrib-swagger-petstore');
-                    packageSourceCode.version.should.equal('1.0.3');
+                    packageSourceCode.version.should.equal('1.0.5');
                     packageSourceCode.license.should.equal('Apache 2.0');
                     fs.statSync(result + '/node.html').size.should.be.above(0);
                     fs.statSync(result + '/node.js').size.should.be.above(0);
@@ -156,8 +156,8 @@ describe('nodegen library', function () {
         });
     });
 
-    describe('Web of Things node', function() {
-        it('should have node files', function(done) {
+    describe('Web of Things node', function () {
+        it('should have node files', function (done) {
             const sourcePath = 'samples/MyLampThing.jsonld';
             const data = {
                 src: JSON.parse(fs.readFileSync(sourcePath)),
@@ -196,7 +196,6 @@ describe('nodegen library', function () {
                 done();
             });
         });
-
     });
 });
 
