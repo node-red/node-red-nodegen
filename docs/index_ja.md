@@ -1,6 +1,6 @@
 ノードジェネレータ
 ----
-ノードジェネレータは、OpenAPIドキュメントやfunctionノードなどのソースコードからNode-REDのノードを生成するためのコマンドラインツールです。
+ノードジェネレータは、OpenAPIドキュメント、[Web of Things Things Description](https://www.w3.org/TR/wot-thing-description/)やfunctionノードなどのソースコードからNode-REDのノードを生成するためのコマンドラインツールです。
 このツールを使用すると、ノード開発者はNode-REDノードの実装時間を大幅に短縮できます。
 
 <a name="use-cases"></a>
@@ -34,9 +34,14 @@ Node-REDユーザは、サブフローを独自のノードとしてカプセル
 そして、Node-REDユーザは、フローライブラリを介して、生成したノードを他のNode-REDユーザと容易に共有できます。
 
 #### (4) デバイスへの接続
-Web of Things (WoT)は、IoTデバイスを接続するための標準仕様です。
-ノードジェネレータはWeb of Thingsの定義から独自のノードを開発することを支援します。
-現在のところ、GitHub上にプロトタイプ実装の[スライド](https://github.com/w3c/wot/blob/master/plugfest/2018-bundang/images/Plugfest-Bundang-WoT.pdf)と[スクリーンショット](https://github.com/w3c/wot/blob/master/plugfest/2018-bundang/result-hitachi.md)があります。
+IoTアプリケーションの開発者は、接続したデバイスをつかった価値の創出に
+注力したいのであり、その実装の詳細に手間をかけたくありません。
+実装の詳細を抽象化するために、W3C Web of Things (WoT)はIoTデバイスがもつ
+インタフェースを抽象化するための枠組みを提供しています。
+WoTではデバイスのインタフェースはThing Descriptionとして記述され、
+ノードジェネレータはこのThing Descriptionから独自ノードを生成できます。
+ノードジェネレータを使うことで、アプリケーションの開発者は
+Node-RED上のノードをデバイスのアバターとして使うことができます。
 
 <a name="how-to-use-node-generator"></a>
 ## ノードジェネレータの使い方
@@ -45,7 +50,7 @@ Web of Things (WoT)は、IoTデバイスを接続するための標準仕様で�
 
     npm install -g node-red-nodegen
 
-ノードジェネレータの現在のバージョンは、functionノードとOpenAPIドキュメントをソースファイルとしてサポートしています。
+ノードジェネレータの現在のバージョンは、functionノード、OpenAPIドキュメントとWoT Thing Descriptionをソースファイルとしてサポートしています。
 ノードジェネレータのコマンドであるnode-red-nodegenは、以下の様にコマンドの引数で指定したファイルをノードに変換します。
 
     node-red-nodegen <source file> -> コマンドツールは、ソースファイルからノードを出力します
@@ -54,6 +59,7 @@ Web of Things (WoT)は、IoTデバイスを接続するための標準仕様で�
 
  - [OpenAPIドキュメントからノードを生成する方法](#how-to-create-a-node-from-openapi-document)
  - [functionノードからノードを生成する方法](#how-to-create-a-node-from-function-node)
+ - [Thing Descriptionからノードを生成する方法](#how-to-create-a-node-from-wot-thing-description)
 
 <a name="generated-files-which-node-package-contains"></a>
 ## ノードパッケージ内のファイル
@@ -718,6 +724,131 @@ functionノードに外部モジュールをロードする場合、Node-REDユ�
     node-red
 
    -> Node-REDフローエディタ上でformat-dateノードを使用できます。
+
+<a name="how-to-create-a-node-from-thing-description"></a>
+## Thing Descriptionからノードを生成する方法
+node-red-nodegenコマンドの最初の引数として、Thing Description(TD)のURL又はファイルパスを指定できます。URL、または拡張子が".jsonld"でないファイルを指定する場合は、`--wottd`オプションをつける必要があります。また、もしURL指定でTDを取得する場合には、`--lang`オプションをつけることで指定した言語のTDを取得することもできます。
+
+(1) node-red-nodegenコマンドを使用してノードを生成
+
+    node-red-nodegen td.jsonld
+
+Node-REDユーザは通常、以下の手順で生成したノードをNode-REDフローエディタのパレットにインポートします。
+
+(2) カレントディレクトリをNode-REDのホームディレクトリに変更（通常、Node-REDのホームディレクトリは、ホームディレクトリの下の".node-red"です）
+
+    cd ~/.node-red
+
+(3) モジュールをローカルにインストール
+
+    npm install <location of node module>
+
+(4) Node-REDを起動
+
+    node-red
+
+(5) Node-REDフローエディタにアクセス (http://localhost:1880)
+
+-> 生成されたノードがNode-REDフローエディタのパレットに表示されます(コマンドラインオプションで指定してなければ、"Web of Things"カテゴリ内にあるはずです)。
+
+(6) 生成されたノードをワークスペースにドラッグアンドドロップ
+
+(7) ノードを設定する
+
+- Interaction: 利用する相互作用
+- Name: 相互作用の名前
+- Access: プロパティにアクセスする場合、読み/書き/監視のどのアクセスを行うか?
+- Form: どの認証方法・エンドポイントを使うか?
+- TokenまたはUsername/Password: もしエンドポイントのアクセスに認証が必要であれば、必要な情報をセットする
+- Node name: フローエディタで表示されるノードの名前を指定する
+
+(8) Node-REDフローエディタでフローを作成
+
+- プロパティの利用法:
+  - プロパティを読むためには、任意のメッセージをノードに送ると、それをトリガーとしてデバイスに問い合わせが行われ、結果がmsg.payloadに入ったメッセージとして出力されます。
+  - プロパティに書き込むためには、書き込む内容をmsg.payloadにいれたメッセージをノードに送ります。
+  - プロパティを監視するように設定すると、ノードは定期的にプロパティの値をmsg.payloadに入れたメッセージを出力します。
+- アクションの利用法:
+  - アクションを起動するためには、必要な引数をmsg.payloadに入れたメッセージをノードに送ります。
+- イベントの利用法:
+  - イベントが発生すると、ノードはイベント内容をmsg.payloadに入れたメッセージを出力します。
+
+### コマンドラインオプション
+生成したノードをカスタマイズする場合は、次の手順やコマンドラインオプションが役立ちます。
+
+#### モジュール名
+ノードジェネレータは、モジュール名のデフォルトのプレフィックスとして "node-red-contrib-"を使用します。またノード名はTDの"name"プロパティから取られます。
+デフォルトのモジュール名を変更したい場合は、`--module`又は`--prefix`オプションを使用してモジュール名を指定できます。
+
+    node-red-nodegen td.jsonld --module wotmodule
+    node-red-nodegen td.jsonld --prefix node-red-wot
+
+#### ノード名
+Thing Descriptionから生成したノードの場合、Thing Descriptionの"name"プロパティを生成ノードの名前として使用します。
+ノードジェネレータは、npmモジュールとNode-REDノードで利用できる適切な名前を変換するために、大文字とスペースをハイフンに置き換えます。
+
+デフォルト名を変更する場合は、`--name`オプションを使用してノード名を設定できます。
+特に、"name"プロパティにアルファベットと数字の代わりに2バイト文字を含む場合、ノードジェネレータがノードを正しく生成できないため、`--name`オプションを使用してノード名を指定します。
+
+    node-red-nodegen td.jsonld --name new-node-name
+
+#### バージョン
+デフォルトでは、ノードジェネレータはモジュールのバージョン番号として "version"プロパティを使用します。
+
+Thing Descriptionのバージョン番号をインクリメントせずにモジュールのバージョン番号を更新する場合は、`--version`オプションを指定します。
+特に、"npm publish"コマンドを使用して、以前公開したモジュールと同じバージョン番号を持つモジュールを公開すると、競合エラーが発生します。
+この場合、モジュールのバージョン番号を更新するには、`--version`オプションを指定します。
+
+    node-red-nodegen td.jsonld --version 0.0.2
+
+#### キーワード
+`--keywords`は、モジュールのキーワードのために用いる便利なオプションです。
+フローライブラリのWebサイトで、訪問者はこのキーワードを使用してモジュールを検索します。
+例えば、 "lamp"をキーワードとして使用する場合は、`--keywords`オプションを使用して単語を指定できます。
+デフォルトでは、ノードジェネレータは "node-red-nodegen"をキーワードとして使用します。
+
+    node-red-nodegen td.jsonld --keywords lamp
+
+2つ以上のキーワードを追加するには、コンマ区切りのキーワードを使用することもできます。
+
+    node-red-nodegen td.jsonld --keywords lamp,led
+
+生成したノードを公開する前に"--keywords node-red"を指定すると、ノードはフローライブラリに登録でき、Node-REDフローエディタでノードをインストールできます。
+
+    node-red-nodegen td.jsonld --keyword lamp,led,node-red
+
+#### カテゴリ
+Node-REDフローエディタのパレットでは、生成したノードはデフォルトとして「Web of Things」カテゴリに入ります。
+カテゴリを変更する場合は、`--category`オプションを用います。
+例えば、次のコマンドが出力するノードは、Node-REDフローエディタの「分析」カテゴリに入ります。
+
+    node-red-nodegen td.jsonld --category analysis
+
+#### ノードアイコン
+ノードジェネレータのコマンドは、生成されるノードのアイコンファイルを指定するための`--icon`オプションをサポートしています。
+オプションにはPNGファイルパス、または[ストックアイコンのファイル名](https://nodered.org/docs/creating-nodes/appearance)を使用できます。アイコンは透明な背景上に白色で表示したPNGファイルである必要があります。
+
+    node-red-nodegen td.jsonld --icon  <PNGファイル、またはストックアイコン>
+
+#### ノードの色
+ノードジェネレータはデフォルトでノードテンプレートで定義されたノードの色を使用します。変更する必要がある場合は、コマンドラインの`--color`オプションを使用できます。オプションには、ノードの色を表す16進数("RRGGBB"形式)の文字列を指定できます。
+
+    node-red-nodegen td.jsonld --color FFFFFF
+
+#### 情報タブ内のノードの情報
+ノードジェネレータは、Thing Descriptionの次のプロパティを使用して、情報タブにノードの情報を自動的に生成します。
+
+- description: ノードの説明
+- 各相互作用のtitle/description/form: 相互作用の説明
+- support: サポート情報
+- links: 参考情報
+
+情報タブのノード情報を変更したい場合は、生成されたノードのHTMLファイルの最後のセクションを編集します。
+
+#### README
+ノードの詳細を説明は、README.mdというファイルに書きます。 
+フローライブラリにノードを公開すると、フローライブラリのWebサイトは、ノードのページで本ファイルを表示します。
+ノードジェネレータはREADME.mdのテンプレートを出力するので、ファイルを変更するだけです。
 
 ## 既知の問題点
 - ノードジェネレータのコマンドでは、非同期の問題があるため、--tgzオプションと--iconオプションを同時に使用することはできません。
