@@ -7,6 +7,7 @@ addons:
     - petstore.swagger.io 
 matrix:
   include:
+    - node_js: "14"
     - node_js: "12"
     - node_js: "10"
       script:
