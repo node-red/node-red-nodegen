@@ -46,7 +46,7 @@
     "cldr": "5.5.4",
     "colors": "1.4.0",
     "csv-string": "3.1.8",
-    "javascript-obfuscator": "0.27.2",
+    "javascript-obfuscator": "0.28.1",
     "jimp": "0.9.6",
     "js-string-escape": "1.0.1",
     "minimist": "1.2.5",
