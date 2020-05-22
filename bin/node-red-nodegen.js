@@ -22,6 +22,7 @@ var request = require('request');
 var yamljs = require('yamljs');
 var argv = require('minimist')(process.argv.slice(2));
 var colors = require('colors');
+var Converter = require('api-spec-converter');
 var nodegen = require('../lib/nodegen.js');
 
 // Command options
@@ -113,10 +114,17 @@ if (argv.help || argv.h) {
             request(sourcePath, function (error, response, body) {
                 if (!error) {
                     data.src = JSON.parse(body);
-                    nodegen.swagger2node(data, options).then(function (result) {
-                        console.log('Success: ' + result);
-                    }).catch(function (error) {
-                        console.log('Error: ' + error);
+                    Converter.convert({
+                        from: data.src.openapi && data.src.openapi.startsWith('3.0') ? 'openapi_3' : 'swagger_2',
+                        to: 'swagger_2',
+                        source: data.src,
+                    }).then(function (convertedData) {
+                        data.src = convertedData.spec;
+                        nodegen.swagger2node(data, options).then(function (result) {
+                            console.log('Success: ' + result);
+                        }).catch(function (error) {
+                            console.log('Error: ' + error);
+                        });
                     });
                 } else {
                     console.error(error);
@@ -163,18 +171,33 @@ if (argv.help || argv.h) {
                 });
             }
             else {
+                Converter.convert({
+                    from: data.src.openapi && data.src.openapi.startsWith('3.0') ? 'openapi_3' : 'swagger_2',
+                    to: 'swagger_2',
+                    source: data.src,
+                }).then(function (convertedData) {
+                    data.src = convertedData.spec;
+                    nodegen.swagger2node(data, options).then(function (result) {
+                        console.log('Success: ' + result);
+                    }).catch(function (error) {
+                        console.log('Error: ' + error);
+                    });
+                });
+            }
+        } else if (sourcePath.endsWith('.yaml')) {
+            data.src = yamljs.load(sourcePath);
+            console.log(JSON.stringify(data.src, null, 4)); // hoge
+            Converter.convert({
+                from: data.src.openapi && data.src.openapi.startsWith('3.0') ? 'openapi_3' : 'swagger_2',
+                to: 'swagger_2',
+                source: data.src,
+            }).then(function (convertedData) {
+                data.src = convertedData.spec;
                 nodegen.swagger2node(data, options).then(function (result) {
                     console.log('Success: ' + result);
                 }).catch(function (error) {
                     console.log('Error: ' + error);
                 });
-            }
-        } else if (sourcePath.endsWith('.yaml')) {
-            data.src = yamljs.load(sourcePath);
-            nodegen.swagger2node(data, options).then(function (result) {
-                console.log('Success: ' + result);
-            }).catch(function (error) {
-                console.log('Error: ' + error);
             });
         } else if (sourcePath.endsWith('.js')) {
             data.src = fs.readFileSync(sourcePath);
