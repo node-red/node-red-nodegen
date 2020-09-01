@@ -54,7 +54,6 @@
     "mustache": "4.0.1",
     "request": "2.88.2",
     "swagger-js-codegen-formdata": "0.15.5",
-    "when": "3.7.8",
     "yamljs": "0.3.0"
   },
   "devDependencies": {
