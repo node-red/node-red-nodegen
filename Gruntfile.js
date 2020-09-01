@@ -28,7 +28,6 @@ module.exports = function (grunt) {
     grunt.file.mkdir('nodegen');
     grunt.loadNpmTasks('grunt-shell');
     grunt.loadNpmTasks('grunt-simple-mocha');
-    grunt.loadNpmTasks('grunt-mocha-istanbul');
-    grunt.registerTask('default', ['shell', 'mocha_istanbul:all']);
+    grunt.registerTask('default', ['shell', 'simplemocha']);
     grunt.registerTask('coverage', 'Run Istanbul code test coverage task', ['shell', 'mocha_istanbul:all']);
 };

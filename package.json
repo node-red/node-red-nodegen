@@ -58,7 +58,6 @@
   "devDependencies": {
     "del": "5.1.0",
     "grunt": "1.0.4",
-    "grunt-mocha-istanbul": "5.0.2",
     "grunt-shell": "3.0.1",
     "grunt-simple-mocha": "0.4.1",
     "istanbul": "0.4.5",
