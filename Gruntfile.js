@@ -1,11 +1,14 @@
 module.exports = function (grunt) {
     grunt.initConfig({
         shell: {
-            generateNode_lowerCase: {
+            generateNode_Function: {
                 command: 'node bin/node-red-nodegen.js samples/lower-case.js -o ./nodegen'
             },
-            generateNode_swaggerPetstore: {
+            generateNode_Swagger: {
                 command: 'node bin/node-red-nodegen.js samples/swagger.json -o ./nodegen'
+            },
+            generateNode_WebOfThings: {
+                command: 'node bin/node-red-nodegen.js samples/MyLampThing.jsonld -o ./nodegen'
             }
         },
         simplemocha: {
@@ -29,5 +32,4 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-shell');
     grunt.loadNpmTasks('grunt-simple-mocha');
     grunt.registerTask('default', ['shell', 'simplemocha']);
-    grunt.registerTask('coverage', 'Run Istanbul code test coverage task', ['shell', 'mocha_istanbul:all']);
 };
