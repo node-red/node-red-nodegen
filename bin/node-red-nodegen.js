@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Copyright JS Foundation and other contributors, http://js.foundation
+ * Copyright OpenJS Foundation and other contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
