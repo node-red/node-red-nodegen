@@ -4,9 +4,6 @@ module.exports = function (grunt) {
             generateNode_lowerCase: {
                 command: 'node bin/node-red-nodegen.js samples/lower-case.js -o ./nodegen'
             },
-            getSwagger_swaggerPetstore: {
-                command: 'node bin/getswagger.js'
-            },
             generateNode_swaggerPetstore: {
                 command: 'node bin/node-red-nodegen.js samples/swagger.json -o ./nodegen'
             }

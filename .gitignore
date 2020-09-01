@@ -2,7 +2,6 @@
 node-red-contrib-*
 node-red-node-*
 ./nodegen
-samples
 
 # Dependency directories
 node_modules

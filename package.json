@@ -52,7 +52,6 @@
     "js-string-escape": "1.0.1",
     "minimist": "1.2.5",
     "mustache": "4.0.1",
-    "request": "2.88.2",
     "swagger-js-codegen-formdata": "0.15.5",
     "yamljs": "0.3.0"
   },
