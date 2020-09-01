@@ -18,7 +18,6 @@
 
 var fs = require('fs');
 var path = require('path');
-var request = require('request');
 
 var argv = require('minimist')(process.argv.slice(2));
 var colors = require('colors');
@@ -114,22 +113,22 @@ if (argv.help || argv.h) {
         data.src = sourcePath;
         if (argv.wottd || /\.jsonld$/.test(sourcePath)) {
             // Explicitly a Web Of Things request
-            promise = nodegen.wottd2node(data, options);
+            promise = nodegen.WebOfThingsGenerator(data, options);
         } else if (/^https?:/.test(sourcePath) || /.yaml$/.test(sourcePath)) {
             // URL/yaml -> swagger
-            promise = nodegen.swagger2node(data, options);
+            promise = nodegen.SwaggerNodeGenerator(data, options);
         } else if (/\.json$/.test(sourcePath)) {
             // JSON could be a Function node, or Swagger
             var content = JSON.parse(fs.readFileSync(sourcePath));
             if (Array.isArray(content)) {
                 data.src = content;
-                promise = nodegen.function2node(data, options);
+                promise = nodegen.FunctionNodeGenerator(data, options);
             } else {
-                promise = nodegen.swagger2node(data, options);
+                promise = nodegen.SwaggerNodeGenerator(data, options);
             }
         } else if (/\.js$/.test(sourcePath)) {
             // .js -> Function node
-            promise = nodegen.function2node(data, options);
+            promise = nodegen.FunctionNodeGenerator(data, options);
         } else {
             console.error('error: Unsupported file type');
             help();
