@@ -431,7 +431,7 @@ module.exports = function (RED) {
                     const urivars = prop.hasOwnProperty("uriVariables") ? msg.payload : {};
                     if (prop.uriVariables) {
                         const ajv = new Ajv({allErrors: true});
-                        if (!ajv.validate(prop.uriVariables, urlvars)) {
+                        if (!ajv.validate(prop.uriVariables, urivars)) {
                             node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
                         }
                     }
