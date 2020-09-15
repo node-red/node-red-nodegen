@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Copyright JS Foundation and other contributors, http://js.foundation
+ * Copyright OpenJS Foundation and other contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,9 @@
 
 var fs = require('fs');
 var path = require('path');
-var request = require('request');
-var yamljs = require('yamljs');
+
 var argv = require('minimist')(process.argv.slice(2));
 var colors = require('colors');
-var Converter = require('api-spec-converter');
 var nodegen = require('../lib/nodegen.js');
 
 // Command options
@@ -39,7 +37,8 @@ var data = {
     category: argv.category || argv.c,
     icon: argv.icon,
     color: argv.color,
-    dst: argv.output || argv.o || '.'
+    dst: argv.output || argv.o || '.',
+    lang: argv.lang
 };
 
 function help() {
@@ -108,113 +107,40 @@ if (argv.help || argv.h) {
 } else if (argv.v) {
     version();
 } else {
+    var promise;
     var sourcePath = argv._[0];
     if (sourcePath) {
-        if (!argv.wottd && (sourcePath.startsWith('http://') || sourcePath.startsWith('https://'))) {
-            request(sourcePath, function (error, response, body) {
-                if (!error) {
-                    data.src = JSON.parse(body);
-                    Converter.convert({
-                        from: data.src.openapi && data.src.openapi.startsWith('3.0') ? 'openapi_3' : 'swagger_2',
-                        to: 'swagger_2',
-                        source: data.src,
-                    }).then(function (convertedData) {
-                        data.src = convertedData.spec;
-                        nodegen.swagger2node(data, options).then(function (result) {
-                            console.log('Success: ' + result);
-                        }).catch(function (error) {
-                            console.log('Error: ' + error);
-                        });
-                    });
-                } else {
-                    console.error(error);
-                }
-            });
-        } else if (argv.wottd && (sourcePath.startsWith('http://') || sourcePath.startsWith('https://'))) {
-            const req = {
-                url: sourcePath,
+        data.src = sourcePath;
+        if (argv.wottd || /\.jsonld$/.test(sourcePath)) {
+            // Explicitly a Web Of Things request
+            promise = nodegen.WebOfThingsGenerator(data, options);
+        } else if (/^https?:/.test(sourcePath) || /.yaml$/.test(sourcePath)) {
+            // URL/yaml -> swagger
+            promise = nodegen.SwaggerNodeGenerator(data, options);
+        } else if (/\.json$/.test(sourcePath)) {
+            // JSON could be a Function node, or Swagger
+            var content = JSON.parse(fs.readFileSync(sourcePath));
+            if (Array.isArray(content)) {
+                data.src = content;
+                promise = nodegen.FunctionNodeGenerator(data, options);
+            } else {
+                promise = nodegen.SwaggerNodeGenerator(data, options);
             }
-            if (argv.lang) {
-                req.headers = {
-                    'Accept-Language': argv.lang
-                }
-            }
-            request(req, function (error, response, body) {
-                if (!error) {
-                    data.src = JSON.parse(skipBom(body));
-                    nodegen.wottd2node(data, options).then(function (result) {
-                        console.log('Success: ' + result);
-                    }).catch(function (error) {
-                        console.log('Error: ' + error);
-                    });
-                } else {
-                    console.error(error);
-                }
-            });
-        } else if (sourcePath.endsWith('.json') && !argv.wottd) {
-            data.src = JSON.parse(fs.readFileSync(sourcePath));
-            // if it's a .json flow file with one function node in...
-            if (Array.isArray(data.src) && data.src[0].hasOwnProperty("type") && data.src[0].type == "function") {
-                var f = data.src[0];
-                if (!f.name || f.name.length ==0) { console.log('Error: No function name supplied.'); return; }
-                data.name = f.name.toLowerCase();
-                data.icon = f.icon;
-                data.info = f.info;
-                data.outputs = f.outputs;
-                data.inputLabels = f.inputLabels;
-                data.outputLabels = f.outputLabels;
-                data.src = Buffer.from(f.func);
-                nodegen.function2node(data, options).then(function (result) {
-                    console.log('Success: ' + result);
-                }).catch(function (error) {
-                    console.log('Error: ' + error);
-                });
-            }
-            else {
-                Converter.convert({
-                    from: data.src.openapi && data.src.openapi.startsWith('3.0') ? 'openapi_3' : 'swagger_2',
-                    to: 'swagger_2',
-                    source: data.src,
-                }).then(function (convertedData) {
-                    data.src = convertedData.spec;
-                    nodegen.swagger2node(data, options).then(function (result) {
-                        console.log('Success: ' + result);
-                    }).catch(function (error) {
-                        console.log('Error: ' + error);
-                    });
-                });
-            }
-        } else if (sourcePath.endsWith('.yaml')) {
-            data.src = yamljs.load(sourcePath);
-            console.log(JSON.stringify(data.src, null, 4)); // hoge
-            Converter.convert({
-                from: data.src.openapi && data.src.openapi.startsWith('3.0') ? 'openapi_3' : 'swagger_2',
-                to: 'swagger_2',
-                source: data.src,
-            }).then(function (convertedData) {
-                data.src = convertedData.spec;
-                nodegen.swagger2node(data, options).then(function (result) {
-                    console.log('Success: ' + result);
-                }).catch(function (error) {
-                    console.log('Error: ' + error);
-                });
-            });
-        } else if (sourcePath.endsWith('.js')) {
-            data.src = fs.readFileSync(sourcePath);
-            nodegen.function2node(data, options).then(function (result) {
-                console.log('Success: ' + result);
-            }).catch(function (error) {
-                console.log('Error: ' + error);
-            });
-        } else if (sourcePath.endsWith('.jsonld') || argv.wottd) {
-            data.src = JSON.parse(skipBom(fs.readFileSync(sourcePath)));
-            nodegen.wottd2node(data, options).then(function (result) {
-                console.log('Success: ' + result);
-            }).catch(function (error) {
-                console.log('Error: ' + error);
-            });
+        } else if (/\.js$/.test(sourcePath)) {
+            // .js -> Function node
+            promise = nodegen.FunctionNodeGenerator(data, options);
         } else {
             console.error('error: Unsupported file type');
+            help();
+            return;
+        }
+        if (promise) {
+            promise.then(function (result) {
+                console.log('Success: ' + result);
+            }).catch(function (error) {
+                console.log('Error: ' + error);
+                console.log(error.stack);
+            });
         }
     } else {
         help();
