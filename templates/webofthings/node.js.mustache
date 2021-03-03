@@ -6,6 +6,7 @@ module.exports = function (RED) {
     const WebSocket = require('ws');
     const urltemplate = require('url-template');
     const Ajv = require('ajv');
+    const nodecoap = require('coap');
 
     function extractTemplate(href, context={}) {
         return urltemplate.parse(href).expand(context);
@@ -68,14 +69,33 @@ module.exports = function (RED) {
         }
     }
 
+    function createCoapReqOpts(resource, method, observe=false) {
+        let urlobj = new URL(resource);
+        let hostname = urlobj.hostname;
+        if (hostname.startsWith('[') && hostname.endsWith(']')) {
+            // remove square brackets from IPv6 address
+            hostname = hostname.slice(1,-1);
+        }
+        let query = urlobj.search;
+        if (query.startsWith('?')) {
+            query = query.slice(1);
+        }
+        return {
+            hostname: hostname,
+            port: urlobj.port,
+            method: method,
+            pathname: urlobj.pathname,
+            query: query,
+            observe: observe
+        };
+    }
+
     function bindingCoap(node, send, done, form, options={}) { // options.psk
-        const coap = require("node-coap-client").CoapClient;
         node.trace("bindingCoap called");
         const msg = options.msg || {};
         const resource = extractTemplate(form.href, options.urivars);
         let payload = null;
         let method = null;
-
         if (options.interaction === "property-read") {
             method = form.hasOwnProperty("cov:methodName") ?
                 coapMethodCodeToName(form['cov:methodName']) : 'get';
@@ -89,78 +109,105 @@ module.exports = function (RED) {
             payload = options.reqbody;
         }
 
-        node.trace(`CoAP request: resource=${resource}, method=${method}, payload=${payload}`);
-        coap.request(resource, method, payload)
-        .then(response => {  // code, format, payload
-            node.trace(`CoAP response: code=${response.code.toString()}, format=${response.format}, payload=${response.payload}`);
-            if (response.format === 50) {  // application/json; rfc7252 section 12.3, table 9
+        const coapreqopt = createCoapReqOpts(resource, method, false);
+
+        node.trace(`CoAP request: reqopt=${JSON.stringify(coapreqopt)},payload=${payload}`);
+        let outmsg = nodecoap.request(coapreqopt);
+        if (payload) {
+            outmsg.write(payload);
+        }
+        outmsg.on('response', response => {
+            const cf = response.options.find(e=>e.name === 'Content-Format');
+            if (cf && cf.value === 'application/json') {
                 try {
-                    msg.payload = JSON.parse(response.payload);
+                    msg.payload = JSON.parse(response.payload.toString());
+                    if (options.outschema) {
+                        const ajv = new Ajv({allErrors: true});
+                        if (!ajv.validate(options.outschema, msg.payload)) {
+                            node.warn(`output schema validation error: ${ajv.errorsText()}`, msg);
+                        }
+                    }
                 } catch (e) {
                     msg.payload = response.payload;
                 }
+            } else if (cf && cf.value === 'text/plain') {
+                msg.payload = response.payload.toString();   
             } else {
                 msg.payload = response.payload;
             }
-            if (options.outschema) {
-                const ajv = new Ajv({allErrors: true});
-                if (!ajv.validate(options.outschema, msg.payload)) {
-                    node.warn(`output schema validation error: ${ajv.errorsText()}`, msg);
-                }
-            }
             send(msg);
-            if (done) {
-                done();
-            }
-        })
-        .catch(err => {
-            node.log(`Error: ${err.toString()}`);
-            msg.payload = `${err.toString()}: ${resource}`;
+            response.on('end', () => { if (done) { done(); }});
+        });
+        const errorHandler = (err) => {
+            node.warn('CoAP request error: ${err.message}');
+            delete msg.payload;
+            msg.error = err;
             send(msg);
-            if (done) {
-                done();
-            }
-        });        
+            if (done) { done() }; 
+        };
+        outmsg.on('timeout', errorHandler);
+        outmsg.on('error', errorHandler);
+        outmsg.end();
     }
 
     function bindingCoapObserve(node, form, options={}) {
-        const coap = require("node-coap-client").CoapClient;
         node.status({fill:"yellow",shape:"dot",text:"CoAP try to observe ..."});
         const resource = extractTemplate(form.href,options.urivars);
         const method = form.hasOwnProperty("cov:methodName") ?
             coapMethodCodeToName(form['cov:methodName']) : 'get';
         const payload = options.reqbody;
-        const callback = response => { // code, format, payload
-            const msg = {};
-            node.trace(`CoAP observe: code=${response.code.toString()}, format=${response.format}, payload=${response.payload}`);
-            if (response.format === 50) {  // application/json; rfc7252 section 12.3, table 9
-                try {
-                    msg.payload = JSON.parse(response.payload);
-                } catch (e) {
-                    msg.payload = response.payload;
+        let observingStream;
+
+        const coapreqopt = createCoapReqOpts(resource, method, true);
+        node.trace(`CoAP observe request: reqopt=${JSON.stringify(coapreqopt)},payload=${payload}`);
+
+        let outmsg = nodecoap.request(coapreqopt);
+        if (payload) {
+            outmsg.write(payload);
+        }
+        outmsg.on('response', response => {
+            observingStream = response;
+            const cf = response.options.find(e=>e.name === 'Content-Format');
+            response.on('end', () => {});
+            response.on('data', chunk => {
+                const msg = {};
+                if (cf && cf.value === 'application/json') {
+                    try {
+                        msg.payload = JSON.parse(chunk.toString());
+                        if (options.outschema) {
+                            const ajv = new Ajv({allErrors: true});
+                            if (!ajv.validate(options.outschema, msg.payload)) {
+                                node.warn(`output schema validation error: ${ajv.errorsText()}`, msg);
+                            }
+                        }
+                    } catch (e) {
+                        msg.payload = chunk;
+                    }
+                } else if (cf && cf.value === 'text/plain') {
+                    msg.payload = chunk.toString();
+                } else {
+                    msg.payload = chunk;
                 }
-            } else {
-                msg.payload = response.payload;
-            }
-            if (options.outschema) {
-                const ajv = new Ajv({allErrors: true});
-                if (!ajv.validate(options.outschema, msg.payload)) {
-                    node.warn(`output schema validation error: ${ajv.errorsText()}`, msg);
-                }
-            }
-            node.send(msg);
-        };
-        coap.observe(resource,method,callback,payload,options)
-        .then(() => {
-            node.status({fill:"green",shape:"dot",text:"CoAP Observing"});
-        })
-        .catch(err => {
-            node.status({fill:"red",shape:"dot",text:`CoAP Error: ${err}`});
-            node.log(`Error: ${err.toString()}`);
+                node.send(msg);
+            });
         });
+        const errorHandler = (err) => {
+            node.warn('CoAP request error: ${err.message}');
+            node.status({fill:'red',shape:'dot',text:`CoAP Error: ${err}`});
+            delete msg.payload;
+            msg.error = err;
+            node.send(msg); 
+        };
+        outmsg.on('timeout', errorHandler);
+        outmsg.on('error', errorHandler);
+        outmsg.end();
+        node.status({fill:'green',shape:'dot',text:'CoAP Observing'});
         node.on('close', () => {
             node.trace('Close node');
-            coap.stopObserving(resource);
+            if (observingStream) {
+                observingStream.close();
+                observingStream = null;
+            };
             node.status({});
         });
     }
@@ -438,7 +485,7 @@ module.exports = function (RED) {
                     if (form.href.match(/^https?:/)) {
                         bindingHttp(node, send, done, form, {interaction:"property-read", auth, msg, urivars, outschema: prop});
                     } else if (form.href.match(/^coaps?:/)) {
-                        bindingCoap(node, send, done, form, send, done, {interaction:"property-read", auth, msg, urivars, outschema: prop});
+                        bindingCoap(node, send, done, form, {interaction:"property-read", auth, msg, urivars, outschema: prop});
                     }
                 });
             } else if (node.proptype === "write") {
