@@ -5,7 +5,7 @@ module.exports = function (RED) {
     const HttpsProxyAgent = require('https-proxy-agent');
     const WebSocket = require('ws');
     const urltemplate = require('url-template');
-    const Ajv = require('ajv');
+    const Ajv = require('ajv').default;
     const nodecoap = require('coap');
 
     function extractTemplate(href, context={}) {
@@ -122,7 +122,7 @@ module.exports = function (RED) {
                 try {
                     msg.payload = JSON.parse(response.payload.toString());
                     if (options.outschema) {
-                        const ajv = new Ajv({allErrors: true});
+                        const ajv = new Ajv({allErrors: true, strict: false});
                         if (!ajv.validate(options.outschema, msg.payload)) {
                             node.warn(`output schema validation error: ${ajv.errorsText()}`, msg);
                         }
@@ -175,7 +175,7 @@ module.exports = function (RED) {
                     try {
                         msg.payload = JSON.parse(chunk.toString());
                         if (options.outschema) {
-                            const ajv = new Ajv({allErrors: true});
+                            const ajv = new Ajv({allErrors: true, strict: false});
                             if (!ajv.validate(options.outschema, msg.payload)) {
                                 node.warn(`output schema validation error: ${ajv.errorsText()}`, msg);
                             }
@@ -262,7 +262,7 @@ module.exports = function (RED) {
                     msg.payload = data;
                 }
                 if (options.outschema) {
-                    const ajv = new Ajv({allErrors: true});
+                    const ajv = new Ajv({allErrors: true, strict: false});
                     if (!ajv.validate(options.outschema, msg.payload)) {
                         node.warn(`output schema validation error: ${ajv.errorsText()}`, msg);
                     }
@@ -329,7 +329,7 @@ module.exports = function (RED) {
                     }
                     // TODO: validation of return value
                     if (options.outschema) {
-                        const ajv = new Ajv();
+                        const ajv = new Ajv({allErrors: true, strict: false});
                         if (!ajv.validate(options.outschema, msg.payload)) {
                             node.warn(`output schema validation error: ${ajv.errorsText()}`, msg);
                         }
@@ -417,7 +417,7 @@ module.exports = function (RED) {
                 }
                 // TODO: validation of return value
                 if (options.outschema) {
-                    const ajv = new Ajv({allErrors: true});
+                    const ajv = new Ajv({allErrors: true, strict: false});
                     if (!ajv.validate(options.outschema, msg.payload)) {
                         node.warn(`output schema validation error: ${ajv.errorsText()}`, msg);
                     }
@@ -477,7 +477,7 @@ module.exports = function (RED) {
                     const auth = makeauth(normTd, form, username, password, token);
                     const urivars = prop.hasOwnProperty("uriVariables") ? msg.payload : {};
                     if (prop.uriVariables) {
-                        const ajv = new Ajv({allErrors: true});
+                        const ajv = new Ajv({allErrors: true, strict: false});
                         if (!ajv.validate(prop.uriVariables, urivars)) {
                             node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
                         }
@@ -494,7 +494,7 @@ module.exports = function (RED) {
                     const prop = normTd.properties[node.propname];
                     const form = prop.forms[node.formindex];// formSelection("property-write", prop.forms);
                     const auth = makeauth(normTd, form, username, password, token);
-                    const ajv = new Ajv({allErrors: true});
+                    const ajv = new Ajv({allErrors: true, strict: false});
                     if (!ajv.validate(prop, msg.payload)) {
                         node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
                     }
@@ -511,7 +511,7 @@ module.exports = function (RED) {
                 const auth = makeauth(normTd, form, username, password, token);
                 const urivars = prop.hasOwnProperty("uriVariables") ? msg.payload : {};
                 if (prop.uriVariables) {
-                    const ajv = new Ajv({allErrors: true});
+                    const ajv = new Ajv({allErrors: true, strict: false});
                     if (!ajv.validate(prop.uriVariables, urivars)) {
                         node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
                     }
@@ -532,13 +532,13 @@ module.exports = function (RED) {
                 const auth = makeauth(normTd, form, username, password, token);
                 const urivars = act.hasOwnProperty("uriVariables") ? msg.payload : {};
                 if (act.uriVariables) {
-                    const ajv = new Ajv({allErrors: true});
+                    const ajv = new Ajv({allErrors: true, strict: false});
                     if (!ajv.validate(act.uriVariables, urivars)) {
                         node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
                     }
                 }
                 if (act.input) {
-                    const ajv = new Ajv({allErrors: true});
+                    const ajv = new Ajv({allErrors: true, strict: false});
                     if (!ajv.validate(act.input, msg.payload)) {
                         node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
                     }
@@ -555,7 +555,7 @@ module.exports = function (RED) {
             const auth = makeauth(normTd, form, username, password, token);
             const urivars = ev.hasOwnProperty("uriVariables") ? msg.payload : {};
             if (ev.uriVariables) {
-                const ajv = new Ajv({allErrors: true});
+                const ajv = new Ajv({allErrors: true, strict: false});
                 if (!ajv.validate(ev.uriVariables, urivars)) {
                     node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
                 }
