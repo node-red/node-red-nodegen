@@ -139,7 +139,7 @@ module.exports = function (RED) {
             response.on('end', () => { if (done) { done(); }});
         });
         const errorHandler = (err) => {
-            node.warn('CoAP request error: ${err.message}');
+            node.warn(`CoAP request error: ${err.message}`);
             delete msg.payload;
             msg.error = err;
             send(msg);
@@ -192,7 +192,7 @@ module.exports = function (RED) {
             });
         });
         const errorHandler = (err) => {
-            node.warn('CoAP request error: ${err.message}');
+            node.warn(`CoAP request error: ${err.message}`);
             node.status({fill:'red',shape:'dot',text:`CoAP Error: ${err}`});
             delete msg.payload;
             msg.error = err;
