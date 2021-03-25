@@ -87,10 +87,10 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 -> You can use Example Thing node on Node-RED flow editor.
 
 ## Documentation
-- [Use cases](https://github.com/node-red/node-red-nodegen/blob/0.1.0/docs/index.md#use-cases) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.0/docs/index_ja.md#use-cases))
-- [How to use Node generator](https://github.com/node-red/node-red-nodegen/blob/0.1.0/docs/index.md#how-to-use-node-generator) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.0/docs/index_ja.md#how-to-use-node-generator))
-- [Generated files which node package contains](https://github.com/node-red/node-red-nodegen/blob/0.1.0/docs/index.md#generated-files-which-node-package-contains) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.0/docs/index_ja.md#generated-files-which-node-package-contains))
-- [How to create a node from OpenAPI document](https://github.com/node-red/node-red-nodegen/blob/0.1.0/docs/index.md#how-to-create-a-node-from-openapi-document) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.0/docs/index_ja.md#how-to-create-a-node-from-openapi-document))
-- [How to create a node from function node](https://github.com/node-red/node-red-nodegen/blob/0.1.0/docs/index.md#how-to-create-a-node-from-function-node) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.0/docs/index_ja.md#how-to-create-a-node-from-function-node))
+- [Use cases](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index.md#use-cases) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index_ja.md#use-cases))
+- [How to use Node generator](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index.md#how-to-use-node-generator) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index_ja.md#how-to-use-node-generator))
+- [Generated files which node package contains](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index.md#generated-files-which-node-package-contains) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index_ja.md#generated-files-which-node-package-contains))
+- [How to create a node from OpenAPI document](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index.md#how-to-create-a-node-from-openapi-document) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index_ja.md#how-to-create-a-node-from-openapi-document))
+- [How to create a node from function node](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index.md#how-to-create-a-node-from-function-node) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index_ja.md#how-to-create-a-node-from-function-node))
 
 Note: Currently node generator supports GET and POST methods using JSON format without authentication.
