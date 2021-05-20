@@ -15,7 +15,7 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 ## Usage
 
     Usage:
-       node-red-nodegen <source file or URL> [-o <path to save>] [--prefix <prefix string>] [--name <node name>] [--module <module name>] [--version <version number>] [--keywords <keywords list>] [--category <node category>] [--icon <png or gif file>] [--color <node color>] [--tgz] [--help] [--wottd] [--lang <accept-language>] [-v]
+       node-red-nodegen <source file or URL> [-o <path to save>] [--prefix <prefix string>] [--name <node name>] [--module <module name>] [--version <version number>] [--keywords <keywords list>] [--category <node category>] [--icon <png or gif file>] [--color <node color>] [--tgz] [--help] [--wottd] [--encoding <encoding>] [--encodekey <encoding key>] [--lang <accept-language>] [-v]
     
     Description:
        Node generator for Node-RED
@@ -23,8 +23,8 @@ You may need to run this with `sudo`, or from within an Administrator command sh
     Supported source:
        - OpenAPI document
        - Function node (js file in library, "~/.node-red/lib/function/")
+       - Subflow node (json file of subflow)
        - (Beta) Thing Description of W3C Web of Things (jsonld file or URL that points jsonld file)
-       - Subflow node (Exported SUBFLOW JSON data)
     
     Options:
        -o : Destination path to save generated node (default: current directory)
@@ -40,7 +40,7 @@ You may need to run this with `sudo`, or from within an Administrator command sh
        --help : Show help
        --wottd : explicitly instruct source file/URL points a Thing Description
        --encoding : Encoding scheme of subflow (none or AES)
-       --encode-key : Encoding key of subflow
+       --encodekey : Encoding key of subflow
        --lang : Language negotiation information when retrieve a Thing Description
        -v : Show node generator version
 
@@ -94,10 +94,11 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 - In Node-RED flow editor, create the SUBFLOW template with module properties filled.  Here, we assume module name for the SUBFLOW template is node-red-contrib-qrcode.
 - Exprot JSON definition of the SUBFLOW template from Export menu.  We assume it is saved to a file named qrcode.json.
 - node-red-nodegen qrcode.json
-- cd node-red-contrib-
+- cd node-red-contrib-qrcode
+- npm install
 - sudo npm link
 - cd ~/.node-red
-- npm link node-red-contrib-
+- npm link node-red-contrib-qrcode
 - node-red
 
 -> You can use  node on Node-RED flow editor.
