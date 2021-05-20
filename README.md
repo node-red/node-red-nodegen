@@ -16,15 +16,16 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 
     Usage:
        node-red-nodegen <source file or URL> [-o <path to save>] [--prefix <prefix string>] [--name <node name>] [--module <module name>] [--version <version number>] [--keywords <keywords list>] [--category <node category>] [--icon <png or gif file>] [--color <node color>] [--tgz] [--help] [--wottd] [--lang <accept-language>] [-v]
-
+    
     Description:
        Node generator for Node-RED
-
+    
     Supported source:
        - OpenAPI document
        - Function node (js file in library, "~/.node-red/lib/function/")
        - (Beta) Thing Description of W3C Web of Things (jsonld file or URL that points jsonld file)
-
+       - Subflow node (Exported SUBFLOW JSON data)
+    
     Options:
        -o : Destination path to save generated node (default: current directory)
        --prefix : Prefix of npm module (default: "node-red-contrib-")
@@ -38,6 +39,8 @@ You may need to run this with `sudo`, or from within an Administrator command sh
        --tgz : Save node as tgz file
        --help : Show help
        --wottd : explicitly instruct source file/URL points a Thing Description
+       --encoding : Encoding scheme of subflow (none or AES)
+       --encode-key : Encoding key of subflow
        --lang : Language negotiation information when retrieve a Thing Description
        -v : Show node generator version
 
@@ -86,11 +89,25 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 
 -> You can use Example Thing node on Node-RED flow editor.
 
+### Example 5. Create an original node from SUBFLOW definition
+
+- In Node-RED flow editor, create the SUBFLOW template with module properties filled.  Here, we assume module name for the SUBFLOW template is node-red-contrib-qrcode.
+- Exprot JSON definition of the SUBFLOW template from Export menu.  We assume it is saved to a file named qrcode.json.
+- node-red-nodegen qrcode.json
+- cd node-red-contrib-
+- sudo npm link
+- cd ~/.node-red
+- npm link node-red-contrib-
+- node-red
+
+-> You can use  node on Node-RED flow editor.
+
 ## Documentation
 - [Use cases](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index.md#use-cases) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index_ja.md#use-cases))
 - [How to use Node generator](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index.md#how-to-use-node-generator) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index_ja.md#how-to-use-node-generator))
 - [Generated files which node package contains](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index.md#generated-files-which-node-package-contains) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index_ja.md#generated-files-which-node-package-contains))
 - [How to create a node from OpenAPI document](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index.md#how-to-create-a-node-from-openapi-document) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index_ja.md#how-to-create-a-node-from-openapi-document))
 - [How to create a node from function node](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index.md#how-to-create-a-node-from-function-node) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index_ja.md#how-to-create-a-node-from-function-node))
+- [How to create a node from subflow](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index.md#how-to-create-a-node-from-subflow) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index_ja.md#how-to-create-a-node-from-subflow))
 
 Note: Currently node generator supports GET and POST methods using JSON format without authentication.
