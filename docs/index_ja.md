@@ -109,41 +109,33 @@ node-red-nodegenコマンドの最初の引数として、OpenAPIドキュメン
 
 Node-REDユーザは通常、以下の手順で生成したノードをNode-REDフローエディタのパレットにインポートします。
 
-(2) 生成したノードのディレクトリにディレクトリを変更
-
-    cd node-red-contrib-swagger-petstore
-
-(3) シンボリックリンクを準備
-
-    sudo npm link
-
-(4) カレントディレクトリをNode-REDのホームディレクトリに変更（通常、Node-REDのホームディレクトリは、ホームディレクトリの下の".node-red"です）
+(2) カレントディレクトリをNode-REDのホームディレクトリに変更（通常、Node-REDのホームディレクトリは、ホームディレクトリの下の".node-red"です）
 
     cd ~/.node-red
 
-(5) シンボリックリンクを作成
+(3) シンボリックリンクを作成
 
-    npm link node-red-contrib-swagger-petstore
+    npm install <path-to>/node-red-contrib-swagger-petstore
 
-(6) Node-REDを起動
+(4) Node-REDを起動
 
     node-red
 
-(7) Node-REDフローエディタにアクセス (http://localhost:1880)
+(5) Node-REDフローエディタにアクセス (http://localhost:1880)
 
 -> 生成されたノードがNode-REDフローエディタのパレットに表示されます。
 
-(8) 生成されたノードをワークスペースにドラッグアンドドロップ
+(6) 生成されたノードをワークスペースにドラッグアンドドロップ
 
-(9) ノードプロパティ設定でメソッドを選択
+(7) ノードプロパティ設定でメソッドを選択
 
 (OpenAPIドキュメントにホスト名が含まれていないか、認証設定がある場合、ノードプロパティ設定にてホスト名と認証設定を設定します)
 
-(10) Node-REDフローエディタでフローを作成
+(8) Node-REDフローエディタでフローを作成
 
 -> injectノード、生成されたノード、debugノードからなるフローが、最初のステップに適しています。(生成されたノードがPOSTメソッドを使用する場合は、injectノードのmsg.payloadにJSONデータを設定する必要があります)
 
-(11) フローを実行
+(9) フローを実行
 
 -> この例では、injectノードのボタンをクリックすると、受信したデータをデバッグタブに表示します。
 
@@ -492,37 +484,29 @@ Node-REDは、jsファイルを"<Home directory>/.node-red/lib/functions/"ディ
 
 Node-REDユーザは通常、以下の手順で生成したノードをNode-REDフローエディタのパレットにインポートします。
 
-(3) 生成したノードのディレクトリにディレクトリを変更
-
-    cd node-red-contrib-lower-case
-
-(4) シンボリックリンクを準備
-
-    sudo npm link
-
-(5) カレントディレクトリをNode-REDのホームディレクトリに変更します（通常、Node-REDのホームディレクトリは、ホームディレクトリの下の".node-red"です）
+(3) カレントディレクトリをNode-REDのホームディレクトリに変更します（通常、Node-REDのホームディレクトリは、ホームディレクトリの下の".node-red"です）
 
     cd ~/.node-red
 
-(6) シンボリックリンクを作成
+(4) シンボリックリンクを作成
 
-    npm link node-red-contrib-lower-case
+    npm install <path-to>/node-red-contrib-lower-case
 
-(7) Node-REDを起動
+(5) Node-REDを起動
 
     node-red
 
-(8) Node-REDフローエディタにアクセス (http://localhost:1880)
+(6) Node-REDフローエディタにアクセス (http://localhost:1880)
 
 -> 生成されたノードがNode-REDフローエディタのパレットに表示されます。
 
-(9) 生成されたノードをワークスペースにドラッグアンドドロップ
+(7) 生成されたノードをワークスペースにドラッグアンドドロップ
 
-(10) Node-REDフローエディタでフローを作成
+(8) Node-REDフローエディタでフローを作成
 
 -> injectノード、生成されたノードおよびdebugノードからなるフローが、最初のステップに適しています。
 
-(11) フローを実行
+(9) フローを実行
 
 -> この例では、injectノードのボタンをクリックすると、受信したデータをデバッグタブに表示します。
 
@@ -756,14 +740,13 @@ functionノードに外部モジュールをロードする場合、Node-REDユ�
     "node-red": "0.18.7",
 ```
 
-(9) シンボリックリンクを準備
+(9) カレントディレクトリをNode-REDのホームディレクトリに変更します（通常、Node-REDのホームディレクトリは、ホームディレクトリの下の".node-red"です）
 
-    sudo npm link
+    cd ~/.node-red
 
 (10) シンボリックリンクを作成
 
-    cd ~/.node-red/
-    npm link node-red-contrib-format-date
+    npm install <path-to>/node-red-contrib-format-date
 
 (11) Node-REDを再起動
 
@@ -787,37 +770,25 @@ functionノードに外部モジュールをロードする場合、Node-REDユ�
 
 Node-REDユーザは通常、以下の手順で生成したノードをNode-REDフローエディタのパレットにインポートします。
 
-(3) 生成したノードのディレクトリにディレクトリを変更
-
-    cd node-red-contrib-qrcode
-
-(4) 依存ライブラリのインストール
-
-    npm install
-
-(5) シンボリックリンクを準備
-
-    sudo npm link
-
-(6) カレントディレクトリをNode-REDのホームディレクトリに変更します（通常、Node-REDのホームディレクトリは、ホームディレクトリの下の".node-red"です）
+(3) カレントディレクトリをNode-REDのホームディレクトリに変更します（通常、Node-REDのホームディレクトリは、ホームディレクトリの下の".node-red"です）
 
     cd ~/.node-red
 
-(7) シンボリックリンクを作成
+(4) シンボリックリンクを作成
 
-    npm link node-red-contrib-lower-case
+    npm install <path-to>/node-red-contrib-qrcode
 
-(8) Node-REDを起動
+(5) Node-REDを起動
 
     node-red
 
-(9) Node-REDフローエディタにアクセス (http://localhost:1880)
+(6) Node-REDフローエディタにアクセス (http://localhost:1880)
 
 -> 生成されたノードがNode-REDフローエディタのパレットに表示されます。
 
-(10) 生成されたノードをワークスペースにドラッグアンドドロップ
+(7) 生成されたノードをワークスペースにドラッグアンドドロップ
 
-(11) Node-REDフローエディタでフローを作成
+(8) Node-REDフローエディタでフローを作成
 
 -> injectノード、生成されたノードおよびdebugノードからなるフローが、最初のステップに適しています。
 

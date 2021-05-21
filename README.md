@@ -1,4 +1,3 @@
-
 # Node generator for Node-RED
 
 Node generator is a command line tool to generate Node-RED nodes based on various sources such as an OpenAPI (Swagger) document, a Node-RED Function node, or a Web Of Things Thing description.
@@ -47,10 +46,8 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 ### Example 1. Create an original node from OpenAPI document
 
 - node-red-nodegen http://petstore.swagger.io/v2/swagger.json
-- cd node-red-contrib-swagger-petstore
-- sudo npm link
 - cd ~/.node-red
-- npm link node-red-contrib-swagger-petstore
+- npm install *<path-to>*/node-red-contrib-swagger-petstore
 - node-red
 
 -> You can use swagger-petstore node on Node-RED flow editor.
@@ -59,10 +56,8 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 
 - In Node-RED flow editor, edit the function node and to the right of the 'name' option, click on the book icon and select 'Save to library'. Then fill in the 'Export as' with the file name (lower-case.js).
 - node-red-nodegen ~/.node-red/lib/functions/lower-case.js
-- cd node-red-contrib-lower-case
-- sudo npm link
 - cd ~/.node-red
-- npm link node-red-contrib-lower-case
+- npm install *<path-to>*/node-red-contrib-lower-case
 - node-red
 
 -> You can use lower-case node on Node-RED flow editor.
@@ -70,10 +65,8 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 ### Example 3. Create original node from Thing Description
 
 - node-red-nodegen example.jsonld
-- cd node-red-contrib-example-thing
-- sudo npm link
 - cd ~/.node-red
-- npm link node-red-contrib-example-thing
+- npm install *<path-to>*/node-red-contrib-example-thing
 - node-red
 
 -> You can use Example Thing node on Node-RED flow editor.
@@ -81,10 +74,8 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 ### Example 4. Create original node from Thing Description via HTTP
 
 - node-red-nodegen http://example.com/td.jsonld --wottd --lang "en-US,en;q=0.5"
-- cd node-red-contrib-example-thing
-- sudo npm link
 - cd ~/.node-red
-- npm link node-red-contrib-example-thing
+- npm install *<path-to>*/node-red-contrib-example-thing
 - node-red
 
 -> You can use Example Thing node on Node-RED flow editor.
@@ -92,18 +83,16 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 ### Example 5. Create an original node from SUBFLOW definition
 
 - In Node-RED flow editor, create the SUBFLOW template with module properties filled.  Here, we assume module name for the SUBFLOW template is node-red-contrib-qrcode.
-- Exprot JSON definition of the SUBFLOW template from Export menu.  We assume it is saved to a file named qrcode.json.
+- Export JSON definition of the SUBFLOW template from Export menu.  We assume it is saved to a file named qrcode.json.
 - node-red-nodegen qrcode.json
-- cd node-red-contrib-qrcode
-- npm install
-- sudo npm link
 - cd ~/.node-red
-- npm link node-red-contrib-qrcode
+- npm install *<path-to>*/node-red-contrib-qrcode
 - node-red
 
--> You can use  node on Node-RED flow editor.
+-> You can use qrcode node on Node-RED flow editor.
 
 ## Documentation
+
 - [Use cases](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index.md#use-cases) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index_ja.md#use-cases))
 - [How to use Node generator](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index.md#how-to-use-node-generator) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index_ja.md#how-to-use-node-generator))
 - [Generated files which node package contains](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index.md#generated-files-which-node-package-contains) ([Japanese](https://github.com/node-red/node-red-nodegen/blob/0.1.1/docs/index_ja.md#generated-files-which-node-package-contains))
