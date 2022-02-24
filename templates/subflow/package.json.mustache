@@ -1,0 +1,18 @@
+{
+    "name": "{{&projectName}}",
+    "version": "{{&projectVersion}}",
+    "description": "Node-RED node for {{&nodeName}}",
+    "node-red": {
+        "nodes": {
+            "{{&nodeName}}": "subflow.js"
+        }
+    },
+    "keywords": [
+        {{#keywords}}
+        "{{name}}"{{^last}}, {{/last}}
+        {{/keywords}}
+    ],
+    "dependencies": {
+        "crypto-js": "^4.0.0"
+    }
+}

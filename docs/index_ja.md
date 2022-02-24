@@ -1,16 +1,20 @@
 ノードジェネレータ
 ----
-ノードジェネレータは、OpenAPIドキュメント、[Web of Things Things Description](https://www.w3.org/TR/wot-thing-description/)やfunctionノードなどのソースコードからNode-REDのノードを生成するためのコマンドラインツールです。
+
+ノードジェネレータは、OpenAPIドキュメント、[Web of Things Things Description](https://www.w3.org/TR/wot-thing-description/)、サブフロー、functionノードなどのソースコードからNode-REDのノードを生成するためのコマンドラインツールです。
 このツールを使用すると、ノード開発者はNode-REDノードの実装時間を大幅に短縮できます。
 
 <a name="use-cases"></a>
+
 ## 利用ケース
+
 Node-REDには、[フローライブラリ](https://flows.nodered.org)に存在するノードを使用し、コーディングすることなく迅速な開発ができるという利点があります。
 しかし、独自の処理を実現するために、Node-REDユーザがノードを開発すると、JavaScriptとHTMLのコーディングに時間がかかり、迅速な開発ができるNode-REDの利点が薄れてしまいます。
 この問題を解決するために、ノードジェネレータはコーディングなしで独自のノードを自動生成し、パッケージ化します。
 以下の通り、ノードジェネレータには4つの利用ケースがあります。
 
 #### (1) クラウドサービスへの接続
+
 http requestノードは、REST API経由でクラウドサービスに簡単に接続できます。
 しかし、マーケティングの観点から考えると、http requestノードの代替として、クラウドサービス向けに専用に独自に開発したノードを公開することは、クラウドサービスのユーザ数を増やすために効果的です。
 なぜなら、クラウドサービスとの接続方法を詳細に解説したノードプロパティ、ノード情報、ドキュメントがユーザビリティに貢献するためです。
@@ -19,21 +23,24 @@ http requestノードは、REST API経由でクラウドサービスに簡単に
 したがって、クラウドサービスプロバイダは、ノード開発コストなしで独自のノードを公開できる様になります。
 
 #### (2) functionノードを独自のノードとして再利用
+
 Node-REDユーザは、functionノードにJavaScriptコードを記述し、簡単な処理を動作させています。
 しかし、試行錯誤を繰り返す開発を行い、フローを徐々に改善すると、大量のJavaScriptコードをfunctionノードに追加してしまうことがあります。
 この時、functionノードに便利な機能が備わっている場合、他のNode-REDユーザにこのfunctionノードを共有し、再利用をしてほしいというニーズがあがってきます。
 なぜなら、ノードを再利用することで、他のNode-REDユーザは同じ機能を開発する必要なく、フローの開発に集中できるためです。
 ノードジェネレータは、この様なニーズを満たすために、既存のfunctionノードから独自のノードの開発する作業を助けます。
 
-#### (3) サブフローを独自のノードとして再利用（将来機能）
+#### (3) サブフローを独自のノードとして再利用
+
 他のNode-REDユーザとフローを共有するには、サブフローの単位で行うのが最適です。
-将来、ノードジェネレータは、サブフローから独自のノードを生成する機能をサポートします。
+ノードジェネレータは、サブフローから独自のノードを生成する機能をサポートします。
 Node-REDユーザは、サブフローを独自のノードとしてカプセル化できる様になります。
 例えば、認証ヘッダを持つtemplateノードとURLを持つhttp requestノードは、多くのNode-REDユーザがクラウドサービスに接続するために使用する典型的なペアです。
 ノードジェネレータは、この様なフローを含むサブフローから独自のノードを生成できます。
 そして、Node-REDユーザは、フローライブラリを介して、生成したノードを他のNode-REDユーザと容易に共有できます。
 
 #### (4) デバイスへの接続
+
 IoTアプリケーションの開発者は、接続したデバイスをつかった価値の創出に
 注力したいのであり、その実装の詳細に手間をかけたくありません。
 実装の詳細を抽象化するために、W3C Web of Things (WoT)はIoTデバイスがもつ
@@ -44,7 +51,9 @@ WoTではデバイスのインタフェースはThing Descriptionとして記述
 Node-RED上のノードをデバイスのアバターとして使うことができます。
 
 <a name="how-to-use-node-generator"></a>
+
 ## ノードジェネレータの使い方
+
 ノードジェネレータをローカル環境にインストールするには、コマンドプロンプト(Windows)又はターミナル(macOS/Linux)で次の「npm install」コマンドを入力します。 
 コマンド実行にはroot権限が必要なため、macOS又はLinux環境では "npm install"コマンドの前に "sudo"が必要です。
 
@@ -57,12 +66,15 @@ Node-RED上のノードをデバイスのアバターとして使うことがで
 
 以降のドキュメントでは、2種類のソースファイルからノードを生成する方法の詳細について説明します。
 
- - [OpenAPIドキュメントからノードを生成する方法](#how-to-create-a-node-from-openapi-document)
- - [functionノードからノードを生成する方法](#how-to-create-a-node-from-function-node)
- - [Thing Descriptionからノードを生成する方法](#how-to-create-a-node-from-wot-thing-description)
+- [OpenAPIドキュメントからノードを生成する方法](#how-to-create-a-node-from-openapi-document)
+- [functionノードからノードを生成する方法](#how-to-create-a-node-from-function-node)
+- [サブフローからノードを生成する方法](#how-to-create-a-node-from-subflow)
+- [Thing Descriptionからノードを生成する方法](#how-to-create-a-node-from-wot-thing-description)
 
 <a name="generated-files-which-node-package-contains"></a>
+
 ## ノードパッケージ内のファイル
+
 ノードジェネレータによって自動生成したノードパッケージの典型的なディレクトリ構造は以下の通りです。
 Node-REDユーザは、自動生成したノードをローカルNode-RED環境にインストールしたり、追加開発なくフローライブラリに公開したりできます。
 
@@ -86,7 +98,9 @@ Node-REDユーザは、自動生成したノードをローカルNode-RED環境�
           |-node.json <- ドイツ語のメッセージカタログ
 
 <a name="how-to-create-a-node-from-openapi-document"></a>
+
 ## OpenAPIドキュメントからノードを生成する方法
+
 node-red-nodegenコマンドの最初の引数として、OpenAPIドキュメントのURL又はファイルパスを指定できます。
 
 (1) node-red-nodegenコマンドを使用してノードを生成
@@ -95,48 +109,42 @@ node-red-nodegenコマンドの最初の引数として、OpenAPIドキュメン
 
 Node-REDユーザは通常、以下の手順で生成したノードをNode-REDフローエディタのパレットにインポートします。
 
-(2) 生成したノードのディレクトリにディレクトリを変更
-
-    cd node-red-contrib-swagger-petstore
-
-(3) シンボリックリンクを準備
-
-    sudo npm link
-
-(4) カレントディレクトリをNode-REDのホームディレクトリに変更（通常、Node-REDのホームディレクトリは、ホームディレクトリの下の".node-red"です）
+(2) カレントディレクトリをNode-REDのホームディレクトリに変更（通常、Node-REDのホームディレクトリは、ホームディレクトリの下の".node-red"です）
 
     cd ~/.node-red
 
-(5) シンボリックリンクを作成
+(3) シンボリックリンクを作成
 
-    npm link node-red-contrib-swagger-petstore
+    npm install <path-to>/node-red-contrib-swagger-petstore
 
-(6) Node-REDを起動
+(4) Node-REDを起動
 
     node-red
 
-(7) Node-REDフローエディタにアクセス (http://localhost:1880)
+(5) Node-REDフローエディタにアクセス (http://localhost:1880)
 
 -> 生成されたノードがNode-REDフローエディタのパレットに表示されます。
 
-(8) 生成されたノードをワークスペースにドラッグアンドドロップ
+(6) 生成されたノードをワークスペースにドラッグアンドドロップ
 
-(9) ノードプロパティ設定でメソッドを選択
+(7) ノードプロパティ設定でメソッドを選択
 
 (OpenAPIドキュメントにホスト名が含まれていないか、認証設定がある場合、ノードプロパティ設定にてホスト名と認証設定を設定します)
 
-(10) Node-REDフローエディタでフローを作成
+(8) Node-REDフローエディタでフローを作成
 
 -> injectノード、生成されたノード、debugノードからなるフローが、最初のステップに適しています。(生成されたノードがPOSTメソッドを使用する場合は、injectノードのmsg.payloadにJSONデータを設定する必要があります)
 
-(11) フローを実行
+(9) フローを実行
 
 -> この例では、injectノードのボタンをクリックすると、受信したデータをデバッグタブに表示します。
 
 ### コマンドラインオプション
+
 生成したノードをカスタマイズする場合は、次の手順やコマンドラインオプションが役立ちます。
 
 #### モジュール名
+
 ノードジェネレータは、モジュール名のデフォルトのプレフィックスとして "node-red-contrib-"を使用します。
 したがって、ノード名が "swagger-petstore"の場合、モジュール名は "node-red-contrib-swagger-petstore"となります。
 デフォルトのモジュール名を変更したい場合は、--module又は--prefixオプションを使用してモジュール名を指定できます。
@@ -145,10 +153,12 @@ Node-REDユーザは通常、以下の手順で生成したノードをNode-RED�
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --prefix node-red-node
 
 #### ノード名
+
 OpenAPIドキュメントから生成したノードの場合、OpenAPIドキュメントの "info.title"値が生成ノードの名前として使用します。
 ノードジェネレータは、npmモジュールとNode-REDノードで利用できる適切な名前を変換するために、大文字とスペースをハイフンに置き換えます。
 
 ##### OpenAPIドキュメントの例
+
 ```
 {
   "swagger": "2.0",
@@ -176,9 +186,11 @@ OpenAPIドキュメントから生成したノードの場合、OpenAPIドキュ
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --name new-node-name
 
 #### バージョン
+
 デフォルトでは、ノードジェネレータはモジュールのバージョン番号として "info.version"値を使用します。
 
 ##### OpenAPIドキュメントの例
+
 ```
 {
   "swagger": "2.0",
@@ -207,6 +219,7 @@ OpenAPIドキュメントのバージョン番号をインクリメントせず�
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --version 0.0.2
 
 #### キーワード
+
 --keywordsは、モジュールのキーワードのために用いる便利なオプションです。
 フローライブラリのWebサイトで、訪問者はこのキーワードを使用してモジュールを検索します。
 例えば、 "petstore"をキーワードとして使用する場合は、--keywordsオプションを使用して単語を指定できます。
@@ -223,6 +236,7 @@ OpenAPIドキュメントのバージョン番号をインクリメントせず�
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --keywords petstore,petshop,node-red
 
 #### カテゴリ
+
 Node-REDフローエディタのパレットでは、生成したノードはデフォルトとして機能カテゴリに入ります。
 カテゴリを変更したり、カテゴリ名に製品名を使用したりしたい場合は、--categoryオプションを用います。
 例えば、次のコマンドが出力するノードは、Node-REDフローエディタの「分析」カテゴリに入ります。
@@ -230,17 +244,20 @@ Node-REDフローエディタのパレットでは、生成したノードはデ
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --category analysis
 
 #### ノードアイコン
+
 ノードジェネレータのコマンドは、生成されるノードのアイコンファイルを指定するための--iconオプションをサポートしています。
 オプションにはPNGファイルパス、または[ストックアイコンのファイル名](https://nodered.org/docs/creating-nodes/appearance)を使用できます。アイコンは透明な背景上に白色で表示したPNGファイルである必要があります。
 
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --icon <PNGファイル、またはストックアイコン>
 
 #### ノードの色
+
 ノードジェネレータはデフォルトでノードテンプレートで定義されたノードの色を使用します。変更する必要がある場合は、コマンドラインの--colorオプションを使用できます。オプションには、ノードの色を表す16進数("RRGGBB"形式)の文字列を指定できます。
 
     node-red-nodegen http://petstore.swagger.io/v2/swagger.json --color FFFFFF
 
 #### 情報タブ内のノードの情報
+
 ノードジェネレータは、OpenAPIドキュメントの次の値を使用して、情報タブにノードの情報を自動的に生成します。
 
 - info.description : ノードの説明
@@ -248,6 +265,7 @@ Node-REDフローエディタのパレットでは、生成したノードはデ
 - paths.[path].[http method].operationId : メソッド名
 
 ##### OpenAPIドキュメントの例
+
 ```
 {
   "swagger": "2.0",
@@ -297,6 +315,7 @@ Node-REDフローエディタのパレットでは、生成したノードはデ
 ```
 
 #### README
+
 ノードの詳細を説明は、README.mdというファイルに書きます。 
 フローライブラリにノードを公開すると、フローライブラリのWebサイトは、ノードのページで本ファイルを表示します。
 ノードジェネレータはREADME.mdのテンプレートを出力するので、ファイルを変更するだけです。
@@ -320,6 +339,7 @@ Run the following command in your Node-RED user directory - typically `~/.node-r
 ```
 
 #### テストケース
+
 テストケースは、本番環境で利用するノードの品質を維持するために最も重要です。
 ノードジェネレータは、生成したディレクトリの下にあるファイル "test/node_spec.js"にテストケースのテンプレートファイルを出力します。
 テストケースファイルでは、以下の（1）、（2）、（3）の3行を変更します。
@@ -363,6 +383,7 @@ Run the following command in your Node-RED user directory - typically `~/.node-r
     npm test
 
 #### メッセージカタログ
+
 デフォルトでは、ノードジェネレータは英語、日本語、中国語、ドイツ語のテンプレートファイルを出力します。
 ノードプロパティの多言語対応をしたい場合は、パラメータの言語メッセージをこれらのファイルに追加します。
 
@@ -398,10 +419,12 @@ Run the following command in your Node-RED user directory - typically `~/.node-r
 （例えば、中国語をサポートしたくない場合は、「zh-CN」ディレクトリごと削除してください）
 
 ### エンドポイントを指定するための設定ノード
+
 設定ノードを使用することで、生成されたノードがアクセスするREST APIのエンドポイントをフローの作成中に変更できるようになります。
 設定ノードを有効にするには、ノードを生成する前にOpenAPIドキュメントから`host`、`basePath`、`schemes`の各プロパティを削除する必要があります。
 
 ##### OpenAPIドキュメントの例
+
 ```
 {
   "swagger": "2.0",
@@ -427,6 +450,7 @@ Run the following command in your Node-RED user directory - typically `~/.node-r
 その他、クラウドサービスのエンドポイントから、クラウドサービスと同じ機能を持つローカルのエンドポイントへ切り替えることができるため、エッジコンピューティングのユースケースでも役立ちます。
 
 ### OpenAPI Specification 3.0
+
 OpenAPI Specification 3.0を使用してノードを生成する場合は、[api-spec-converter](https://www.npmjs.com/package/api-spec-converter)コマンドを使用してデータ形式を3.0から2.0に変換する必要があります。
 
 (1) api-spec-converterコマンドをインストール
@@ -442,7 +466,9 @@ OpenAPI Specification 3.0を使用してノードを生成する場合は、[api
     node-red-nodegen swagger.json
 
 <a name="how-to-create-a-node-from-function-node"></a>
+
 ## functionノードからノードを生成する方法
+
 functionノードにJavaScriptコードを記述した後、functionノードの "ライブラリへ保存..."メニューを使用して、JavaScriptコードをjsファイルとして書き出します。
 ノードジェネレータはfunctionノード名を生成ノードの名前として使用するため、functionノードをエクスポートする前にノード名を入力する方がよいでしょう。
 Node-REDは、jsファイルを"<Home directory>/.node-red/lib/functions/"ディレクトリに保存します。
@@ -458,44 +484,38 @@ Node-REDは、jsファイルを"<Home directory>/.node-red/lib/functions/"ディ
 
 Node-REDユーザは通常、以下の手順で生成したノードをNode-REDフローエディタのパレットにインポートします。
 
-(3) 生成したノードのディレクトリにディレクトリを変更
-
-    cd node-red-contrib-lower-case
-
-(4) シンボリックリンクを準備
-
-    sudo npm link
-
-(5) カレントディレクトリをNode-REDのホームディレクトリに変更します（通常、Node-REDのホームディレクトリは、ホームディレクトリの下の".node-red"です）
+(3) カレントディレクトリをNode-REDのホームディレクトリに変更します（通常、Node-REDのホームディレクトリは、ホームディレクトリの下の".node-red"です）
 
     cd ~/.node-red
 
-(6) シンボリックリンクを作成
+(4) シンボリックリンクを作成
 
-    npm link node-red-contrib-lower-case
+    npm install <path-to>/node-red-contrib-lower-case
 
-(7) Node-REDを起動
+(5) Node-REDを起動
 
     node-red
 
-(8) Node-REDフローエディタにアクセス (http://localhost:1880)
+(6) Node-REDフローエディタにアクセス (http://localhost:1880)
 
 -> 生成されたノードがNode-REDフローエディタのパレットに表示されます。
 
-(9) 生成されたノードをワークスペースにドラッグアンドドロップ
+(7) 生成されたノードをワークスペースにドラッグアンドドロップ
 
-(10) Node-REDフローエディタでフローを作成
+(8) Node-REDフローエディタでフローを作成
 
 -> injectノード、生成されたノードおよびdebugノードからなるフローが、最初のステップに適しています。
 
-(11) フローを実行
+(9) フローを実行
 
 -> この例では、injectノードのボタンをクリックすると、受信したデータをデバッグタブに表示します。
 
 ### コマンドラインオプション
+
 生成したノードをカスタマイズする場合は、次の手順やコマンドラインオプションが役立ちます。
 
 #### モジュール名
+
 ノードジェネレータは、モジュール名のデフォルトのプレフィックスとして "node-red-contrib-"を使用します。
 したがって、ノード名が "lower-case"の場合、モジュール名は "node-red-contrib-lower-case"になります。
 デフォルトのモジュール名を変更したい場合は、--module又は--prefixオプションを使用してモジュール名を指定できます。
@@ -504,12 +524,14 @@ Node-REDユーザは通常、以下の手順で生成したノードをNode-RED�
     node-red-nodegen ~/.node-red/lib/functions/lower-case.js --prefix node-red-node
 
 #### ノード名
+
 functionノードの場合、functionノード内のノード名を、生成されるノードのノード名として使用します。
 もしデフォルトのノード名を変更したい場合は、--nameオプションを使用してノード名を設定します。
 
     node-red-nodegen ~/.node-red/lib/functions/lower-case.js --name new-node-name
 
 #### バージョン
+
 デフォルトでは、モジュールのバージョン番号は常に"0.0.1"です。
 モジュールのバージョン番号を更新するときは、--versionオプションを指定します。
 特に、"npm publish"コマンドを使用して、以前公開したモジュールと同じバージョン番号を持つモジュールを公開すると、競合エラーが発生します。
@@ -518,6 +540,7 @@ functionノードの場合、functionノード内のノード名を、生成さ�
     node-red-nodegen ~/.node-red/lib/functions/lower-case.js --version 0.0.2
 
 #### キーワード
+
 --keywordsは、フローライブラリ上のモジュールのキーワードを指定できる便利なオプションです。
 フローライブラリのWebサイトでは、訪問者はこのキーワードを使用してモジュールを検索します。
 例えば、キーワードとして"lower-case"を使用する場合は、--keywordsオプションを使用してこの単語を指定できます。
@@ -534,6 +557,7 @@ functionノードの場合、functionノード内のノード名を、生成さ�
     node-red-nodegen ~/.node-red/lib/functions/lower-case.js --keywords lower-case,function,node-red
 
 #### カテゴリ
+
 Node-REDフローエディタのパレットでは、生成したノードはデフォルトとして機能カテゴリに入ります。
 カテゴリを変更したり、カテゴリ名に製品名を使用したりしたい場合は、--categoryオプションを用います。
 例えば、次のコマンドが出力するノードは、Node-REDフローエディタの「分析」カテゴリに入ります。
@@ -541,17 +565,20 @@ Node-REDフローエディタのパレットでは、生成したノードはデ
     node-red-nodegen ~/.node-red/lib/functions/lower-case.js --category analysis
 
 #### ノードアイコン
+
 ノードジェネレータのコマンドは、生成されるノードのアイコンファイルを指定するための--iconオプションをサポートしています。
 オプションにはPNGファイルパス、または[ストックアイコンのファイル名](https://nodered.org/docs/creating-nodes/appearance)を使用できます。アイコンは透明な背景上に白色で表示したPNGファイルである必要があります。
 
     node-red-nodegen ~/.node-red/lib/functions/lower-case.js --icon <PNGファイル、またはストックアイコン>
 
 #### ノードの色
+
 ノードジェネレータはデフォルトでノードテンプレートで定義されたノードの色を使用します。変更する必要がある場合は、コマンドラインの--colorオプションを使用できます。オプションには、ノードの色を表す16進数("RRGGBB"形式)の文字列を指定できます。
 
     node-red-nodegen ~/.node-red/lib/functions/lower-case.js --color FFFFFF
 
 #### 情報タブ内のノードの情報
+
 ノードジェネレータはノード情報のテンプレートをnode.htmlファイルに出力します。
 ノードとともにテンプレートを変更します。
 （将来のバージョンのNode-REDとノードジェネレータでは、ノード開発者はノード記述プロパティを使用して、ノード情報を指定できます）
@@ -587,6 +614,7 @@ Outputセクションには、出力したメッセージの情報を記載し�
 Detailsセクションには、生成したノードの追加情報を記載します。
 
 #### README
+
 ノードの詳細を説明は、README.mdというファイルに書きます。
 フローライブラリにノードを公開すると、フローライブラリのWebサイトは、ノードのページで本ファイルを表示します。
 ノードジェネレータはREADME.mdのテンプレートを出力するので、ファイルを変更するだけです。
@@ -608,6 +636,7 @@ Run the following command in your Node-RED user directory - typically `~/.node-r
 ```
 
 #### テストケース
+
 テストケースは、本番環境で使用するノードの品質を維持するために最も重要です。
 ノードジェネレータは、生成したディレクトリの下にあるファイル"test/node_spec.js"にテストケースのテンプレートファイルを出力します。
 テストケースファイルでは、（1）と（2）の2行を修正します。
@@ -641,6 +670,7 @@ Run the following command in your Node-RED user directory - typically `~/.node-r
     npm test
 
 ### 外部モジュールの利用
+
 functionノードに外部モジュールをロードする場合、Node-REDユーザーは通常、モジュールをsettings.jsファイルの `functionGlobalContext`セクションに追加します。
 現在のノードジェネレータは、この設定を生成されたノードにエクスポートする機能をサポートしていません。
 したがって、生成されたノードを他のノード-RED環境と共有する前に、node.jsファイルとpackage.jsonファイルを変更する必要があります。
@@ -672,9 +702,9 @@ functionノードに外部モジュールをロードする場合、Node-REDユ�
 
 (4) 外部モジュールを使用するJavaScriptコードをfunctionノードに記述
 
-| 項目 | functionノードのプロパティ値 |
-|---|---|
-| 名前 | Format date |
+| 項目  | functionノードのプロパティ値                                                                                             |
+| --- | -------------------------------------------------------------------------------------------------------------- |
+| 名前  | Format date                                                                                                    |
 | コード | var moment = global.get('moment');<br>msg.payload = moment().format('MMMM Do YYYY, h:mm:ss a');<br>return msg; |
 
 (5) functionノードプロパティUIの"ライブラリへ保存"メニューからjsファイルとしてfunctionノードを保存
@@ -710,14 +740,13 @@ functionノードに外部モジュールをロードする場合、Node-REDユ�
     "node-red": "0.18.7",
 ```
 
-(9) シンボリックリンクを準備
+(9) カレントディレクトリをNode-REDのホームディレクトリに変更します（通常、Node-REDのホームディレクトリは、ホームディレクトリの下の".node-red"です）
 
-    sudo npm link
+    cd ~/.node-red
 
 (10) シンボリックリンクを作成
 
-    cd ~/.node-red/
-    npm link node-red-contrib-format-date
+    npm install <path-to>/node-red-contrib-format-date
 
 (11) Node-REDを再起動
 
@@ -725,8 +754,60 @@ functionノードに外部モジュールをロードする場合、Node-REDユ�
 
    -> Node-REDフローエディタ上でformat-dateノードを使用できます。
 
+<a name="how-to-create-a-node-from-subflow"></a>
+
+## サブフローからノードを生成する方法
+
+サブフローを作成し、サブフローテンプレートのモジュールプロパティを記入します。サブフローテンプレートを表示した状態で、Node-REDエディタの"書き出し"メニューを使用して、JSON形式のサブフローデータをダウンロードします。
+
+(1) サブフローをJSONファイルとしてエクスポート
+
+   ここでは、モジュールプロパティでモジュール名としてnode-red-contrib-qrcodeを指定し、サブフローのJSONデータをqrcode.jsonにダウンロードした場合を想定します。
+
+(2) node-red-nodegenコマンドを使用してノードを生成
+
+    node-red-nodegen qrcode.json
+
+Node-REDユーザは通常、以下の手順で生成したノードをNode-REDフローエディタのパレットにインポートします。
+
+(3) カレントディレクトリをNode-REDのホームディレクトリに変更します（通常、Node-REDのホームディレクトリは、ホームディレクトリの下の".node-red"です）
+
+    cd ~/.node-red
+
+(4) シンボリックリンクを作成
+
+    npm install <path-to>/node-red-contrib-qrcode
+
+(5) Node-REDを起動
+
+    node-red
+
+(6) Node-REDフローエディタにアクセス (http://localhost:1880)
+
+-> 生成されたノードがNode-REDフローエディタのパレットに表示されます。
+
+(7) 生成されたノードをワークスペースにドラッグアンドドロップ
+
+(8) Node-REDフローエディタでフローを作成
+
+-> injectノード、生成されたノードおよびdebugノードからなるフローが、最初のステップに適しています。
+
+(11) フローを実行
+
+-> この例では、injectノードのボタンをクリックすると、受信したデータをデバッグタブに表示します。
+
+### コマンドラインオプション
+
+生成したノードをカスタマイズする場合は、次の手順やコマンドラインオプションが役立ちます。
+
+#### 暗号化(実験機能)
+
+ノードジェネレータは生成したノードのサブフロー定義を暗号化することができます。暗号化を行うには、--encodingオプションにAESを、-encodekeyに暗号化キーを指定してください。暗号化指定したノードを利用する場合は、環境変数NR_FLOW_DECODE_KEYに暗号化キーを指定します。
+
 <a name="how-to-create-a-node-from-thing-description"></a>
+
 ## Thing Descriptionからノードを生成する方法
+
 node-red-nodegenコマンドの最初の引数として、Thing Description(TD)のURL又はファイルパスを指定できます。URL、または拡張子が".jsonld"でないファイルを指定する場合は、`--wottd`オプションをつける必要があります。また、もしURL指定でTDを取得する場合には、`--lang`オプションをつけることで指定した言語のTDを取得することもできます。
 
 (1) node-red-nodegenコマンドを使用してノードを生成
@@ -774,9 +855,11 @@ Node-REDユーザは通常、以下の手順で生成したノードをNode-RED�
   - イベントが発生すると、ノードはイベント内容をmsg.payloadに入れたメッセージを出力します。
 
 ### コマンドラインオプション
+
 生成したノードをカスタマイズする場合は、次の手順やコマンドラインオプションが役立ちます。
 
 #### モジュール名
+
 ノードジェネレータは、モジュール名のデフォルトのプレフィックスとして "node-red-contrib-"を使用します。またノード名はTDの"name"プロパティから取られます。
 デフォルトのモジュール名を変更したい場合は、`--module`又は`--prefix`オプションを使用してモジュール名を指定できます。
 
@@ -784,6 +867,7 @@ Node-REDユーザは通常、以下の手順で生成したノードをNode-RED�
     node-red-nodegen td.jsonld --prefix node-red-wot
 
 #### ノード名
+
 Thing Descriptionから生成したノードの場合、Thing Descriptionの"name"プロパティを生成ノードの名前として使用します。
 ノードジェネレータは、npmモジュールとNode-REDノードで利用できる適切な名前を変換するために、大文字とスペースをハイフンに置き換えます。
 
@@ -793,6 +877,7 @@ Thing Descriptionから生成したノードの場合、Thing Descriptionの"nam
     node-red-nodegen td.jsonld --name new-node-name
 
 #### バージョン
+
 デフォルトでは、ノードジェネレータはモジュールのバージョン番号として "version"プロパティを使用します。
 
 Thing Descriptionのバージョン番号をインクリメントせずにモジュールのバージョン番号を更新する場合は、`--version`オプションを指定します。
@@ -802,6 +887,7 @@ Thing Descriptionのバージョン番号をインクリメントせずにモジ
     node-red-nodegen td.jsonld --version 0.0.2
 
 #### キーワード
+
 `--keywords`は、モジュールのキーワードのために用いる便利なオプションです。
 フローライブラリのWebサイトで、訪問者はこのキーワードを使用してモジュールを検索します。
 例えば、 "lamp"をキーワードとして使用する場合は、`--keywords`オプションを使用して単語を指定できます。
@@ -818,6 +904,7 @@ Thing Descriptionのバージョン番号をインクリメントせずにモジ
     node-red-nodegen td.jsonld --keyword lamp,led,node-red
 
 #### カテゴリ
+
 Node-REDフローエディタのパレットでは、生成したノードはデフォルトとして「Web of Things」カテゴリに入ります。
 カテゴリを変更する場合は、`--category`オプションを用います。
 例えば、次のコマンドが出力するノードは、Node-REDフローエディタの「分析」カテゴリに入ります。
@@ -825,17 +912,20 @@ Node-REDフローエディタのパレットでは、生成したノードはデ
     node-red-nodegen td.jsonld --category analysis
 
 #### ノードアイコン
+
 ノードジェネレータのコマンドは、生成されるノードのアイコンファイルを指定するための`--icon`オプションをサポートしています。
 オプションにはPNGファイルパス、または[ストックアイコンのファイル名](https://nodered.org/docs/creating-nodes/appearance)を使用できます。アイコンは透明な背景上に白色で表示したPNGファイルである必要があります。
 
     node-red-nodegen td.jsonld --icon  <PNGファイル、またはストックアイコン>
 
 #### ノードの色
+
 ノードジェネレータはデフォルトでノードテンプレートで定義されたノードの色を使用します。変更する必要がある場合は、コマンドラインの`--color`オプションを使用できます。オプションには、ノードの色を表す16進数("RRGGBB"形式)の文字列を指定できます。
 
     node-red-nodegen td.jsonld --color FFFFFF
 
 #### 情報タブ内のノードの情報
+
 ノードジェネレータは、Thing Descriptionの次のプロパティを使用して、情報タブにノードの情報を自動的に生成します。
 
 - description: ノードの説明
@@ -846,10 +936,12 @@ Node-REDフローエディタのパレットでは、生成したノードはデ
 情報タブのノード情報を変更したい場合は、生成されたノードのHTMLファイルの最後のセクションを編集します。
 
 #### README
+
 ノードの詳細を説明は、README.mdというファイルに書きます。 
 フローライブラリにノードを公開すると、フローライブラリのWebサイトは、ノードのページで本ファイルを表示します。
 ノードジェネレータはREADME.mdのテンプレートを出力するので、ファイルを変更するだけです。
 
 ## 既知の問題点
+
 - ノードジェネレータのコマンドでは、非同期の問題があるため、--tgzオプションと--iconオプションを同時に使用することはできません。
 - OpenAPIドキュメントの値`info.title`は生成されたコードの変数名として使われるため、アルファベットの文字（数字ではない）で始める必要があります。

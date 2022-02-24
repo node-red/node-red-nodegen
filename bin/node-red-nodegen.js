@@ -27,6 +27,8 @@ var nodegen = require('../lib/nodegen.js');
 var options = {};
 options.tgz = argv.tgz;
 options.obfuscate = argv.obfuscate;
+options.encoding = argv.encoding;
+options.encodekey = argv.encodekey;
 
 var data = {
     prefix: argv.prefix || argv.p,
@@ -57,6 +59,8 @@ function help() {
         ' [--tgz]' +
         ' [--help]' +
         ' [--wottd]' +
+        ' [--encoding <encoding>]' +
+        ' [--encodekey <encoding key>]' +
         ' [--lang <accept-language>]' +
         ' [-v]\n' +
         '\n' +
@@ -66,7 +70,7 @@ function help() {
         'Supported source:'.bold + '\n' +
         '   - OpenAPI document\n' +
         '   - Function node (js file in library, "~/.node-red/lib/function/")\n' +
-        // '   - Subflow node (json file of subflow)\n' +
+        '   - Subflow node (json file of subflow)\n' +
         '   - (Beta) Thing Description of W3C Web of Things (jsonld file or URL that points jsonld file)\n' +
         '\n' +
         'Options:\n'.bold +
@@ -82,6 +86,8 @@ function help() {
         '   --tgz : Save node as tgz file\n' +
         '   --help : Show help\n' +
         '   --wottd : explicitly instruct source file/URL points a Thing Description\n' +
+        '   --encoding : Encoding scheme of subflow (none or AES)\n' +
+        '   --encodekey : Encoding key of subflow\n' +
         '   --lang : Language negotiation information when retrieve a Thing Description\n' +
         '   -v : Show node generator version\n';
     console.log(helpText);
@@ -100,6 +106,13 @@ function skipBom(body) {
     } else {
         return body;
     }
+}
+
+function isSubflowDefinition(data) {
+    return data.find((item) => {
+        return ((item.type === "subflow") &&
+                (item.hasOwnProperty("meta")));
+    });
 }
 
 if (argv.help || argv.h) {
@@ -122,7 +135,12 @@ if (argv.help || argv.h) {
             var content = JSON.parse(fs.readFileSync(sourcePath));
             if (Array.isArray(content)) {
                 data.src = content;
-                promise = nodegen.FunctionNodeGenerator(data, options);
+                if (isSubflowDefinition(content)) {
+                    promise = nodegen.SubflowNodeGenerator(data, options);
+                }
+                else {
+                    promise = nodegen.FunctionNodeGenerator(data, options);
+                }
             } else {
                 promise = nodegen.SwaggerNodeGenerator(data, options);
             }
