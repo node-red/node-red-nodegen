@@ -13,7 +13,8 @@ module.exports = function (grunt) {
         },
         simplemocha: {
             options: {
-                timeout: 10000
+                timeout: 10000,
+                retries: 10
             },
             all: {
                 src: [ 'test/**/*_spec.js' ]
