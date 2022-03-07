@@ -19,7 +19,6 @@ describe('Function node', function () {
             fs.statSync(result + '/icons/icon.svg').size.should.be.above(0);
             fs.statSync(result + '/README.md').size.should.be.above(0);
             fs.statSync(result + '/LICENSE').size.should.be.above(0);
-            fs.statSync(result + '/.travis.yml').size.should.be.above(0);
             del.sync(result);
             done();
         });

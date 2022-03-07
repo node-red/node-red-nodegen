@@ -28,7 +28,6 @@ describe('swagger node', function () {
             fs.statSync(result + '/locales/zh-CN/node.json').size.should.be.above(0);
             fs.statSync(result + '/README.md').size.should.be.above(0);
             fs.statSync(result + '/LICENSE').size.should.be.above(0);
-            fs.statSync(result + '/.travis.yml').size.should.be.above(0);
             del.sync(result);
             done();
         });
