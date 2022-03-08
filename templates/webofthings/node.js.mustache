@@ -478,7 +478,8 @@ module.exports = function (RED) {
                     const urivars = prop.hasOwnProperty("uriVariables") ? msg.payload : {};
                     if (prop.uriVariables) {
                         const ajv = new Ajv({allErrors: true, strict: false, validateFormats: false});
-                        if (!ajv.validate(prop.uriVariables, urivars)) {
+                        const uvschema = { type: "object", properties: prop.uriVariables };
+                        if (!ajv.validate(uvschema, urivars)) {
                             node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
                         }
                     }
@@ -512,7 +513,8 @@ module.exports = function (RED) {
                 const urivars = prop.hasOwnProperty("uriVariables") ? msg.payload : {};
                 if (prop.uriVariables) {
                     const ajv = new Ajv({allErrors: true, strict: false, validateFormats: false});
-                    if (!ajv.validate(prop.uriVariables, urivars)) {
+                    const uvschema = { type: "object", properties: prop.uriVariables };
+                    if (!ajv.validate(uvschema, urivars)) {
                         node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
                     }
                 }
@@ -533,7 +535,8 @@ module.exports = function (RED) {
                 const urivars = act.hasOwnProperty("uriVariables") ? msg.payload : {};
                 if (act.uriVariables) {
                     const ajv = new Ajv({allErrors: true, strict: false, validateFormats: false});
-                    if (!ajv.validate(act.uriVariables, urivars)) {
+                    const uvschema = { type: "object", properties: act.uriVariables };
+                    if (!ajv.validate(uvschema, urivars)) {
                         node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
                     }
                 }
@@ -556,7 +559,8 @@ module.exports = function (RED) {
             const urivars = ev.hasOwnProperty("uriVariables") ? msg.payload : {};
             if (ev.uriVariables) {
                 const ajv = new Ajv({allErrors: true, strict: false, validateFormats: false});
-                if (!ajv.validate(ev.uriVariables, urivars)) {
+                const uvschema = { type: "object", properties: ev.uriVariables };
+                if (!ajv.validate(uvschema, urivars)) {
                     node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
                 }
             }
