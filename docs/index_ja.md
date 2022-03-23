@@ -804,7 +804,7 @@ Node-REDユーザは通常、以下の手順で生成したノードをNode-RED�
 
 ノードジェネレータは生成したノードのサブフロー定義を暗号化することができます。暗号化を行うには、--encodingオプションにAESを、-encodekeyに暗号化キーを指定してください。暗号化指定したノードを利用する場合は、環境変数NR_FLOW_DECODE_KEYに暗号化キーを指定します。
 
-<a name="how-to-create-a-node-from-thing-description"></a>
+<a name="how-to-create-a-node-from-wot-thing-description"></a>
 
 ## Thing Descriptionからノードを生成する方法
 

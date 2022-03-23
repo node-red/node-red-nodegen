@@ -801,7 +801,7 @@ If you want to customize the generated node, the following procedures and comman
 
 Node generater can encrypt subflow definition included in generated code.  Specify AES to --encoding option and encoding key to --encodekey option.  When using the node with encrypted subflow definition, specify the encoding key to OS environment variable `NR_FLOW_DECODE_KEY` before starting Node-RED.
 
-<a name="how-to-create-a-node-from-thing-description"></a>
+<a name="how-to-create-a-node-from-wot-thing-description"></a>
 
 ## How to create a node from WoT Thing Description
 
