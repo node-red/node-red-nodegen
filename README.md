@@ -47,7 +47,7 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 
 - node-red-nodegen http://petstore.swagger.io/v2/swagger.json
 - cd ~/.node-red
-- npm install *<path-to>*/node-red-contrib-swagger-petstore
+- npm install \<path-to\>/node-red-contrib-swagger-petstore
 - node-red
 
 -> You can use swagger-petstore node on Node-RED flow editor.
@@ -57,7 +57,7 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 - In Node-RED flow editor, edit the function node and to the right of the 'name' option, click on the book icon and select 'Save to library'. Then fill in the 'Export as' with the file name (lower-case.js).
 - node-red-nodegen ~/.node-red/lib/functions/lower-case.js
 - cd ~/.node-red
-- npm install *<path-to>*/node-red-contrib-lower-case
+- npm install \<path-to\>/node-red-contrib-lower-case
 - node-red
 
 -> You can use lower-case node on Node-RED flow editor.
@@ -66,7 +66,7 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 
 - node-red-nodegen example.jsonld
 - cd ~/.node-red
-- npm install *<path-to>*/node-red-contrib-example-thing
+- npm install \<path-to\>/node-red-contrib-example-thing
 - node-red
 
 -> You can use Example Thing node on Node-RED flow editor.
@@ -75,7 +75,7 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 
 - node-red-nodegen http://example.com/td.jsonld --wottd --lang "en-US,en;q=0.5"
 - cd ~/.node-red
-- npm install *<path-to>*/node-red-contrib-example-thing
+- npm install \<path-to\>/node-red-contrib-example-thing
 - node-red
 
 -> You can use Example Thing node on Node-RED flow editor.
@@ -86,7 +86,7 @@ You may need to run this with `sudo`, or from within an Administrator command sh
 - Export JSON definition of the SUBFLOW template from Export menu.  We assume it is saved to a file named qrcode.json.
 - node-red-nodegen qrcode.json
 - cd ~/.node-red
-- npm install *<path-to>*/node-red-contrib-qrcode
+- npm install \<path-to\>/node-red-contrib-qrcode
 - node-red
 
 -> You can use qrcode node on Node-RED flow editor.
