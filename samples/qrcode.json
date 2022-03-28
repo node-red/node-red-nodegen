@@ -3,7 +3,7 @@
         "id": "921a4b1d.07bb68",
         "type": "subflow",
         "name": "QRcode",
-        "info": "",
+        "info": "This node generates a QR code from the text data in the `msg.payload`. The QR code in the outputted `msg.payload` is text data (not image data) described by text which consists of black rectangles and white spaces. Therefore, you can use the debug node to see the QR code.\n\n### Inputs\n- `payload` - _string_\n\n  Text data which is converted to QR code\n\n### Outputs\n- `payload` - _string_\n\n  Text data which contains QR code\n\n**Note**: This node uses the [node-qrcode](https://www.npmjs.com/package/qrcode) module to generate QR codes.",
         "category": "",
         "in": [
             {
