@@ -1,11 +1,11 @@
-module.exports = function(RED) {
+module.exports = function (RED) {
     const fs = require('fs');
     const path = require("path");
-    const crypt = require("crypto-js");
-
     const file = path.join(__dirname, "subflow.json");
     const text = fs.readFileSync(file);
     const flow = JSON.parse(text);
+    {{#encoding}}
+    const crypt = require("crypto-js");
 
     function getDecoder(encoding) {
         var settings = RED.settings;
@@ -63,4 +63,8 @@ module.exports = function(RED) {
     }
 
     RED.nodes.registerSubflow(convFlow(flow));
+    {{/encoding}}
+    {{^encoding}}
+    RED.nodes.registerSubflow(flow);
+    {{/encoding}}
 }

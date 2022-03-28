@@ -1,18 +1,21 @@
 {
-    "name": "{{&projectName}}",
-    "version": "{{&projectVersion}}",
-    "description": "Node-RED node for {{&nodeName}}",
-    "node-red": {
-        "nodes": {
-            "{{&nodeName}}": "subflow.js"
-        }
-    },
-    "keywords": [
-        {{#keywords}}
-        "{{name}}"{{^last}}, {{/last}}
-        {{/keywords}}
-    ],
-    "dependencies": {
-        "crypto-js": "4.1.1"
+  "name": "{{&projectName}}",
+  "version": "{{&projectVersion}}",
+  "description": "Node-RED node for {{&nodeName}}",
+  "keywords": [
+    {{#keywords}}
+    "{{name}}"{{^last}}, {{/last}}
+    {{/keywords}}
+  ],
+  "node-red": {
+    "nodes": {
+      "{{&nodeName}}": "subflow.js"
     }
+  },
+  {{#encoding}}
+  "dependencies": {
+    "crypto-js": "4.1.1"
+  },
+  {{/encoding}}
+  "license": "{{&licenseName}}"
 }
