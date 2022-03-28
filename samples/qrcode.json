@@ -1,1 +1,66 @@
-[{"id":"921a4b1d.07bb68","type":"subflow","name":"QRcode","info":"","category":"","in":[{"x":140,"y":120,"wires":[{"id":"e563f491.e443f8"}]}],"out":[{"x":380,"y":120,"wires":[{"id":"e563f491.e443f8","port":0}]}],"env":[],"meta":{"module":"node-red-contrib-qrcode","type":"qrcode","version":"0.1.0","author":"hiroyasu.nishiyama.uq@hitachi.com","desc":"Node-RED node for converting string to QRcode","keywords":"Node-RED, subflow, QRcode","license":"Apache-2.0"},"color":"#87A980","icon":"font-awesome/fa-qrcode"},{"id":"e563f491.e443f8","type":"function","z":"921a4b1d.07bb68","name":"","func":"qrcode.toString(msg.payload, (err,str) => {\n    if (err) {\n        node.error(err);\n        return;\n    }\n    node.send({payload: str});\n});","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[{"var":"qrcode","module":"qrcode"}],"x":260,"y":120,"wires":[[]]}]
+[
+    {
+        "id": "921a4b1d.07bb68",
+        "type": "subflow",
+        "name": "QRcode",
+        "info": "This node generates a QR code from the text data in the `msg.payload`. The QR code in the outputted `msg.payload` is text data (not image data) described by text which consists of black rectangles and white spaces. Therefore, you can use the debug node to see the QR code.\n\n### Inputs\n- `payload` - _string_\n\n  Text data which is converted to QR code\n\n### Outputs\n- `payload` - _string_\n\n  Text data which contains QR code\n\n**Note**: This node uses the [node-qrcode](https://www.npmjs.com/package/qrcode) module to generate QR codes.",
+        "category": "",
+        "in": [
+            {
+                "x": 140,
+                "y": 120,
+                "wires": [
+                    {
+                        "id": "e563f491.e443f8"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 380,
+                "y": 120,
+                "wires": [
+                    {
+                        "id": "e563f491.e443f8",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {
+            "module": "node-red-contrib-qrcode",
+            "type": "qrcode",
+            "version": "0.1.0",
+            "author": "hiroyasu.nishiyama.uq@hitachi.com",
+            "desc": "Node-RED node for converting string to QRcode",
+            "keywords": "Node-RED, subflow, QRcode",
+            "license": "Apache-2.0"
+        },
+        "color": "#87A980",
+        "icon": "font-awesome/fa-qrcode"
+    },
+    {
+        "id": "e563f491.e443f8",
+        "type": "function",
+        "z": "921a4b1d.07bb68",
+        "name": "",
+        "func": "qrcode.toString(msg.payload, (err,str) => {\n    if (err) {\n        node.error(err);\n        return;\n    }\n    node.send({payload: str});\n});",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "qrcode",
+                "module": "qrcode"
+            }
+        ],
+        "x": 260,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    }
+]
