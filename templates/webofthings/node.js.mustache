@@ -7,6 +7,7 @@ module.exports = function (RED) {
     const urltemplate = require('url-template');
     const Ajv = require('ajv').default;
     const nodecoap = require('coap');
+    const mqtt = require('mqtt');
 
     function extractTemplate(href, context={}) {
         return urltemplate.parse(href).expand(context);
@@ -15,9 +16,9 @@ module.exports = function (RED) {
     function getResType(form) {
         if (form) {
             if (form.response && form.response.contentType) {
-                return form.response.contentType;
+                return form.response.contentType.split(';')[0];
             } else if (form.contentType) {
-                return form.contentType;
+                return form.contentType.split(';')[0];
             }
         }
         return "application/json";
@@ -25,7 +26,7 @@ module.exports = function (RED) {
 
     function isBinaryType(contentType) {
         let result;
-        switch (contentType) {
+        switch (contentType.split(';')[0]) {
             case "image/jpeg":
             case "application/octet-stream":
                 result = true;
@@ -35,6 +36,101 @@ module.exports = function (RED) {
                 break;
         }
         return result;
+    }
+
+    function bindingMqtt(node, send, done, form, options={}) { // options.interaction, options.reqbody, options.msg
+        let jobqueue = []; // [{topic, op: "publish"/"subscribe"/"subscribeonce", msg, callback(recvmsg)}]
+        const mqttcli = options.mqttcli;
+        mqttcli.on('connect', () => {
+            node.trace('connected to broker');
+            flushJobQueue();
+        });
+        function flushJobQueue() {
+            jobqueue.forEach((e) => {
+                processMqttOp(e);
+            });
+            jobqueue = [];
+        }
+        function processMqttOp({ topic, op, msg, callback }) {
+            switch (op) {
+                case "publish":
+                    mqttcli.publish(topic, msg);
+                    break;
+                case "subscribe":
+                    mqttcli.on('message', (t, m, _) => {
+                        if (t !== topic) {
+                            node.trace(`wrong topic: ${t}`);
+                        }
+                        callback(m);
+                    })
+                    mqttcli.subscribe(topic);
+                    break;
+                case "subscribeonce":
+                    mqttcli.once('message', (t, m, _) => {
+                        if (t !== topic) {
+                            node.trace(`wrong topic: ${t}`);
+                        }
+                        mqttcli.unsubscribe(topic);
+                        callback(m);
+                    })
+                    mqttcli.subscribe(topic);
+                default:
+                    // unknown op
+                    break;
+            }
+        }
+        function mkmessage(form, origmessage) {
+            let retval;
+            if (getResType(form) == "application/json") {
+                try {
+                    retval = {payload: JSON.parse(origmessage.toString())};
+                } catch (_) {
+                    retval = {payload: origmessage};
+                }
+            } else {
+                retval = {payload: origmessage};
+            }
+            return retval;
+        }
+ 
+        const msg = options.msg || {};
+        const topic = (new URL(extractTemplate(form.href, options.urivars))).pathname.slice(1);
+        node.trace(`interaction: ${options.interaction}`);
+        switch (options.interaction) {
+            case "property-read":
+                node.trace(`MQTT subscribe (property-read)`);
+                jobqueue.push({topic, op: "subscribeonce", callback: (m) => {
+                    send(mkmessage(form, m));
+                    done();
+                }});
+                break;
+            case "property-write":
+                node.trace(`MQTT publish (property-write)`);
+                jobqueue.push({topic, op: "publish", msg: JSON.stringify(options.reqbody), callback: (_) => {done()}});
+                break;
+            case "property-observe":
+                node.trace(`MQTT subscribe (property-observe)`);
+                jobqueue.push({topic, op: "subscribe", callback: (m) => {
+                    node.send(mkmessage(form, m));
+                }});
+                break;
+            case "action": 
+                node.trace(`MQTT publish (action)`);
+                jobqueue.push({topic, op: "publish", msg: JSON.stringify(options.reqbody), callback: (_) => {done()}});
+                break;
+            case "event":
+                node.trace(`MQTT subscribe (event)`);
+                jobqueue.push({topic, op: "subscribe", callback: (m) => {
+                    node.send(mkmessage(form, m));                   
+                }});
+                break;
+            default:
+                node.trace(`Unknown interaction`);
+                break;
+        }
+        if (mqttcli.connected) {
+            flushJobQueue();
+        } 
     }
 
     function coapMethodCodeToName(methodCode) {
@@ -451,6 +547,26 @@ module.exports = function (RED) {
         return auth;
     }
 
+    function setupMqttConnection(form, node) {
+        const u = new URL(form.href);
+        const mqtturi = `${u.protocol}//${u.host}`;
+        const cli = mqtt.connect(mqtturi);
+        cli.on('connect', ()=> {
+            node.status({fill:"green", shape:"dot", text:"connected"});
+        });
+        cli.on('reconnect', () => {
+            node.status({fill:"yellow", shape:"dot", text:"reconnecting..."});
+        });
+        cli.on('offline', () => {
+            node.status({fill:"red", shape:"ring", text:"disconnected"});
+        });
+        cli.on('error', () => {
+            node.status({fill:"red", shape:"dot", text:"error"});
+        });
+        return cli;
+    }
+
+
     function Node(config) {
         RED.nodes.createNode(this, config);
         const node = this;
@@ -465,16 +581,20 @@ module.exports = function (RED) {
         const username = node.credentials.username;
         const password = node.credentials.password;
         const token = node.credentials.token;
+        let mqttcli = null;
      
         node.td = {{{tdstr}}};
         const normTd = {{{normtd}}};
         if (node.interactiontype === "property") {
+            const prop = normTd.properties[node.propname];
+            const form = prop.forms[node.formindex];// formSelection("property-read", prop.forms);
+            const auth = makeauth(normTd, form, username, password, token);
+            if (form.href.match(/^mqtt:/)) {
+                mqttcli = setupMqttConnection(form, node);
+            }
             if (node.proptype === "read") {
                 node.on("input", (msg, send, done) => {
                     send = send || function() { node.send.apply(node,arguments) };
-                    const prop = normTd.properties[node.propname];
-                    const form = prop.forms[node.formindex];// formSelection("property-read", prop.forms);
-                    const auth = makeauth(normTd, form, username, password, token);
                     const urivars = prop.hasOwnProperty("uriVariables") ? msg.payload : {};
                     if (prop.uriVariables) {
                         const ajv = new Ajv({allErrors: true, strict: false, validateFormats: false});
@@ -487,14 +607,13 @@ module.exports = function (RED) {
                         bindingHttp(node, send, done, form, {interaction:"property-read", auth, msg, urivars, outschema: prop});
                     } else if (form.href.match(/^coaps?:/)) {
                         bindingCoap(node, send, done, form, {interaction:"property-read", auth, msg, urivars, outschema: prop});
+                    } else if (form.href.match(/^mqtt:/)) {
+                        bindingMqtt(node, send, done, form, {interaction:"property-read", auth, msg, urivars, outschema: prop, mqttcli});
                     }
                 });
             } else if (node.proptype === "write") {
                 node.on("input", (msg, send, done) => {
                     send = send || function() { node.send.apply(node,arguments) };
-                    const prop = normTd.properties[node.propname];
-                    const form = prop.forms[node.formindex];// formSelection("property-write", prop.forms);
-                    const auth = makeauth(normTd, form, username, password, token);
                     const ajv = new Ajv({allErrors: true, strict: false, validateFormats: false});
                     if (!ajv.validate(prop, msg.payload)) {
                         node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
@@ -504,34 +623,31 @@ module.exports = function (RED) {
                         bindingHttp(node, send, done, form, {interaction: "property-write", auth, msg, reqbody: msg.payload}); 
                     } else if (form.href.match(/^coaps?:/)) {
                         bindingCoap(node, send, done, form, {interaction: "property-write", auth, msg, reqbody: msg.payload}); 
+                    } else if (form.href.match(/^mqtt:/)) {
+                        bindingMqtt(node, send, done, form, {interaction: "property-write", auth, msg, reqbody: msg.payload, mqttcli});
                     }
                 });
             } else if (node.proptype === "observe") {
-                const prop = normTd.properties[node.propname];
-                const form = prop.forms[node.formindex];// formSelection("property-observe", prop.forms);
-                const auth = makeauth(normTd, form, username, password, token);
-                const urivars = prop.hasOwnProperty("uriVariables") ? msg.payload : {};
-                if (prop.uriVariables) {
-                    const ajv = new Ajv({allErrors: true, strict: false, validateFormats: false});
-                    const uvschema = { type: "object", properties: prop.uriVariables };
-                    if (!ajv.validate(uvschema, urivars)) {
-                        node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
-                    }
-                }
+                const urivars = {};
                 if (form.href.match(/^wss?:/)) { // websocket
                     bindingWebSocket(node, form, {auth, urivars, outschema: prop});
                 } else if (form.href.match(/^coaps?:/)) { // CoAP observe
                     bindingCoapObserve(node, form, {auth, urivars, outschema: prop});
-                } else { // long polling
+                } else if (form.href.match(/^https?:/)) { // long polling
                     bindingLongPoll(node, form, {auth, urivars, outschema: prop});
+                } else if (form.href.match(/^mqtt:/)) {
+                    bindingMqtt(node, undefined, undefined, form, {interaction: "property-observe", auth, urivars, outschema: prop, mqttcli});
                 }               
             }
         } else if (node.interactiontype === "action") {
+            const act = normTd.actions[node.actname];
+            const form = act.forms[node.formindex];// formSelection("action", act.forms);
+            const auth = makeauth(normTd, form, username, password, token);
+            if (form.href.match(/^mqtt:/)) {
+                mqttcli = setupMqttConnection(form, node);
+            }
             node.on("input", (msg, send, done) => {
                 send = send || function() { node.send.apply(node,arguments) };
-                const act = normTd.actions[node.actname];
-                const form = act.forms[node.formindex];// formSelection("action", act.forms);
-                const auth = makeauth(normTd, form, username, password, token);
                 const urivars = act.hasOwnProperty("uriVariables") ? msg.payload : {};
                 if (act.uriVariables) {
                     const ajv = new Ajv({allErrors: true, strict: false, validateFormats: false});
@@ -550,28 +666,33 @@ module.exports = function (RED) {
                     bindingHttp(node, send, done, form, {interaction: "action", auth, msg, urivars, reqbody:msg.payload});
                 } else if (form.href.match(/^coaps?/)) {
                     bindingCoap(node, send, done, form, {interaction: "action", auth, msg, urivars, reqbody:msg.payload});
+                } else if (form.href.match(/^mqtt:/)) {
+                    bindingMqtt(node, send, done, form, {interaction: "action", auth, msg, urivars, reqbody:msg.payload, mqttcli});
                 }                
             });
         } else if (node.interactiontype === "event") {
             const ev = normTd.events[node.evname];
             const form = ev.forms[node.formindex];// formSelection("event", ev.forms);
             const auth = makeauth(normTd, form, username, password, token);
-            const urivars = ev.hasOwnProperty("uriVariables") ? msg.payload : {};
-            if (ev.uriVariables) {
-                const ajv = new Ajv({allErrors: true, strict: false, validateFormats: false});
-                const uvschema = { type: "object", properties: ev.uriVariables };
-                if (!ajv.validate(uvschema, urivars)) {
-                    node.warn(`input schema validation error: ${ajv.errorsText()}`, msg);
-                }
+            if (form.href.match(/^mqtt:/)) {
+                mqttcli = setupMqttConnection(form, node);
             }
+            const urivars = {};
             if (form.href.match(/^wss?:/)) { // websocket
                 bindingWebSocket(node, form, {auth, urivars});
             } else if (form.href.match(/^coaps?:/)) {
                 bindingCoapObserve(node, form, {auth, urivars});
-            } else { // long polling
+            } else if (form.href.match(/^https?:/)) { // long polling
                 bindingLongPoll(node, form, {auth, urivars});
-            }               
+            } else if (form.href.match(/^mqtt:/)) {
+                bindingMqtt(node, undefined, undefined, form, {interaction: "event", auth, urivars, mqttcli });
+            }              
         }
+        node.on('close', () => {
+            if (mqttcli) {
+                mqttcli.end(true);
+            }
+        });
     }
     
     RED.nodes.registerType("{{&nodeName}}", Node, {
