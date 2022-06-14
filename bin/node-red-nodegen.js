@@ -110,8 +110,7 @@ function skipBom(body) {
 
 function isSubflowDefinition(data) {
     return data.find((item) => {
-        return ((item.type === "subflow") &&
-                (item.hasOwnProperty("meta")));
+        return item.type === "subflow";
     });
 }
 
@@ -156,7 +155,6 @@ if (argv.help || argv.h) {
             promise.then(function (result) {
                 console.log('Success: ' + result);
             }).catch(function (error) {
-                console.log('Error: ' + error);
                 console.log(error.stack);
             });
         }
