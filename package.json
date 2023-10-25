@@ -48,7 +48,7 @@
     "api-spec-converter": "2.12.0",
     "axios": "0.26.0",
     "colors": "1.4.0",
-    "crypto-js": "4.1.1",
+    "crypto-js": "4.2.0",
     "csv-string": "4.1.0",
     "javascript-obfuscator": "1.12.1",
     "jimp": "0.16.1",
